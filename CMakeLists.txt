@@ -9,4 +9,4 @@ set(HEAD_FILES include/io.h)
 
 set(SOURCE_FILES src/main.cpp)
 
-add_executable(bin/SeedCup2016 ${SOURCE_FILES} ${HEAD_FILES})
+add_executable(SeedCup2016 ${SOURCE_FILES} ${HEAD_FILES})
