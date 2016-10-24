@@ -5,6 +5,6 @@ using namespace std;
 using namespace cParser;
 
 int main(int argc, char const *argv[]) {
-  io::write("test_write", io::read("test"));
+  io::write("output.txt", io::read("input.txt"));
   return 0;
 }
