@@ -3,10 +3,12 @@ project(C_parser)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+add_subdirectory(test)
+
 include_directories(include)
 
-set(HEAD_FILES include/io.h)
+set(C_PARSER_HEAD include/)
 
-set(SOURCE_FILES src/main.cpp)
+set(C_PARSER_SRC src/main.cpp)
 
-add_executable(SeedCup2016 ${SOURCE_FILES} ${HEAD_FILES})
+add_executable(SeedCup2016 ${C_PARSER_SRC} ${C_PARSER_HEAD})
