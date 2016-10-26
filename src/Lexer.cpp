@@ -6,7 +6,7 @@
 using namespace std;
 
 void Lexer::init() {
-  INT = Token("int", TokenType::Int, "int");
+  INT = Token("int", TokenType ::Int, "int");
   DOUBLE = Token("double", TokenType::Double, "double");
   FLOAT = Token("float", TokenType::Float, "float");
   LONG = Token("long", TokenType::Long, "long");
@@ -77,243 +77,251 @@ Lexer::Lexer(const string &code) : code(code) {
   pos = 0;
   line = 0;
   init();
-  finished = false;
+  initFunctions();
 }
 
 /*
  * Get all the tokens into token list.
  */
 void Lexer::lexan() {
+  while (pos < code.length()) {
+    next();
+  }
+  if (pos != 0) {
+    line++;
+  }
+}
+
+void Lexer::push(Token *token) {
+  curr_token = *token;
+//  cout << "current token " << curr_token << ", at pos " << pos << endl;
+  tokens.push_back(token);
+}
+
+void Lexer::next() {
   int last_pos;
   int token;
-  while (pos < code.length()) {
-    while (1) {
-      if (pos == code.length()) {
-        break;
+  while (1) {
+    if (pos == code.length()) {
+      break;
+    }
+    token = code[pos];
+    ++pos;
+    if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
+      // find a variable
+      last_pos = pos - 1;
+      while ((code[pos] >= 'a' && code[pos] <= 'z')
+          || (code[pos] >= 'A' && code[pos] <= 'Z')
+          || (code[pos] >= '0' && code[pos] <= '9')
+          || (code[pos] == '_')) {
+        pos++;
       }
-      token = code[pos];
-      ++pos;
-
-      if (token == '\n') {
-        line++;
-      } else if (token == '#') {
-        while (code[pos] != 0 && code[pos] != '\n') {
-          pos++;
+      string name = code.substr((size_t)last_pos, (size_t)(pos - last_pos));
+      if (keywords.find(name) != keywords.end()) {
+        Token *t = &keywords.find(name)->second;
+        push(t);
+      } else {
+        Token *t = new Token("Var", TokenType::Var, name);
+        identifiers[name] = *t;
+        push(t);
+      }
+    } else if (token >= '0' && token <= '9') {
+      int token_val = token - '0';
+      if (token_val > 0) {
+        while (code[pos] >= '0' && code[pos] <= '9') {
+          token_val = token_val * 10 + code[pos++] - '0';
         }
-      } else if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
-        // find a variable
-        last_pos = pos - 1;
-        while ((code[pos] >= 'a' && code[pos] <= 'z')
-            || (code[pos] >= 'A' && code[pos] <= 'Z')
-            || (code[pos] >= '0' && code[pos] <= '9')
-            || (code[pos] == '_')) {
-          pos++;
-        }
-        string name = code.substr(last_pos, pos - last_pos);
-        if (keywords.find(name) != keywords.end()) {
-          Token* curr_token = &keywords.find(name)->second;
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token("Var", TokenType::Var);
-          curr_token->token_val = name;
-          identifiers[name] = *curr_token;
-          push(curr_token);
-        }
-        continue;
-      } else if (token >= '0' && token <= '9') {
-        int token_val = token - '0';
-        if (token_val > 0) {
-          while (code[pos] >= '0' && code[pos] <= '9') {
-            token_val = token_val * 10 + code[pos++] - '0';
-          }
-        } else {
-          if (code[pos] == 'x' || code[pos] == 'X') {
+      } else {
+        if (code[pos] == 'x' || code[pos] == 'X') {
+          token = code[++pos];
+          while ((token >= '0' && token <= '9') || (token >= 'a' && token <= 'f') || (token >= 'A' & token <= 'F')) {
+            token_val = token_val * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
             token = code[++pos];
-            while ((token >= '0' && token <= '9') || (token >= 'a' && token <= 'f') || (token >= 'A' & token <= 'F')) {
-              token_val = token_val * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
-              token = code[++pos];
-            }
-          } else {
-            while (code[pos] >= '0' && code[pos] <= '7') {
-              token_val = token_val * 8 + code[pos++] - '0';
-            }
-          }
-        }
-        Token* curr_token = new Token("Num", TokenType::Num);
-        curr_token->token_val = to_string(token_val);
-        push(curr_token);
-        continue;
-      } else if (token == '"' || token == '\'') {
-        // TODO: deal with escaped string.
-        int cur_pos = pos;
-        while (pos < code.length()) {
-          if (code[pos] == token) {
-            break;
-          }
-          if (code[pos] =='\\') {
-            pos++;
-          }
-          pos++;
-        }
-        if (code[pos] != token) {
-          pos = cur_pos;
-          continue;
-        }
-        if (pos - cur_pos == 1) {
-          Token* curr_token = new Token(string(1, code[cur_pos]), TokenType::Num);
-          curr_token->token_val = string(1, code[cur_pos]);
-          push(curr_token);
-        } else {
-          string name = code.substr(cur_pos, pos - cur_pos);
-          Token* curr_token = new Token(name, TokenType:: Str);
-          curr_token->token_val = name;
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '/') {
-        if (code[pos] == '/') {
-          while (code[pos] != 0 && code[pos] != '\n') {
-            ++pos;
           }
         } else {
-          Token* curr_token = new Token(DIV);
-          push(curr_token);
-          continue;
+          while (code[pos] >= '0' && code[pos] <= '7') {
+            token_val = token_val * 8 + code[pos++] - '0';
+          }
         }
-      } else if (token == '=') {
-        if (code[pos] == '=') {
-          pos++;
-          Token* curr_token = new Token(EQ);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(ASSIGN);
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '+') {
-        if (code[pos] == '+') {
-          pos++;
-          Token* curr_token = new Token(INC);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(ADD);
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '-') {
-        if (code[pos] == '-') {
-          pos++;
-          Token* curr_token = new Token(DEC);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(SUB);
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '!') {
-        if (code[pos] == '=') {
-          pos++;
-          Token* curr_token = new Token(NE);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(NOT);
-          push(curr_token);
-        }
-        //TODO: judge logical not
-        continue;
-      } else if (token == '<') {
-        if (code[pos] == '=') {
-          pos++;
-          Token* curr_token = new Token(LE);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(LT);
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '>') {
-        if (code[pos] == '=') {
-          pos++;
-          Token* curr_token = new Token(GE);
-          push(curr_token);
-        } else {
-          Token* curr_token = new Token(GT);
-          push(curr_token);
-        }
-        continue;
-      } else if (token == '|') {
-        if (code[pos] == '|') {
-          pos++;
-          Token* curr_token = new Token(LOR);
-          push(curr_token);
-        } else {
-          cout << "Invalid op" << endl;
-        }
-        continue;
-      } else if (token == '&') {
-        if (code[pos] == '&') {
-          pos++;
-          Token* curr_token = new Token(LAN);
-          push(curr_token);
-        } else {
-          cout << "Invalid op" << endl;
-        }
-        continue;
-      } else if (token == '%') {
-        Token* curr_token = new Token(MOD);
-        push(curr_token);
-        continue;
-      } else if (token == '*') {
-        Token* curr_token = new Token(MUL);
-        push(curr_token);
-        continue;
-      } else if (token == '[') {
-        Token* curr_token = new Token(L_BRAK);
-        push(curr_token);
-        continue;
-      } else if (token == '?') {
-        Token* curr_token = new Token(COND);
-        push(curr_token);
-        continue;
-      } else if (token == ']') {
-        Token* curr_token = new Token(R_BRAK);
-        push(curr_token);
-        continue;
-      } else if (token == '{') {
-        Token* curr_token = new Token(L_BR);
-        push(curr_token);
-        continue;
-      } else if (token == '}') {
-        Token* curr_token = new Token(R_BR);
-        push(curr_token);
-        continue;
-      } else if (token == '(') {
-        Token* curr_token = new Token(L_PH);
-        push(curr_token);
-        continue;
-      } else if (token == ')') {
-        Token* curr_token = new Token(R_PH);
-        push(curr_token);
-        continue;
-      } else if (token == ';') {
-        Token* curr_token = new Token(S_COLON);
-        push(curr_token);
-        continue;
-      } else if (token == ':') {
-        Token* curr_token = new Token(COLON);
-        push(curr_token);
-        continue;
-      } else if (token == ',') {
-        Token* curr_token = new Token(COMMA);
-        push(curr_token);
-        continue;
       }
+      Token *t = new Token("Num", TokenType::Num, to_string(token_val));
+      push(t);
+
+    } else if (token == '"' || token == '\'') {
+      // TODO: deal with escaped string.
+      int cur_pos = pos;
+      while (pos < code.length()) {
+        if (code[pos] == token) {
+          break;
+        }
+        if (code[pos] == '\\') {
+          pos++;
+        }
+        pos++;
+      }
+      if (code[pos] != token) {
+        pos = cur_pos;
+      }
+      if (pos - cur_pos == 1) {
+        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num, string(1, code[cur_pos]));
+        push(curr_token);
+      } else if (pos - cur_pos > 0) {
+        string name = code.substr((size_t)cur_pos, (size_t)(pos - cur_pos));
+        Token *t = new Token(name, TokenType::Str, name);
+        push(t);
+      }
+    } else if (functions.find(token) != functions.end()) {
+      functions.find(token)->second();
     }
   }
-
 }
 
 
-void Lexer::push(Token* token) {
-  tokens.push_back(token);
+void Lexer::initFunctions() {
+  auto comma = [this]() {
+    push(&COMMA);
+  };
+  auto add = [this]() {
+    if (code[pos] == '+') {
+      pos++;
+      push(&INC);
+    } else {
+      push(&ADD);
+    }
+  };
+  auto sub = [this]() {
+    if (code[pos] == '-') {
+      pos++;
+      push(&DEC);
+    } else {
+      push(&SUB);
+    }
+  };
+  auto eq = [this]() {
+    if (code[pos] == '=') {
+      pos++;
+      push(&EQ);
+    } else {
+      push(&ASSIGN);
+    }
+  };
+  auto _not = [this]() {
+    if (code[pos] == '=') {
+      pos++;
+      push(&NE);
+    } else {
+      push(&NOT);
+    }
+  };
+  auto gt = [this]() {
+    if (code[pos] == '=') {
+      pos++;
+      push(&GE);
+    } else {
+      push(&GT);
+    }
+  };
+  auto div = [this]() {
+    if (code[pos] == '/') {
+      while (code[pos] != 0 && code[pos] != '\n') {
+        ++pos;
+      }
+      if (code[pos] == '\n') {
+        line++;
+      }
+    } else if (code[pos] == '*') {
+      while (pos < code.length() && !(code[pos] == '*' && code[pos] == '/')) {
+        if (code[pos] == '\n') {
+          line++;
+        }
+        ++pos;
+      }
+    } else {
+      push(&DIV);
+    }
+  };
+  auto lt = [this]() {
+    if (code[pos] == '=') {
+      pos++;
+      push(&LE);
+    } else {
+      push(&LT);
+    }
+  };
+  auto colon = [this]() {
+    push(&COLON);
+  };
+  auto s_colon = [this]() {
+    push(&S_COLON);
+  };
+  auto r_ph = [this]() {
+    push(&R_PH);
+  };
+  auto l_ph = [this]() {
+    push(&L_PH);
+  };
+  auto r_br = [this]() {
+    push(&R_BR);
+  };
+  auto l_br = [this]() {
+    push(&L_BR);
+  };
+  auto l_brak = [this]() {
+    push(&L_BRAK);
+  };
+  auto r_brak = [this]() {
+    push(&R_BRAK);
+  };
+  auto cond = [this]() {
+    push(&COND);
+  };
+  auto mul = [this]() {
+    push(&MUL);
+  };
+  auto mod = [this]() {
+    push(&MOD);
+  };
+  auto _and = [this]() {
+    if (code[pos] == '&') {
+      pos++;
+      push(&LAN);
+    }
+  };
+  auto _or = [this]() {
+    if (code[pos] == '|') {
+      pos++;
+      push(&LOR);
+    }
+  };
+  auto hash = [this]() {
+    while (code[pos] != 0 && code[pos] != '\n') {
+      pos++;
+    }
+  };
+  auto n = [this]() {
+    line++;
+  };
+  functions[','] = comma;
+  functions['+'] = add;
+  functions['-'] = sub;
+  functions['/'] = div;
+  functions['*'] = mul;
+  functions['='] = eq;
+  functions[':'] = colon;
+  functions[';'] = s_colon;
+  functions['?'] = cond;
+  functions['('] = l_ph;
+  functions[')'] = r_ph;
+  functions['{'] = l_br;
+  functions['}'] = r_br;
+  functions['['] = l_brak;
+  functions[']'] = r_brak;
+  functions['%'] = mod;
+  functions['&'] = _and;
+  functions['|'] = _or;
+  functions['>'] = gt;
+  functions['<'] = lt;
+  functions['!'] = _not;
+  functions['\n'] = n;
+  functions['#'] = hash;
 }

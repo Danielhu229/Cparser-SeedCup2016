@@ -17,22 +17,24 @@ class Lexer {
  private:
   const string& code;
   const string old_code;
-  bool finished;
   int pos;
-  int line;
-  map<string, Token> identifiers;
+
   map<string, Token> keywords;
   Token curr_token;
   void init();
+  void initFunctions();
+  void next();
+  map<int, std::function<void()>> functions;
  public:
 
+  map<string, Token> identifiers;
+  int line;
   vector<Token*> tokens;
   Lexer(const string& code);
   /*
    * Lexical analysis
    */
   void lexan();
-
   void push(Token* token);
   Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE, ENUM, RETURN, SIZEOF, WHILE, FOR, VOID, MAIN, ASSIGN, EQ;
   Token INC, DEC;
@@ -47,6 +49,7 @@ class Lexer {
   Token L_PH, R_PH;
   Token S_COLON, COLON, COMMA;
   Token DO;
+
 
 };
 

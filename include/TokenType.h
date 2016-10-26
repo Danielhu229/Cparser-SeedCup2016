@@ -11,27 +11,147 @@ enum class TokenType {
   Fun, Sys, Glo, Loc,
   Var, // Variable
   Str, // String literal
-  Char, Else, Enum, If, Int, Double, Float, Long, Unsigned, Return, Sizeof, While, DO,
+  /*!
+   * keyword char
+   */
+  Char,
+  Else,
+  Enum,
+  If,
+  Int,
+  Double,
+  Float,
+  Long,
+  Unsigned,
+  /*!
+   * keyword return
+   */
+  Return,
+  /*!
+   * keyword sizeof
+   */
+  Sizeof,
+  /*!
+   * keyword while
+   */
+  While,
+  /*!
+   * keyword do
+   */
+  DO,
+  /*!
+   * symbol for =
+   */
   Assign, // =
+  /*!
+   * symbol for ?
+   */
   Cond, // ?
+  /*!
+   * symbol for ||
+   */
   L_or, // ||
+  /*!
+   * symbol for &&
+   */
   L_an, // &&
+  /*!
+   * symbol for ==
+   */
   Eq, // ==
+  /*!
+   * symbol for !=
+   */
   Ne, // !=
-  Lt, Gt, // < and >
-  Le, Ge, // <= and >=
-  Add, Sub, Mul, Div, Mod, Inc, Dec,
-  Break, // Break;
+  /*!
+   * symbol for <
+   */
+  Lt,
+  /*!
+   * symbol for >
+   */
+  Gt, // < and >
+  /*!
+   * symbol for <=
+   */
+  Le,
+  /*!
+   * symbol for >=
+   */
+  Ge,
+  Add, Sub, Mul, Div, Mod,
+  /*!
+   * symbol for increment ++
+   */
+  Inc,
+  /*!
+   * symbol for decrement --
+   */
+  Dec,
+  /*!
+   * keyword break;
+   */
+  Break,
+  /*!
+   * keyword switch
+   */
   Switch,
+  /*!
+   * keyword case
+   */
   Case,
+  /*!
+   * for
+   */
   For,
+  /*!
+   * keyword void
+   */
   Void,
+  /*!
+   * keyword main
+   */
   Main, // main
-  L_BRAK, R_BRAK, // [ and ]
-  L_PH, R_PH, // { and }
-  L_BR, R_BR, // ( and )
-  Colon, S_Colon, Comma, //: and ; and ,
-  Not // !
+  /*!
+   * punctuation [
+   */
+  L_BRAK,
+  /*!
+   * punctuation ]
+   */
+  R_BRAK,
+  /*!
+   * punctuation (
+   */
+  L_PH,
+  /*!
+   * punctuation )
+   */
+  R_PH,
+  /*!
+   * punctuation {
+   */
+  L_BR,
+  /*!
+   * punctuation }
+   */
+  R_BR,
+  /*!
+   * punctuation :
+   */
+  Colon,
+  /*!
+   * punctuation ;
+   */
+  S_Colon,
+  /*!
+   * punctuation ,
+   */
+  Comma,
+  /*!
+   * punctuation !
+   */
+  Not
 };
 
 
