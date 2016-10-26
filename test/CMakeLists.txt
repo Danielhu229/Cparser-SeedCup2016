@@ -12,7 +12,7 @@ set(C_PARSER_HEAD
         ../include
         )
 
-set(C_PARSER unit/test_main.cpp)
+set(C_PARSER unit/test_main.cpp unit/ParserTest.cpp ../src/Parser.cpp ../src/Token.cpp unit/ParserTest.cpp)
 
 add_executable(SeedCup2016_Test ${C_PARSER} ${C_PARSER_HEAD})
 

@@ -9,6 +9,6 @@ include_directories(include)
 
 set(C_PARSER_HEAD include/)
 
-set(C_PARSER_SRC src/main.cpp)
+set(C_PARSER_SRC src/main.cpp src/Parser.cpp src/Lexer.cpp src/Token.cpp)
 
 add_executable(SeedCup2016 ${C_PARSER_SRC} ${C_PARSER_HEAD})

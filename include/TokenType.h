@@ -5,7 +5,7 @@
 #ifndef SEEDCUP_SYMBOL_H
 #define SEEDCUP_SYMBOL_H
 // tokens and classes
-enum class token_type {
+enum class TokenType {
 
   Num, // numbers and single character
   Fun, Sys, Glo, Loc,

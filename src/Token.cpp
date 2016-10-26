@@ -2,19 +2,19 @@
 // Created by aLIEzTed on 10/25/16.
 //
 
-#include "../include/Token.h"
+#include "Token.h"
 
 
-Token::Token(std::string name, token_type symbol) {
+Token::Token(std::string name, TokenType symbol) {
   this->name = name;
   this->token = symbol;
-  this->hash = m_hash(this->name);
+  // this->hash = m_hash(this->name);
   this->token_val = "";
   this->clz = 0;
   this->type = 0;
 }
 
-Token::Token(std::string name, token_type symbol, std::string value) {
+Token::Token(std::string name, TokenType symbol, std::string value) {
   this->name = name;
   this->token = symbol;
   this->token_val = value;
@@ -37,67 +37,63 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
   std::string token_name;
   std::string token_val;
   switch (token.token) {
-    case token_type :: Var:
+    case TokenType :: Var:
       token_name = "Var";
       token_val = token.name;
       break;
-    case token_type:: Int:
+    case TokenType:: Int:
       token_name = "Int";
       token_val = token.name;
       break;
-    case token_type::Add:
+    case TokenType::Add:
       token_name = "Add";
       token_val = token.name;
       break;
-    case token_type ::And:
-      token_name = "And";
-      token_val = token.name;
-      break;
-    case token_type::Assign:
+    case TokenType::Assign:
       token_name = "Assign";
       token_val = token.name;
       break;
-    case token_type ::Break:
+    case TokenType ::Break:
       token_name = "Break";
       token_val = token.name;
       break;
-    case token_type ::Case:
+    case TokenType ::Case:
       token_name = "Case";
       token_val = token.name;
       break;
-    case token_type ::Char:
+    case TokenType ::Char:
       token_name = "Char";
       token_val = token.name;
       break;
-    case token_type::Else:
+    case TokenType::Else:
       token_name = "Else";
       token_val = token.name;
       break;
-    case token_type ::Enum:
+    case TokenType ::Enum:
       token_name = "Enum";
       token_val = token.name;
       break;
-    case token_type ::Num:
+    case TokenType ::Num:
       token_name = "Num";
       token_val = token.token_val;
       break;
-    case token_type ::Str:
+    case TokenType ::Str:
       token_name = "Str";
       token_val = token.token_val;
       break;
-    case token_type::S_Colon:
+    case TokenType::S_Colon:
       token_name = "Semicolon";
       break;
-    case token_type :: Colon:
+    case TokenType :: Colon:
       token_name = "Colon";
       break;
-    case token_type ::Double:
+    case TokenType ::Double:
       token_name = "Double";
       break;
-    case token_type::Float:
+    case TokenType::Float:
       token_name = "Float";
       break;
-    case token_type::L_PH:
+    case TokenType::L_PH:
       token_name = "(";
     default:
       token_name = "Unknown";

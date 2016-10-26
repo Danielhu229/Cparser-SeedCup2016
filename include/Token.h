@@ -4,23 +4,22 @@
 
 #ifndef SEEDCUP_TOKEN_H
 #define SEEDCUP_TOKEN_H
-#include "token_type.h"
+#include "TokenType.h"
 #include <string>
 #include <ostream>
 #include <vector>
-#include "token_type.h"
 class Token {
  public:
-  token_type token;
+  TokenType token;
   // value of this token, used in var, char, string literal
   std::string token_val;
   std::string name;
   int type;
   int clz;
-  Token(std::string name, token_type symbol);
+  Token(std::string name, TokenType symbol);
   Token();
   Token(const Token& obj);
-  Token(std::string name, token_type symbol, std::string token_val);
+  Token(std::string name, TokenType symbol, std::string token_val);
   bool operator==(const Token &rhs) const;
   bool operator!=(const Token &rhs) const;
   bool operator<(const Token &rhs) const;

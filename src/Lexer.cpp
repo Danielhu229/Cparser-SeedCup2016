@@ -6,52 +6,52 @@
 using namespace std;
 
 void Lexer::init() {
-  INT = Token("int", token_type::Int, "int");
-  DOUBLE = Token("double", token_type::Double, "double");
-  FLOAT = Token("float", token_type::Float, "float");
-  LONG = Token("long", token_type::Long, "long");
-  CHAR = Token("char", token_type::Char, "char");
-  BREAK = Token("break", token_type::Break, "break");
-  SWITCH = Token("switch", token_type::Switch, "switch");
-  CASE = Token("case", token_type::Case, "case");
-  ELSE = Token("else", token_type::Else, "else");
-  ENUM = Token("enum", token_type::Enum, "enum");
-  IF = Token("if", token_type::If, "if");
-  RETURN = Token("return", token_type::Return, "return");
-  SIZEOF = Token("sizeof", token_type::Sizeof, "sizeof");
-  WHILE = Token("while", token_type::While, "while");
-  FOR = Token("for", token_type::For, "for");
-  VOID = Token("void", token_type::Void, "void");
-  MAIN = Token("main", token_type::Main, "main");
-  UNSIGNED = Token("unsigned", token_type::Unsigned, "unsigned");
-  DO = Token("do", token_type::DO, "do");
-  ASSIGN = Token("=", token_type::Assign, "=");
-  EQ = Token("==", token_type::Eq, "==");
-  NE = Token("!=", token_type::Ne, "!=");
-  INC = Token("++", token_type::Inc, "++");
-  DEC = Token("--", token_type::Dec, "--");
-  ADD = Token("+", token_type::Add, "+");
-  SUB = Token("-", token_type::Sub, "-");
-  MUL = Token("*", token_type::Mul, "*");
-  DIV = Token("/", token_type::Div, "/");
-  LE = Token("<=", token_type::Le, "<=");
-  LT = Token("<", token_type::Lt, "<");
-  GE = Token(">=", token_type::Ge, ">=");
-  GT = Token(">", token_type::Gt, ">");
-  NOT = Token("!", token_type::Not, "!");
-  LOR = Token("||", token_type::L_or, "||");
-  LAN = Token("&&", token_type::L_an, "&&");
-  MOD = Token("%", token_type::Mod, "%");
-  L_BRAK = Token("[", token_type::L_BRAK, "[");
-  R_BRAK = Token("]", token_type::R_BRAK, "]");
-  L_BR = Token("{", token_type::L_BR, "{");
-  R_BR = Token("}", token_type::R_BR, "}");
-  L_PH = Token("(", token_type::L_PH, "(");
-  R_PH = Token(")", token_type::R_PH, ")");
-  COND = Token("?", token_type::Cond, "?");
-  COLON = Token(":", token_type::Colon, ":");
-  S_COLON = Token(";", token_type::S_Colon, ";");
-  COMMA = Token(",", token_type::Comma, ",");
+  INT = Token("int", TokenType::Int, "int");
+  DOUBLE = Token("double", TokenType::Double, "double");
+  FLOAT = Token("float", TokenType::Float, "float");
+  LONG = Token("long", TokenType::Long, "long");
+  CHAR = Token("char", TokenType::Char, "char");
+  BREAK = Token("break", TokenType::Break, "break");
+  SWITCH = Token("switch", TokenType::Switch, "switch");
+  CASE = Token("case", TokenType::Case, "case");
+  ELSE = Token("else", TokenType::Else, "else");
+  ENUM = Token("enum", TokenType::Enum, "enum");
+  IF = Token("if", TokenType::If, "if");
+  RETURN = Token("return", TokenType::Return, "return");
+  SIZEOF = Token("sizeof", TokenType::Sizeof, "sizeof");
+  WHILE = Token("while", TokenType::While, "while");
+  FOR = Token("for", TokenType::For, "for");
+  VOID = Token("void", TokenType::Void, "void");
+  MAIN = Token("main", TokenType::Main, "main");
+  UNSIGNED = Token("unsigned", TokenType::Unsigned, "unsigned");
+  DO = Token("do", TokenType::DO, "do");
+  ASSIGN = Token("=", TokenType::Assign, "=");
+  EQ = Token("==", TokenType::Eq, "==");
+  NE = Token("!=", TokenType::Ne, "!=");
+  INC = Token("++", TokenType::Inc, "++");
+  DEC = Token("--", TokenType::Dec, "--");
+  ADD = Token("+", TokenType::Add, "+");
+  SUB = Token("-", TokenType::Sub, "-");
+  MUL = Token("*", TokenType::Mul, "*");
+  DIV = Token("/", TokenType::Div, "/");
+  LE = Token("<=", TokenType::Le, "<=");
+  LT = Token("<", TokenType::Lt, "<");
+  GE = Token(">=", TokenType::Ge, ">=");
+  GT = Token(">", TokenType::Gt, ">");
+  NOT = Token("!", TokenType::Not, "!");
+  LOR = Token("||", TokenType::L_or, "||");
+  LAN = Token("&&", TokenType::L_an, "&&");
+  MOD = Token("%", TokenType::Mod, "%");
+  L_BRAK = Token("[", TokenType::L_BRAK, "[");
+  R_BRAK = Token("]", TokenType::R_BRAK, "]");
+  L_BR = Token("{", TokenType::L_BR, "{");
+  R_BR = Token("}", TokenType::R_BR, "}");
+  L_PH = Token("(", TokenType::L_PH, "(");
+  R_PH = Token(")", TokenType::R_PH, ")");
+  COND = Token("?", TokenType::Cond, "?");
+  COLON = Token(":", TokenType::Colon, ":");
+  S_COLON = Token(";", TokenType::S_Colon, ";");
+  COMMA = Token(",", TokenType::Comma, ",");
   keywords["int"] = INT;
   keywords["do"] = DO;
   keywords["double"] = DOUBLE;
@@ -114,7 +114,7 @@ void Lexer::lexan() {
           Token* curr_token = &keywords.find(name)->second;
           push(curr_token);
         } else {
-          Token* curr_token = new Token("Var", token_type::Var);
+          Token* curr_token = new Token("Var", TokenType::Var);
           curr_token->token_val = name;
           identifiers[name] = *curr_token;
           push(curr_token);
@@ -139,7 +139,7 @@ void Lexer::lexan() {
             }
           }
         }
-        Token* curr_token = new Token("Num", token_type::Num);
+        Token* curr_token = new Token("Num", TokenType::Num);
         curr_token->token_val = to_string(token_val);
         push(curr_token);
         continue;
@@ -160,12 +160,12 @@ void Lexer::lexan() {
           continue;
         }
         if (pos - cur_pos == 1) {
-          Token* curr_token = new Token(string(1, code[cur_pos]), token_type::Num);
+          Token* curr_token = new Token(string(1, code[cur_pos]), TokenType::Num);
           curr_token->token_val = string(1, code[cur_pos]);
           push(curr_token);
         } else {
           string name = code.substr(cur_pos, pos - cur_pos);
-          Token* curr_token = new Token(name, token_type:: Str);
+          Token* curr_token = new Token(name, TokenType:: Str);
           curr_token->token_val = name;
           push(curr_token);
         }
