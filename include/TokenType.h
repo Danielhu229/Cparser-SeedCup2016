@@ -18,6 +18,7 @@ enum class TokenType {
   Else,
   Enum,
   If,
+  ElseIf,
   Int,
   Double,
   Float,

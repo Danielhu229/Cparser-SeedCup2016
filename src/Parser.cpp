@@ -25,7 +25,7 @@ ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,
 };
 
 ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
-                            int position) -> shared_ptr<Statement> {
+                          int position) -> shared_ptr<Statement> {
   auto ast =
       shared_ptr<Statement>(new Statement(ASTType::Call, tokens[position]));
   int cur_token = begin;
@@ -34,14 +34,22 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
   begin++;
   end--;
   int lastCommaPosition = begin;
-  while(cur_token < end) {
-    if(tokens[cur_token]->token == TokenType::Comma) {
+  while (cur_token < end) {
+    if (tokens[cur_token]->token == TokenType::Comma) {
       Parser::parseTokens(tokens, lastCommaPosition, cur_token - 1);
       lastCommaPosition = begin;
     }
     cur_token++;
   }
   Parser::parseTokens(tokens, lastCommaPosition, cur_token - 1);
+  return ast;
+};
+
+ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
+                        int position) -> shared_ptr<Statement> {
+  auto ast =
+      shared_ptr<Statement>(new Statement(ASTType::If, tokens[position]));
+  ast->children.push_back(Parser::parseTokens(tokens, position + 2, end - 1));
   return ast;
 };
 
@@ -58,7 +66,13 @@ unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::Add), binaryParser},
     {e(TokenType::Sub), binaryParser},
     {e(TokenType::Mul), binaryParser},
-    {e(TokenType::Div), binaryParser}};
+    {e(TokenType::Div), binaryParser},
+    {e(TokenType::Eq), binaryParser},
+    {e(TokenType::Gt), binaryParser},
+    {e(TokenType::Lt), binaryParser},
+    {e(TokenType::Ge), binaryParser},
+    {e(TokenType::Le), binaryParser}
+};
 
 bool Parser::isFinal(TokenType t) {
   return finalTokens.find(static_cast<int>(t)) != finalTokens.end();
@@ -86,7 +100,8 @@ shared_ptr<Statement> Parser::parseTokens(vector<Token *> &tokens, int begin,
   if (end - begin == 1) {
     return shared_ptr<Statement>(new Statement(ASTType::Final, tokens[begin]));
   }
-  if (tokens[begin]->token == TokenType::L_BR && tokens[end-1]->token == TokenType::R_BR) {
+  if (tokens[begin]->token == TokenType::L_BR &&
+      tokens[end - 1]->token == TokenType::R_BR) {
     begin++;
     end--;
   }
@@ -96,11 +111,9 @@ shared_ptr<Statement> Parser::parseTokens(vector<Token *> &tokens, int begin,
   while (curToken < tokens.size()) {
     if (tokens[curToken]->token == TokenType::L_BR) {
       paren++;
-    }
-    else if (tokens[curToken]->token == TokenType::R_BR) {
+    } else if (tokens[curToken]->token == TokenType::R_BR) {
       paren--;
-    }
-    else if (paren == 0){
+    } else if (paren == 0) {
       int priority = getPriority(tokens[curToken]->token);
       if (priority > maxPriority) {
         maxPriority = priority;

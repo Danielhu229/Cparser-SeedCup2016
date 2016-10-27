@@ -6,6 +6,6 @@
 #define C_PARSER_ASTTYPE_H
 namespace cParser {
 
-enum class ASTType { Final, Binary, Call };
+enum class ASTType { Final, Binary, Call, If, Else, ElseIf, For };
 }
 #endif //C_PARSER_ASTTYPE_H
