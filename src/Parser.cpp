@@ -15,6 +15,20 @@ using namespace std;
 
 namespace cParser {
 
+
+ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
+                          int position) -> shared_ptr<Statement> {
+  shared_ptr<Statement> ast = make_shared<Statement>(ASTType::Self, tokens[position]);;
+  auto left = Parser::parseTokens(tokens, begin, position);
+  auto right = Parser::parseTokens(tokens, position + 1, end);
+  if (left && left->token->token == TokenType::Var) {
+    ast->children.push_back(left);
+  } else if (right && right->token->token == TokenType::Var) {
+    ast->children.push_back(right);
+  }
+  return ast;
+};
+
 ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,
                             int position) -> shared_ptr<Statement> {
   auto ast =
@@ -57,12 +71,16 @@ unordered_set<int> Parser::finalTokens = {static_cast<int>(TokenType::Num),
                                           static_cast<int>(TokenType::Comma)};
 
 vector<unordered_set<int>> Parser::priorityTable = {
-    {Parser::finalTokens},
     {e(TokenType::Add), e(TokenType::Sub)},
     {e(TokenType::Mul), e(TokenType::Div)},
-    {e(TokenType::If), e(TokenType::Switch)}};
+    {e(TokenType::Inc), e(TokenType::Dec)},
+    {e(TokenType::If), e(TokenType::Switch)},
+    Parser::finalTokens,
+};
 
 unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
+    {e(TokenType::Inc), selfParser},
+    {e(TokenType::Dec), selfParser},
     {e(TokenType::Add), binaryParser},
     {e(TokenType::Sub), binaryParser},
     {e(TokenType::Mul), binaryParser},
@@ -105,25 +123,24 @@ shared_ptr<Statement> Parser::parseTokens(vector<Token *> &tokens, int begin,
     begin++;
     end--;
   }
-  int curToken = begin, maxPrioToken = begin;
-  int maxPriority = -1;
+  int curToken = begin, minPrioToken = begin;
+  int minPriority = 100;
   int paren = 0;
-  while (curToken < tokens.size()) {
+  while (curToken < end) {
     if (tokens[curToken]->token == TokenType::L_BR) {
       paren++;
     } else if (tokens[curToken]->token == TokenType::R_BR) {
       paren--;
     } else if (paren == 0) {
       int priority = getPriority(tokens[curToken]->token);
-      if (priority > maxPriority) {
-        maxPriority = priority;
-        maxPrioToken = curToken;
+      if (priority < minPriority) {
+        minPriority = priority;
+        minPrioToken = curToken;
       }
     }
     curToken++;
   }
-  cout << tokens[maxPrioToken]->name << endl;
-  auto parser = getUnFinalParser(tokens[maxPrioToken]->token);
-  return parser(tokens, begin, end, maxPrioToken);
+  auto parser = getUnFinalParser(tokens[minPrioToken]->token);
+  return parser(tokens, begin, end, minPrioToken);
 }
 }

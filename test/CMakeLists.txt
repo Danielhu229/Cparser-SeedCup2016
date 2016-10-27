@@ -12,9 +12,19 @@ set(C_PARSER_HEAD
         ../include
         )
 
-set(C_PARSER unit/test_main.cpp unit/ParserTest.cpp ../src/Parser.cpp ../src/Token.cpp
-        unit/ParserTest.cpp unit/LexerTest.cpp ../src/Lexer.cpp ../src/Interpreter.cpp ../include/Interpreter.h)
+set(C_PARSER_SRC
+        unit/test_main.cpp
+        unit/ParserTest.cpp
+        unit/LexerTest.cpp
+        unit/IoTest.cpp
+        unit/InterpreterTest.cpp
+        ../src/Parser.cpp
+        ../src/Token.cpp
+        ../src/Lexer.cpp
+        ../src/Utility.cpp
+        ../src/Interpreter.cpp
+        )
 
-add_executable(SeedCup2016_Test ${C_PARSER} ${C_PARSER_HEAD})
+add_executable(SeedCup2016_Test ${C_PARSER_SRC} ${C_PARSER_HEAD})
 
 target_link_libraries(SeedCup2016_Test gtest)

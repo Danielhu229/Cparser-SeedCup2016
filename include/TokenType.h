@@ -65,7 +65,7 @@ enum class TokenType {
    */
   Ne, // !=
   /*!
-   * symbol for <
+   * symbol for less than <
    */
   Lt,
   /*!

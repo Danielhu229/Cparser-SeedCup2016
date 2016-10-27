@@ -6,12 +6,13 @@
 #define C_PARSER_UTILITY_H
 
 #include <vector>
+#include "Token.h"
 
 using namespace std;
 
 namespace cParser {
 namespace Utility {
-  void combinElseIf(vector<int>& tokens);
+  vector<Token*> combineElseIf(vector<Token*>& tokens);
 }
 }
 
