@@ -2,19 +2,17 @@
 // Created by 胡一鸣 on 16/10/26.
 //
 
-#include "gtest/gtest.h"
+#include "Parser.h"
 #include "Token.h"
 #include "TokenType.h"
-#include "Parser.h"
+#include "gtest/gtest.h"
 
 using namespace cParser;
 
 TEST(shouldDivideTokens, binaryParser) {
-  auto tokens = new vector<Token *>({
-                                        new Token("3435", TokenType::Num),
-                                        new Token("+", TokenType::Add),
-                                        new Token("78", TokenType::Num)
-                                    });
+  auto tokens = new vector<Token *>({new Token("3435", TokenType::Num),
+                                     new Token("+", TokenType::Add),
+                                     new Token("78", TokenType::Num)});
   ParserFun binaryParser = Parser::getUnFinalParser(TokenType::Add);
   auto ast = binaryParser(*tokens, 0, 3, 1);
   EXPECT_EQ(ast->children.size(), 2);
@@ -23,15 +21,11 @@ TEST(shouldDivideTokens, binaryParser) {
 }
 
 TEST(shouldTakeBracket, binaryParser) {
-  auto tokens = new vector<Token *>({
-                                        new Token("(", TokenType::L_BR),
-                                        new Token("3435", TokenType::Num),
-                                        new Token("+", TokenType::Add),
-                                        new Token("78", TokenType::Num),
-                                        new Token(")", TokenType::R_BR),
-                                        new Token("*", TokenType::Mul),
-                                        new Token("57", TokenType::Num)
-                                    });
+  auto tokens = new vector<Token *>(
+      {new Token("(", TokenType::L_BR), new Token("3435", TokenType::Num),
+       new Token("+", TokenType::Add), new Token("78", TokenType::Num),
+       new Token(")", TokenType::R_BR), new Token("*", TokenType::Mul),
+       new Token("57", TokenType::Num)});
   ParserFun binaryParser = Parser::getUnFinalParser(TokenType::Mul);
   auto ast = binaryParser(*tokens, 0, 7, 5);
   EXPECT_EQ(ast->children.size(), 2);
@@ -41,22 +35,17 @@ TEST(shouldTakeBracket, binaryParser) {
 }
 
 TEST(shouldParseLeft, SingleParser) {
-  auto tokens = new vector<Token *>({
-                                        new Token("++", TokenType::Inc),
-                                        new Token("i", TokenType::Var)
-                                    });
+  auto tokens = new vector<Token *>(
+      {new Token("++", TokenType::Inc), new Token("i", TokenType::Var)});
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
   auto ast = selfPerser(*tokens, 0, tokens->size(), 0);
   EXPECT_EQ(ast->children.size(), 1);
   EXPECT_EQ(ast->children[0]->token->name, "i");
 }
 
-
 TEST(shouldParseRight, SingleParser) {
-  auto tokens = new vector<Token *>({
-                                        new Token("i", TokenType::Var),
-                                        new Token("--", TokenType::Dec)
-                                    });
+  auto tokens = new vector<Token *>(
+      {new Token("i", TokenType::Var), new Token("--", TokenType::Dec)});
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
   auto ast = selfPerser(*tokens, 0, tokens->size(), 1);
   EXPECT_EQ(ast->children.size(), 1);
@@ -64,15 +53,12 @@ TEST(shouldParseRight, SingleParser) {
 }
 
 TEST(shouldParseComplex, SingleParser) {
-  auto tokens = new vector<Token *>({
-                                        new Token("i", TokenType::Var),
-                                        new Token("++", TokenType::Inc),
-                                        new Token("+", TokenType::Add),
-                                        new Token("a", TokenType::Var),
-                                        new Token("--", TokenType::Dec)
-                                    });
+  auto tokens = new vector<Token *>(
+      {new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+       new Token("+", TokenType::Add), new Token("a", TokenType::Var),
+       new Token("--", TokenType::Dec)});
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
-  auto ast = selfPerser(*tokens, 0, 1, 1);
+  auto ast = selfPerser(*tokens, 0, 2, 1);
   EXPECT_EQ(ast->children.size(), 1);
   EXPECT_EQ(ast->children[0]->token->name, "i");
 
@@ -81,17 +67,13 @@ TEST(shouldParseComplex, SingleParser) {
   EXPECT_EQ(ast->children[0]->token->name, "a");
 }
 
-
 TEST(shouldParseExpression, Parse) {
   auto tokens = new vector<Token *>({
-                                        new Token("i", TokenType::Var),
-                                        new Token("++", TokenType::Inc),
-                                        new Token("+", TokenType::Add),
-                                        new Token("a", TokenType::Var),
-                                        new Token("--", TokenType::Dec),
-                                        new Token("*", TokenType::Mul),
-                                        new Token("4", TokenType::Num),
-                                    });
+      new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+      new Token("+", TokenType::Add), new Token("a", TokenType::Var),
+      new Token("--", TokenType::Dec), new Token("*", TokenType::Mul),
+      new Token("4", TokenType::Num),
+  });
   auto ast = Parser::parseTokens(*tokens, 0, tokens->size());
   EXPECT_EQ(ast->type, ASTType::Binary);
   EXPECT_EQ(ast->token->token, TokenType::Add);

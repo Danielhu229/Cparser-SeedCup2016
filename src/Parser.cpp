@@ -15,10 +15,11 @@ using namespace std;
 
 namespace cParser {
 
-
 ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> shared_ptr<Statement> {
-  shared_ptr<Statement> ast = make_shared<Statement>(ASTType::Self, tokens[position]);;
+  shared_ptr<Statement> ast =
+      make_shared<Statement>(ASTType::Self, tokens[position]);
+  ;
   auto left = Parser::parseTokens(tokens, begin, position);
   auto right = Parser::parseTokens(tokens, position + 1, end);
   if (left && left->token->token == TokenType::Var) {
@@ -67,8 +68,8 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
-unordered_set<int> Parser::finalTokens = {static_cast<int>(TokenType::Num),
-                                          static_cast<int>(TokenType::Comma)};
+unordered_set<int> Parser::finalTokens = {
+    e(TokenType::Num), e(TokenType::Comma), e(TokenType::Var)};
 
 vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::Add), e(TokenType::Sub)},
@@ -79,18 +80,12 @@ vector<unordered_set<int>> Parser::priorityTable = {
 };
 
 unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
-    {e(TokenType::Inc), selfParser},
-    {e(TokenType::Dec), selfParser},
-    {e(TokenType::Add), binaryParser},
-    {e(TokenType::Sub), binaryParser},
-    {e(TokenType::Mul), binaryParser},
-    {e(TokenType::Div), binaryParser},
-    {e(TokenType::Eq), binaryParser},
-    {e(TokenType::Gt), binaryParser},
-    {e(TokenType::Lt), binaryParser},
-    {e(TokenType::Ge), binaryParser},
-    {e(TokenType::Le), binaryParser}
-};
+    {e(TokenType::Inc), selfParser},   {e(TokenType::Dec), selfParser},
+    {e(TokenType::Add), binaryParser}, {e(TokenType::Sub), binaryParser},
+    {e(TokenType::Mul), binaryParser}, {e(TokenType::Div), binaryParser},
+    {e(TokenType::Eq), binaryParser},  {e(TokenType::Gt), binaryParser},
+    {e(TokenType::Lt), binaryParser},  {e(TokenType::Ge), binaryParser},
+    {e(TokenType::Le), binaryParser}};
 
 bool Parser::isFinal(TokenType t) {
   return finalTokens.find(static_cast<int>(t)) != finalTokens.end();
@@ -113,6 +108,10 @@ shared_ptr<Statement> Parser::parseTokens(vector<Token *> &tokens, int begin,
                                           int end) {
   if (end - begin < 1) {
     cout << "no token" << endl;
+    return nullptr;
+  }
+  if (end > tokens.size() || begin < 0) {
+    cout << "token out of range" << endl;
     return nullptr;
   }
   if (end - begin == 1) {
