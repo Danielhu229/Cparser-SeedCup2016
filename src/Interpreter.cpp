@@ -58,5 +58,5 @@ void Interpreter::execute(string source) {
   Lexer lexer(source);
   lexer.lexan();
   auto tokens = Utility::combineElseIf(lexer.tokens);
-  Parser::parseTokens(lexer.tokens, 0, lexer.tokens.size());
+  Parser::parseTokens(tokens, 0, lexer.tokens.size());
 }

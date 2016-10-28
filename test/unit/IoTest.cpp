@@ -7,7 +7,8 @@
 using namespace cParser;
 
 
-//TEST(shouldReadString, readString) {
-//  std::string a = io::read("input.txt");
-//  EXPECT_EQ("Hello World", a);
-//}
+TEST(file, io) {
+  io::write("output.txt", "This is a string");
+  std::string a = io::read("output.txt");
+  EXPECT_EQ(a,  "This is a string");
+}
