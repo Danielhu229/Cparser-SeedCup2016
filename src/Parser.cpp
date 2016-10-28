@@ -25,7 +25,7 @@ ParserFun declareVarParser = [](vector<Token *> &tokens, int begin, int end,
 };
 
 ParserFun colonParser = [](vector<Token *> &tokens, int begin, int end,
-                                int position) -> shared_ptr<Statement> {
+                           int position) -> shared_ptr<Statement> {
   shared_ptr<Statement> ast =
       make_shared<Statement>(ASTType::ChildStatement, tokens[position]);
   if (begin < position) {
@@ -37,17 +37,19 @@ ParserFun colonParser = [](vector<Token *> &tokens, int begin, int end,
 
 ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> shared_ptr<Statement> {
-  shared_ptr<Statement> ast =
-      make_shared<Statement>(ASTType::Self, tokens[position]);
-  ;
   auto left = Parser::parseTokens(tokens, begin, position);
   auto right = Parser::parseTokens(tokens, position + 1, end);
   if (left && left->token->token == TokenType::Var) {
+    shared_ptr<Statement> ast =
+        make_shared<Statement>(ASTType::LSelf, tokens[position]);
     ast->children.push_back(left);
+    return ast;
   } else if (right && right->token->token == TokenType::Var) {
+    shared_ptr<Statement> ast =
+        make_shared<Statement>(ASTType::RSelf, tokens[position]);
     ast->children.push_back(right);
+    return ast;
   }
-  return ast;
 };
 
 ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,
@@ -100,19 +102,25 @@ vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::Add), e(TokenType::Sub)},
     {e(TokenType::Mul), e(TokenType::Div)},
     {e(TokenType::Inc), e(TokenType::Dec)},
-    Parser::finalTokens
-};
+    Parser::finalTokens};
 
 unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::S_Colon), colonParser},
-    {e(TokenType::Inc), selfParser},   {e(TokenType::Dec), selfParser},
+    {e(TokenType::Inc), selfParser},
+    {e(TokenType::Dec), selfParser},
     {e(TokenType::Assign), binaryParser},
-    {e(TokenType::Add), binaryParser}, {e(TokenType::Sub), binaryParser},
-    {e(TokenType::Mul), binaryParser}, {e(TokenType::Div), binaryParser},
-    {e(TokenType::Eq), binaryParser},  {e(TokenType::Gt), binaryParser},
-    {e(TokenType::Lt), binaryParser},  {e(TokenType::Ge), binaryParser},
-    {e(TokenType::Float), declareVarParser}, {e(TokenType::Int), declareVarParser},
-    {e(TokenType::Double), declareVarParser}, {e(TokenType::Str), declareVarParser},
+    {e(TokenType::Add), binaryParser},
+    {e(TokenType::Sub), binaryParser},
+    {e(TokenType::Mul), binaryParser},
+    {e(TokenType::Div), binaryParser},
+    {e(TokenType::Eq), binaryParser},
+    {e(TokenType::Gt), binaryParser},
+    {e(TokenType::Lt), binaryParser},
+    {e(TokenType::Ge), binaryParser},
+    {e(TokenType::Float), declareVarParser},
+    {e(TokenType::Int), declareVarParser},
+    {e(TokenType::Double), declareVarParser},
+    {e(TokenType::Str), declareVarParser},
     {e(TokenType::Le), binaryParser}};
 
 bool Parser::isFinal(TokenType t) {
