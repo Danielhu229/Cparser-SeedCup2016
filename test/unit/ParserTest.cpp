@@ -72,9 +72,21 @@ TEST(shouldParseExpression, Parse) {
       new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
       new Token("+", TokenType::Add), new Token("a", TokenType::Var),
       new Token("--", TokenType::Dec), new Token("*", TokenType::Mul),
-      new Token("4", TokenType::Num),
+      new Token("4", TokenType::Num)
   });
   auto ast = Parser::parseTokens(*tokens, 0, tokens->size());
   EXPECT_EQ(ast->type, ASTType::Binary);
   EXPECT_EQ(ast->token->token, TokenType::Add);
+}
+
+TEST(shouldParseSimiColon, Parse) {
+  auto tokens = new vector<Token *>({
+                                        new Token("4", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, tokens->size());
+  EXPECT_EQ(ast->type, ASTType::ChildStatement);
+  EXPECT_EQ(ast->token->token, TokenType::S_Colon);
+  EXPECT_EQ(ast->children.size(), 1);
+  EXPECT_EQ(ast->children[0]->token->token, TokenType::Num);
 }

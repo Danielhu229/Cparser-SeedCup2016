@@ -15,6 +15,26 @@ using namespace std;
 
 namespace cParser {
 
+ParserFun declareVarParser = [](vector<Token *> &tokens, int begin, int end,
+                                int position) -> shared_ptr<Statement> {
+  shared_ptr<Statement> ast =
+      make_shared<Statement>(ASTType::DeclareVar, tokens[position]);
+  auto child = Parser::parseTokens(tokens, position + 1, end);
+  ast->children.push_back(child);
+  return ast;
+};
+
+ParserFun colonParser = [](vector<Token *> &tokens, int begin, int end,
+                                int position) -> shared_ptr<Statement> {
+  shared_ptr<Statement> ast =
+      make_shared<Statement>(ASTType::ChildStatement, tokens[position]);
+  if (begin < position) {
+    auto child = Parser::parseTokens(tokens, begin, position);
+    ast->children.push_back(child);
+  }
+  return ast;
+};
+
 ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> shared_ptr<Statement> {
   shared_ptr<Statement> ast =
@@ -72,19 +92,27 @@ unordered_set<int> Parser::finalTokens = {
     e(TokenType::Num), e(TokenType::Comma), e(TokenType::Var)};
 
 vector<unordered_set<int>> Parser::priorityTable = {
+    {e(TokenType::If), e(TokenType::For), e(TokenType::Switch)},
+    {e(TokenType::Colon)},
+    {e(TokenType::Assign)},
+    {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double),
+     e(TokenType::Str)},
     {e(TokenType::Add), e(TokenType::Sub)},
     {e(TokenType::Mul), e(TokenType::Div)},
     {e(TokenType::Inc), e(TokenType::Dec)},
-    {e(TokenType::If), e(TokenType::Switch)},
-    Parser::finalTokens,
+    Parser::finalTokens
 };
 
 unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
+    {e(TokenType::S_Colon), colonParser},
     {e(TokenType::Inc), selfParser},   {e(TokenType::Dec), selfParser},
+    {e(TokenType::Assign), binaryParser},
     {e(TokenType::Add), binaryParser}, {e(TokenType::Sub), binaryParser},
     {e(TokenType::Mul), binaryParser}, {e(TokenType::Div), binaryParser},
     {e(TokenType::Eq), binaryParser},  {e(TokenType::Gt), binaryParser},
     {e(TokenType::Lt), binaryParser},  {e(TokenType::Ge), binaryParser},
+    {e(TokenType::Float), declareVarParser}, {e(TokenType::Int), declareVarParser},
+    {e(TokenType::Double), declareVarParser}, {e(TokenType::Str), declareVarParser},
     {e(TokenType::Le), binaryParser}};
 
 bool Parser::isFinal(TokenType t) {
@@ -101,7 +129,13 @@ int Parser::getPriority(TokenType t) {
 }
 
 ParserFun Parser::getUnFinalParser(TokenType t) {
-  return unFinalTokenParser[static_cast<int>(t)];
+  auto parser = unFinalTokenParser.find(e(t));
+  if (parser == unFinalTokenParser.end()) {
+    getchar();
+    cout << "token has no parser" << endl;
+    return nullptr;
+  }
+  return parser->second;
 }
 
 shared_ptr<Statement> Parser::parseTokens(vector<Token *> &tokens, int begin,
