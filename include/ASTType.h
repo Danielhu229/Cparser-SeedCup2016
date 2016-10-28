@@ -17,7 +17,8 @@ enum class ASTType {
   LSelf,
   RSelf,
   DeclareVar,
-  ChildStatement
-};
+  ChildStatement,
+  While,
+  Block};
 }
 #endif // C_PARSER_ASTTYPE_H
