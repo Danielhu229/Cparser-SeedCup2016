@@ -16,11 +16,11 @@ void printAST(shared_ptr<Statement> ast) {
 }
 
 void manualTest1() {
-  auto tokens = new vector<Token *>({new Token("(", TokenType::L_BR),
+  auto tokens = new vector<Token *>({new Token("(", TokenType::L_PH),
                                      new Token("3435", TokenType::Num),
                                      new Token("+", TokenType::Add),
                                      new Token("78", TokenType::Num),
-                                     new Token(")", TokenType::R_BR),
+                                     new Token(")", TokenType::L_PH),
                                      new Token("*", TokenType::Mul),
                                      new Token("57", TokenType::Num)
                                     });
@@ -30,11 +30,11 @@ void manualTest1() {
 }
 
 void manualTest2() {
-  auto tokens = new vector<Token *>({new Token("(", TokenType::L_BR),
+  auto tokens = new vector<Token *>({new Token("(", TokenType::L_PH),
                                      new Token("3435", TokenType::Num),
                                      new Token("+", TokenType::Add),
                                      new Token("78", TokenType::Num),
-                                     new Token(")", TokenType::R_BR),
+                                     new Token(")", TokenType::R_PH),
                                      new Token("*", TokenType::Mul),
                                      new Token("57", TokenType::Num)
                                     });
