@@ -78,3 +78,14 @@ TEST(shouldParseExpression, Parse) {
   EXPECT_EQ(ast->type, ASTType::Binary);
   EXPECT_EQ(ast->token->token, TokenType::Add);
 }
+
+TEST(shouldParseIfExpression, ifParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("{", TokenType::L_BR),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::If);
+  EXPECT_EQ(ast->token->token, TokenType::If);
+}

@@ -39,6 +39,49 @@ ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
+/*
+ * Function for parsing "for" expression
+ * "for" "(" <Expression> ";" <Expression> ";" <Expression> ")" { <Block> | <Expression> }
+ */
+ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
+                            int position) -> shared_ptr<Statement> {
+  auto ast =
+      shared_ptr<Statement>(new Statement(ASTType::For, tokens[position]));
+  ast->children.push_back(Parser::parseTokens(tokens, begin + 2, end - 1));
+  return ast;
+};
+
+
+/*
+ * Function for parsing "for" expression
+ * "while" "(" <Expression> ")" { <Block> | <Expression> }
+ */
+ParserFun whileParser = [](vector<Token *> &tokens, int begin, int end,
+                            int position) -> shared_ptr<Statement> {
+  auto ast =
+      shared_ptr<Statement>(new Statement(ASTType::While, tokens[position]));
+  ast->children.push_back(Parser::parseTokens(tokens, begin + 2, end - 1));
+  return ast;
+};
+
+// fixme: What if expression doesn't contain brackets?
+ParserFun elseParser= [](vector<Token *> &tokens, int begin, int end,
+                            int position) -> shared_ptr<Statement> {
+  auto ast =
+      shared_ptr<Statement>(new Statement(ASTType::Else, tokens[position]));
+  ast->children.push_back(Parser::parseTokens(tokens, begin, end));
+  return ast;
+};
+
+// fixme: What if expression doesn't contain brackets? the expression at the end should not be decrement.
+ParserFun elseifParser = [](vector<Token *> &tokens, int begin, int end,
+                            int position) -> shared_ptr<Statement> {
+  auto ast =
+      shared_ptr<Statement>(new Statement(ASTType::ElseIf, tokens[position]));
+  ast->children.push_back(Parser::parseTokens(tokens, begin + 2, end - 1));
+  return ast;
+};
+
 ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> shared_ptr<Statement> {
   auto ast =
@@ -60,6 +103,7 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
+// fixme: What if expression doesn't contain brackets?
 ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
                         int position) -> shared_ptr<Statement> {
   auto ast =
