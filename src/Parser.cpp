@@ -65,6 +65,7 @@ ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,
  * Function for parsing "for" expression
  * "for" "(" <Expression> ";" <Expression> ";" <Expression> ")" { <Block> | <Expression> }
  */
+// TODO: Do remember that in for we ignore the ';' !!!!
 ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
                             int position) -> shared_ptr<Statement> {
   auto ast =
@@ -73,11 +74,12 @@ ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
   int scolonPos = position + 1;
   while (tokens[scolonPos]->token != TokenType ::R_PH && scolonPos < end) {
     if (tokens[scolonPos]->token == TokenType::S_Colon) {
-      ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos + 1));
+      ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos));
       prev = scolonPos + 1;
     }
     scolonPos++;
   }
+  ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos));
   // minus 1 because offset by one!
   if (tokens[end - 1]->token == TokenType::R_BR) {
     ast->children.push_back(Parser::parseTokens(tokens, scolonPos + 1, end - 1));
@@ -85,6 +87,14 @@ ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
     ast->children.push_back(Parser::parseTokens(tokens, scolonPos + 1, end));
   }
   return ast;
+};
+
+//TODO: implement this method.
+ParserFun switchParser = [](vector<Token *> &tokens, int begin, int end,
+                            int position) -> shared_ptr<Statement> {
+  auto ast = shared_ptr<Statement>(new Statement(ASTType::Switch, tokens[position]));
+  return ast;
+
 };
 
 
@@ -135,7 +145,6 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
  * Function for parsing "if" expression
  * "if" "(" <Expression> ")" { <Block> | <Expression> }
  */
-// TODO: deal with else and else if in this parser
 ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
                         int position) -> shared_ptr<Statement> {
   auto ast =

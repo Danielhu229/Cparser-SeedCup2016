@@ -423,7 +423,6 @@ TEST(shouldParseForExpr, forParser) {
                                         new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
                                         new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-                                        new Token(";", TokenType::S_Colon),
                                         new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
                                         new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
@@ -431,9 +430,9 @@ TEST(shouldParseForExpr, forParser) {
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
   EXPECT_EQ(ast->token->token, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->token, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->token->token, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->token, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->token->token, TokenType::L_BR);
   EXPECT_EQ(ast->children[3]->children[0]->token->token, TokenType::S_Colon);
   EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->token, TokenType::Inc);
@@ -447,7 +446,6 @@ TEST(shouldParseForExprInBlock, forParser) {
                                         new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
                                         new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-                                        new Token(";", TokenType::S_Colon),
                                         new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
                                         new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("a", TokenType::Var),
@@ -459,13 +457,13 @@ TEST(shouldParseForExprInBlock, forParser) {
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
   EXPECT_EQ(ast->token->token, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->token, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->token->token, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->token, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->token->token, TokenType::L_BR);
-  EXPECT_EQ(ast->children[0]->children[0]->token->token, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->children[0]->token->token, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->children[0]->token->token, TokenType::Inc);
+  EXPECT_EQ(ast->children[0]->token->token, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->token, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->children[0]->token->token, TokenType::S_Colon);
   EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->children[1]->children[0]->token->token, TokenType::Assign);
@@ -479,7 +477,6 @@ TEST(shouldParseForExprNoBrackets, forParser) {
                                         new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
                                         new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-                                        new Token(";", TokenType::S_Colon),
                                         new Token(")", TokenType::R_PH),
                                         new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon)
@@ -487,13 +484,10 @@ TEST(shouldParseForExprNoBrackets, forParser) {
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
   EXPECT_EQ(ast->token->token, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->token, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->token->token, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->token, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->token->token, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[0]->children[0]->token->token, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->children[0]->token->token, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->children[0]->token->token, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->children[0]->token->token, TokenType::Inc);
 }
 
