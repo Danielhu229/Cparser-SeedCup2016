@@ -55,10 +55,10 @@ class Context {
 
 class Interpreter {
   stack<Context*> contexts;
-  vector<shared_ptr<Statement>> statements;
   map<shared_ptr<Statement>, int> lineOfStatement;
   int currentStatement;
 public:
+  vector<shared_ptr<Statement>> statements;
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();

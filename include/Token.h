@@ -8,26 +8,27 @@
 #include <string>
 #include <ostream>
 #include <vector>
+
+using namespace std;
+
+namespace cParser {
+
 class Token {
  public:
-  TokenType token;
+  TokenType type;
   // value of this token, used in var, char, string literal
-  std::string token_val;
-  std::string name;
-  int type;
-  int clz;
-  Token(std::string name, TokenType symbol);
+  std::string str;
   Token();
-  Token(const Token& obj);
-  Token(std::string name, TokenType symbol, std::string token_val);
+  Token(const Token &obj);
+  Token(string, TokenType);
   bool operator==(const Token &rhs) const;
   bool operator!=(const Token &rhs) const;
   bool operator<(const Token &rhs) const;
   bool operator>(const Token &rhs) const;
   bool operator<=(const Token &rhs) const;
   bool operator>=(const Token &rhs) const;
-  friend std::ostream &operator<<(std::ostream &os, const Token &token);
 };
 
+}
 
 #endif //SEEDCUP_TOKEN_H

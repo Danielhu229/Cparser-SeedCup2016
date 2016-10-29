@@ -4,14 +4,16 @@
 #include "Lexer.h"
 #include "gtest/gtest.h"
 
+using namespace cParser;
+
 
 TEST(shouldFindParentheses, findParenttheses) {
   std::string a("()");
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 2);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::L_PH);
-  EXPECT_EQ(lexer.tokens[1]->token, TokenType::R_PH);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::L_PH);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::R_PH);
 }
 
 TEST(shouldFindBrackets, findBrackets) {
@@ -19,8 +21,8 @@ TEST(shouldFindBrackets, findBrackets) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 4);
-  EXPECT_EQ(lexer.tokens[1]->token, TokenType::L_BRAK);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::R_BRAK);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::L_BRAK);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::R_BRAK);
 }
 
 TEST(shouldFindBraces, findBraces) {
@@ -28,8 +30,8 @@ TEST(shouldFindBraces, findBraces) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 5);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::L_BR);
-  EXPECT_EQ(lexer.tokens[4]->token, TokenType::R_BR);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::L_BR);
+  EXPECT_EQ(lexer.tokens[4]->type, TokenType::R_BR);
 }
 
 TEST(shouldFindComma, findComma) {
@@ -37,7 +39,7 @@ TEST(shouldFindComma, findComma) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 5);
-  EXPECT_EQ(lexer.tokens[2]->token, TokenType::Comma);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Comma);
 }
 
 TEST(shouldFindColon, findColon) {
@@ -45,7 +47,7 @@ TEST(shouldFindColon, findColon) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 10);
-  EXPECT_EQ(lexer.tokens[4]->token, TokenType::Colon);
+  EXPECT_EQ(lexer.tokens[4]->type, TokenType::Colon);
 }
 
 TEST(shouldFindSemicolon, findSemicolon) {
@@ -53,7 +55,7 @@ TEST(shouldFindSemicolon, findSemicolon) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 1);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::S_Colon);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::S_Colon);
 }
 
 TEST(shouldFindLogicalAnd, findLogicalAnd) {
@@ -61,7 +63,7 @@ TEST(shouldFindLogicalAnd, findLogicalAnd) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::L_an);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::L_an);
 }
 
 TEST(shouldFindGt, findGt) {
@@ -69,7 +71,7 @@ TEST(shouldFindGt, findGt) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Gt);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Gt);
 }
 
 TEST(shouldFindGe, findGe) {
@@ -77,7 +79,7 @@ TEST(shouldFindGe, findGe) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Ge);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Ge);
 }
 
 TEST(shouldFindLt, findLt) {
@@ -85,7 +87,7 @@ TEST(shouldFindLt, findLt) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Lt);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Lt);
 }
 
 TEST(shouldFindLe, findLe) {
@@ -93,7 +95,7 @@ TEST(shouldFindLe, findLe) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Le);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Le);
 }
 
 
@@ -102,7 +104,7 @@ TEST(shouldFindLogicalOr, findLogicalOr) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::L_or);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::L_or);
 }
 
 
@@ -111,7 +113,7 @@ TEST(shouldFindNot, findNot) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 5);
-  EXPECT_EQ(lexer.tokens[2]->token, TokenType::Not);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Not);
 }
 
 TEST(shouldFindNotEq, findNotEq) {
@@ -119,7 +121,7 @@ TEST(shouldFindNotEq, findNotEq) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Ne);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Ne);
 }
 
 TEST(shouldFindEq, findEq) {
@@ -127,7 +129,7 @@ TEST(shouldFindEq, findEq) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 6);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Eq);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Eq);
 }
 
 TEST(shouldFindMod, findMod) {
@@ -135,7 +137,7 @@ TEST(shouldFindMod, findMod) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 7);
-  EXPECT_EQ(lexer.tokens[4]->token, TokenType::Mod);
+  EXPECT_EQ(lexer.tokens[4]->type, TokenType::Mod);
 }
 
 TEST(shouldFindCommonModInStr, findCommonMod) {
@@ -143,8 +145,8 @@ TEST(shouldFindCommonModInStr, findCommonMod) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 1);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Str);
-  EXPECT_EQ(lexer.tokens[0]->token_val, "%d");
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Str);
+  EXPECT_EQ(lexer.tokens[0]->str, "%d");
 }
 
 TEST(shouldFindReturn, findReturn) {
@@ -152,7 +154,7 @@ TEST(shouldFindReturn, findReturn) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 2);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Return);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Return);
 }
 
 
@@ -177,10 +179,10 @@ TEST(shouldFindTwoVar, findTwoVar) {
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 4);
   EXPECT_EQ(lexer.identifiers.size(), 2);
-  EXPECT_EQ(lexer.tokens[1]->token, TokenType::Var);
-  EXPECT_EQ(lexer.tokens[1]->token_val, "a");
-  EXPECT_EQ(lexer.tokens[3]->token_val, "b");
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[1]->str, "a");
+  EXPECT_EQ(lexer.tokens[3]->str, "b");
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::Var);
 
 }
 TEST(shouldFindKeywords, findKeywords) {
@@ -188,8 +190,8 @@ TEST(shouldFindKeywords, findKeywords) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 2);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Void);
-  EXPECT_EQ(lexer.tokens[1]->token, TokenType::Main);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Void);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Main);
 }
 
 TEST(shouldCountTwoLine, countTwoLine) {
@@ -229,8 +231,8 @@ TEST(shouldFindWeirdVar, findWeirdVar) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 1);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Var);
-  EXPECT_EQ(lexer.tokens[0]->token_val, "whileforvoid");
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[0]->str, "whileforvoid");
 }
 
 TEST(shouldFindInc, findInc) {
@@ -238,7 +240,7 @@ TEST(shouldFindInc, findInc) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 4);
-  EXPECT_EQ(lexer.tokens[2]->token, TokenType::Inc);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Inc);
 }
 
 TEST(shouldFindDec, findDec) {
@@ -246,7 +248,7 @@ TEST(shouldFindDec, findDec) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 4);
-  EXPECT_EQ(lexer.tokens[2]->token, TokenType::Dec);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Dec);
 }
 
 TEST(shouldFindWhile, findWhile) {
@@ -254,7 +256,7 @@ TEST(shouldFindWhile, findWhile) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 11);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::While);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::While);
 }
 
 TEST(shouldFindNum, findNum) {
@@ -262,8 +264,8 @@ TEST(shouldFindNum, findNum) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 5);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Num);
-  EXPECT_EQ(lexer.tokens[0]->token_val, "1");
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "1");
 }
 
 TEST(shouldFindString, findString) {
@@ -271,8 +273,8 @@ TEST(shouldFindString, findString) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 1);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Str);
-  EXPECT_EQ(lexer.tokens[0]->token_val, "Hello World");
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Str);
+  EXPECT_EQ(lexer.tokens[0]->str, "Hello World");
 }
 
 TEST(shouldFindAllTokens, findAllTokens) {
@@ -280,19 +282,19 @@ TEST(shouldFindAllTokens, findAllTokens) {
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 11);
-  EXPECT_EQ(lexer.tokens[0]->token, TokenType::Void);
-  EXPECT_EQ(lexer.tokens[1]->token, TokenType::Main);
-  EXPECT_EQ(lexer.tokens[2]->token, TokenType::L_PH);
-  EXPECT_EQ(lexer.tokens[3]->token, TokenType::R_PH);
-  EXPECT_EQ(lexer.tokens[4]->token, TokenType::L_BR);
-  EXPECT_EQ(lexer.tokens[5]->token, TokenType::Var);
-  EXPECT_EQ(lexer.tokens[5]->token_val, "printf");
-  EXPECT_EQ(lexer.tokens[6]->token, TokenType::L_PH);
-  EXPECT_EQ(lexer.tokens[7]->token, TokenType::Str);
-  EXPECT_EQ(lexer.tokens[7]->token_val, "hello world");
-  EXPECT_EQ(lexer.tokens[8]->token, TokenType::R_PH);
-  EXPECT_EQ(lexer.tokens[9]->token, TokenType::S_Colon);
-  EXPECT_EQ(lexer.tokens[10]->token, TokenType::R_BR);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Void);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Main);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::L_PH);
+  EXPECT_EQ(lexer.tokens[3]->type, TokenType::R_PH);
+  EXPECT_EQ(lexer.tokens[4]->type, TokenType::L_BR);
+  EXPECT_EQ(lexer.tokens[5]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[5]->str, "printf");
+  EXPECT_EQ(lexer.tokens[6]->type, TokenType::L_PH);
+  EXPECT_EQ(lexer.tokens[7]->type, TokenType::Str);
+  EXPECT_EQ(lexer.tokens[7]->str, "hello world");
+  EXPECT_EQ(lexer.tokens[8]->type, TokenType::R_PH);
+  EXPECT_EQ(lexer.tokens[9]->type, TokenType::S_Colon);
+  EXPECT_EQ(lexer.tokens[10]->type, TokenType::R_BR);
   EXPECT_EQ(lexer.line, 2);
 }
 

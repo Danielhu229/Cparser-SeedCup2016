@@ -6,11 +6,13 @@
 #include <TokenType.h>
 #include <Utility.h>
 
+using namespace cParser;
+
 vector<Token *> cParser::Utility::combineElseIf(vector<Token *> &tokens) {
   vector<Token *> combinedTokens;
   for (int i = 0; i < tokens.size(); ++i) {
-    if (tokens[i]->token == TokenType::Else && i + 1 < tokens.size() &&
-        tokens[i + 1]->token == TokenType::If) {
+    if (tokens[i]->type == TokenType::Else && i + 1 < tokens.size() &&
+        tokens[i + 1]->type == TokenType::If) {
       combinedTokens.push_back(new Token("else if", TokenType::ElseIf));
       i++;
     } else {

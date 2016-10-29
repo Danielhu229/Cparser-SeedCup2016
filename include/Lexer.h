@@ -12,10 +12,13 @@
 #include "Token.h"
 #include <vector>
 using namespace std;
+
+namespace cParser {
+
 class Lexer {
 
  private:
-  const string& code;
+  const string &code;
   const string old_code;
   int pos;
 
@@ -29,14 +32,15 @@ class Lexer {
 
   map<string, Token> identifiers;
   int line;
-  vector<Token*> tokens;
-  Lexer(const string& code);
+  vector<Token *> tokens;
+  Lexer(const string &code);
   /*
    * Lexical analysis
    */
   void lexan();
-  void push(Token* token);
-  Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE, ENUM, RETURN, SIZEOF, WHILE, FOR, VOID, MAIN, ASSIGN, EQ;
+  void push(Token *token);
+  Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE, ENUM, RETURN, SIZEOF, WHILE, FOR, VOID,
+      MAIN, ASSIGN, EQ;
   Token INC, DEC;
   Token ADD, SUB, DIV, MUL;
   Token LE, LT, GE, GT, NE, COND;
@@ -50,7 +54,8 @@ class Lexer {
   Token S_COLON, COLON, COMMA;
   Token DO;
 
-
 };
+
+}
 
 #endif //SEEDCUP_PHASER_H

@@ -4,54 +4,55 @@
 
 #include "../include/Lexer.h"
 using namespace std;
+using namespace cParser;
 
 void Lexer::init() {
-  INT = Token("int", TokenType ::Int, "int");
-  DOUBLE = Token("double", TokenType::Double, "double");
-  FLOAT = Token("float", TokenType::Float, "float");
-  LONG = Token("long", TokenType::Long, "long");
-  CHAR = Token("char", TokenType::Char, "char");
-  BREAK = Token("break", TokenType::Break, "break");
-  SWITCH = Token("switch", TokenType::Switch, "switch");
-  CASE = Token("case", TokenType::Case, "case");
-  ELSE = Token("else", TokenType::Else, "else");
-  ENUM = Token("enum", TokenType::Enum, "enum");
-  IF = Token("if", TokenType::If, "if");
-  RETURN = Token("return", TokenType::Return, "return");
-  SIZEOF = Token("sizeof", TokenType::Sizeof, "sizeof");
-  WHILE = Token("while", TokenType::While, "while");
-  FOR = Token("for", TokenType::For, "for");
-  VOID = Token("void", TokenType::Void, "void");
-  MAIN = Token("main", TokenType::Main, "main");
-  UNSIGNED = Token("unsigned", TokenType::Unsigned, "unsigned");
-  DO = Token("do", TokenType::DO, "do");
-  ASSIGN = Token("=", TokenType::Assign, "=");
-  EQ = Token("==", TokenType::Eq, "==");
-  NE = Token("!=", TokenType::Ne, "!=");
-  INC = Token("++", TokenType::Inc, "++");
-  DEC = Token("--", TokenType::Dec, "--");
-  ADD = Token("+", TokenType::Add, "+");
-  SUB = Token("-", TokenType::Sub, "-");
-  MUL = Token("*", TokenType::Mul, "*");
-  DIV = Token("/", TokenType::Div, "/");
-  LE = Token("<=", TokenType::Le, "<=");
-  LT = Token("<", TokenType::Lt, "<");
-  GE = Token(">=", TokenType::Ge, ">=");
-  GT = Token(">", TokenType::Gt, ">");
-  NOT = Token("!", TokenType::Not, "!");
-  LOR = Token("||", TokenType::L_or, "||");
-  LAN = Token("&&", TokenType::L_an, "&&");
-  MOD = Token("%", TokenType::Mod, "%");
-  L_BRAK = Token("[", TokenType::L_BRAK, "[");
-  R_BRAK = Token("]", TokenType::R_BRAK, "]");
-  L_BR = Token("{", TokenType::L_BR, "{");
-  R_BR = Token("}", TokenType::R_BR, "}");
-  L_PH = Token("(", TokenType::L_PH, "(");
-  R_PH = Token(")", TokenType::R_PH, ")");
-  COND = Token("?", TokenType::Cond, "?");
-  COLON = Token(":", TokenType::Colon, ":");
-  S_COLON = Token(";", TokenType::S_Colon, ";");
-  COMMA = Token(",", TokenType::Comma, ",");
+  INT = Token("int", TokenType::Int);
+  DOUBLE = Token("double", TokenType::Double);
+  FLOAT = Token("float", TokenType::Float);
+  LONG = Token("long", TokenType::Long);
+  CHAR = Token("char", TokenType::Char);
+  BREAK = Token("break", TokenType::Break);
+  SWITCH = Token("switch", TokenType::Switch);
+  CASE = Token("case", TokenType::Case);
+  ELSE = Token("else", TokenType::Else);
+  ENUM = Token("enum", TokenType::Enum);
+  IF = Token("if", TokenType::If);
+  RETURN = Token("return", TokenType::Return);
+  SIZEOF = Token("sizeof", TokenType::Sizeof);
+  WHILE = Token("while", TokenType::While);
+  FOR = Token("for", TokenType::For);
+  VOID = Token("void", TokenType::Void);
+  MAIN = Token("main", TokenType::Main);
+  UNSIGNED = Token("unsigned", TokenType::Unsigned);
+  DO = Token("do", TokenType::DO);
+  ASSIGN = Token("=", TokenType::Assign);
+  EQ = Token("==", TokenType::Eq);
+  NE = Token("!=", TokenType::Ne);
+  INC = Token("++", TokenType::Inc);
+  DEC = Token("--", TokenType::Dec);
+  ADD = Token("+", TokenType::Add);
+  SUB = Token("-", TokenType::Sub);
+  MUL = Token("*", TokenType::Mul);
+  DIV = Token("/", TokenType::Div);
+  LE = Token("<=", TokenType::Le);
+  LT = Token("<", TokenType::Lt);
+  GE = Token(">=", TokenType::Ge);
+  GT = Token(">", TokenType::Gt);
+  NOT = Token("!", TokenType::Not);
+  LOR = Token("||", TokenType::L_or);
+  LAN = Token("&&", TokenType::L_an);
+  MOD = Token("%", TokenType::Mod);
+  L_BRAK = Token("[", TokenType::L_BRAK);
+  R_BRAK = Token("]", TokenType::R_BRAK);
+  L_BR = Token("{", TokenType::L_BR);
+  R_BR = Token("}", TokenType::R_BR);
+  L_PH = Token("(", TokenType::L_PH);
+  R_PH = Token(")", TokenType::R_PH);
+  COND = Token("?", TokenType::Cond);
+  COLON = Token(":", TokenType::Colon);
+  S_COLON = Token(";", TokenType::S_Colon);
+  COMMA = Token(",", TokenType::Comma);
   keywords["int"] = INT;
   keywords["do"] = DO;
   keywords["double"] = DOUBLE;
@@ -94,7 +95,7 @@ void Lexer::lexan() {
 
 void Lexer::push(Token *token) {
   curr_token = *token;
-//  cout << "current token " << curr_token << ", at pos " << pos << endl;
+  //  cout << "current token " << curr_token << ", at pos " << pos << endl;
   tokens.push_back(token);
 }
 
@@ -107,13 +108,13 @@ void Lexer::next() {
     }
     token = code[pos];
     ++pos;
-    if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') || (token == '_')) {
+    if ((token >= 'a' && token <= 'z') || (token >= 'A' && token <= 'Z') ||
+        (token == '_')) {
       // find a variable
       last_pos = pos - 1;
-      while ((code[pos] >= 'a' && code[pos] <= 'z')
-          || (code[pos] >= 'A' && code[pos] <= 'Z')
-          || (code[pos] >= '0' && code[pos] <= '9')
-          || (code[pos] == '_')) {
+      while ((code[pos] >= 'a' && code[pos] <= 'z') ||
+             (code[pos] >= 'A' && code[pos] <= 'Z') ||
+             (code[pos] >= '0' && code[pos] <= '9') || (code[pos] == '_')) {
         pos++;
       }
       string name = code.substr((size_t)last_pos, (size_t)(pos - last_pos));
@@ -121,30 +122,32 @@ void Lexer::next() {
         Token *t = &keywords.find(name)->second;
         push(t);
       } else {
-        Token *t = new Token("Var", TokenType::Var, name);
+        Token *t = new Token(name, TokenType::Var);
         identifiers[name] = *t;
         push(t);
       }
     } else if (token >= '0' && token <= '9') {
-      int token_val = token - '0';
-      if (token_val > 0) {
+      int str = token - '0';
+      if (str > 0) {
         while (code[pos] >= '0' && code[pos] <= '9') {
-          token_val = token_val * 10 + code[pos++] - '0';
+          str = str * 10 + code[pos++] - '0';
         }
       } else {
         if (code[pos] == 'x' || code[pos] == 'X') {
           token = code[++pos];
-          while ((token >= '0' && token <= '9') || (token >= 'a' && token <= 'f') || (token >= 'A' & token <= 'F')) {
-            token_val = token_val * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
+          while ((token >= '0' && token <= '9') ||
+                 (token >= 'a' && token <= 'f') ||
+                 (token >= 'A' & token <= 'F')) {
+            str = str * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
             token = code[++pos];
           }
         } else {
           while (code[pos] >= '0' && code[pos] <= '7') {
-            token_val = token_val * 8 + code[pos++] - '0';
+            str = str * 8 + code[pos++] - '0';
           }
         }
       }
-      Token *t = new Token("Num", TokenType::Num, to_string(token_val));
+      Token *t = new Token(to_string(str), TokenType::Num);
       push(t);
 
     } else if (token == '"' || token == '\'') {
@@ -163,11 +166,11 @@ void Lexer::next() {
         pos = cur_pos;
       }
       if (pos - cur_pos == 1) {
-        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num, string(1, code[cur_pos]));
+        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num);
         push(curr_token);
       } else if (pos - cur_pos > 0) {
         string name = code.substr((size_t)cur_pos, (size_t)(pos - cur_pos));
-        Token *t = new Token(name, TokenType::Str, name);
+        Token *t = new Token(name, TokenType::Str);
         push(t);
       }
     } else if (functions.find(token) != functions.end()) {
@@ -176,11 +179,8 @@ void Lexer::next() {
   }
 }
 
-
 void Lexer::initFunctions() {
-  auto comma = [this]() {
-    push(&COMMA);
-  };
+  auto comma = [this]() { push(&COMMA); };
   auto add = [this]() {
     if (code[pos] == '+') {
       pos++;
@@ -248,39 +248,17 @@ void Lexer::initFunctions() {
       push(&LT);
     }
   };
-  auto colon = [this]() {
-    push(&COLON);
-  };
-  auto s_colon = [this]() {
-    push(&S_COLON);
-  };
-  auto r_ph = [this]() {
-    push(&R_PH);
-  };
-  auto l_ph = [this]() {
-    push(&L_PH);
-  };
-  auto r_br = [this]() {
-    push(&R_BR);
-  };
-  auto l_br = [this]() {
-    push(&L_BR);
-  };
-  auto l_brak = [this]() {
-    push(&L_BRAK);
-  };
-  auto r_brak = [this]() {
-    push(&R_BRAK);
-  };
-  auto cond = [this]() {
-    push(&COND);
-  };
-  auto mul = [this]() {
-    push(&MUL);
-  };
-  auto mod = [this]() {
-    push(&MOD);
-  };
+  auto colon = [this]() { push(&COLON); };
+  auto s_colon = [this]() { push(&S_COLON); };
+  auto r_ph = [this]() { push(&R_PH); };
+  auto l_ph = [this]() { push(&L_PH); };
+  auto r_br = [this]() { push(&R_BR); };
+  auto l_br = [this]() { push(&L_BR); };
+  auto l_brak = [this]() { push(&L_BRAK); };
+  auto r_brak = [this]() { push(&R_BRAK); };
+  auto cond = [this]() { push(&COND); };
+  auto mul = [this]() { push(&MUL); };
+  auto mod = [this]() { push(&MOD); };
   auto _and = [this]() {
     if (code[pos] == '&') {
       pos++;
@@ -298,9 +276,7 @@ void Lexer::initFunctions() {
       pos++;
     }
   };
-  auto n = [this]() {
-    line++;
-  };
+  auto n = [this]() { line++; };
   functions[','] = comma;
   functions['+'] = add;
   functions['-'] = sub;
