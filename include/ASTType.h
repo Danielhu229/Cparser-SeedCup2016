@@ -19,6 +19,7 @@ enum class ASTType {
   DeclareVar,
   ChildStatement,
   While,
+  Switch,
   Block};
 }
 #endif // C_PARSER_ASTTYPE_H
