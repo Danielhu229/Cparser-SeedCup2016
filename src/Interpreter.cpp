@@ -10,16 +10,22 @@
 using namespace cParser;
 using namespace std;
 
+string getVarName(shared_ptr<Statement> declareOrVar) {
+  if (declareOrVar->type == ASTType::DeclareVar) {
+    return declareOrVar->children[0]->token->token_val;
+  }
+  if (declareOrVar->type == ASTType::Final && declareOrVar->token->token == TokenType::Var) {
+    return declareOrVar->token->token_val;
+  }
+  cerr << "cannot get var name from ast of" << declareOrVar->token->token_val << endl;
+  return "";
+}
+
 template <typename ValueType>
 ValueType binaryCalculator(Interpreter* interpreter, shared_ptr<Statement> statement) {
-  if (statement->token->token == TokenType::Num) {
-    return static_cast<ValueType>(atof(statement->token->name.c_str()));
-  }if (statement->token->token == TokenType::Var) {
-    ValueType value = interpreter->curContext()->get<ValueType>(statement->token->name);
-    return value;
-  }
-  auto right = calculator<ValueType>(interpreter, statement->children[1]);
-  auto left = calculator<ValueType>(interpreter, statement->children[0]);
+
+  auto right = interpreter->calculate<ValueType>(statement->children[1]);
+  auto left = interpreter->calculate<ValueType>(statement->children[0]);
   switch (statement->token->token) {
     case TokenType::Add :
       return left + right;
@@ -30,7 +36,8 @@ ValueType binaryCalculator(Interpreter* interpreter, shared_ptr<Statement> state
     case TokenType::Div :
       return left / right;
     case TokenType::Assign:
-      interpreter->curContext()->set<ValueType>(statement->children[0]->token->name, right);
+      getchar();
+      interpreter->curContext()->set<ValueType>(getVarName(statement->children[0]), right);
       interpreter->rSelfOperation();
       return right;
     case TokenType::Lt:
@@ -46,13 +53,20 @@ ValueType binaryCalculator(Interpreter* interpreter, shared_ptr<Statement> state
 
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter* interpreter, shared_ptr<Statement> statement) {
-  return (static_cast<ValueType>(atof(statement->children[0]->token->name.c_str())) + 1);
+  return (static_cast<ValueType>(atof(statement->children[0]->token->token_val.c_str())) + 1);
 }
 
 template <typename ValueType>
 ValueType rSelfCalculator(Interpreter* interpreter, shared_ptr<Statement> statement) {
-  interpreter->markRSelf(statement->children[0]->token->name, statement->token->token);
-  return static_cast<ValueType>(atof(statement->children[0]->token->name.c_str()));
+  interpreter->markRSelf(statement->children[0]->token->token_val, statement->token->token);
+  return static_cast<ValueType>(atof(statement->children[0]->token->token_val.c_str()));
+}
+
+template <typename ValueType>
+ValueType declareVar(Interpreter* interpreter, shared_ptr<Statement> statement) {
+  getchar();
+  interpreter->curContext()->declare<ValueType>(statement->children[0]->token->token_val, ValueType(0));
+  return ValueType(0);
 }
 
 template <> map<string, int> &Context::getVars<int>() { return this->ints; }
@@ -78,6 +92,7 @@ template <class T> void Context::set(string name, T value) {
     }
     current = current->parent;
   }
+  getchar();
 }
 template <class T> T Context::get(string name) {
   auto current = this;
@@ -137,8 +152,39 @@ void Interpreter::parse(string source) {
   statements.push_back(Parser::parseTokens(tokens, 0, lexer.tokens.size()));
 }
 void Interpreter::step() {
-
+  execute(statements[currentStatement]);
 }
+
+void Interpreter::execute(shared_ptr<Statement> ast) {
+  switch (ast->type) {
+    case ASTType::Binary:
+      calculate<int>(ast);
+      break;
+    case ASTType::LSelf:
+      calculate<int>(ast);
+      break;
+    case ASTType::RSelf:
+      calculate<int>(ast);
+      break;
+    case ASTType::Final:
+      calculate<int>(ast);
+      break;
+    case ASTType::Call:break;
+    case ASTType::If:break;
+    case ASTType::Else:break;
+    case ASTType::ElseIf:break;
+    case ASTType::For:break;
+    case ASTType::DeclareVar:
+      calculate<int>(ast);
+      break;
+    case ASTType::ChildStatement:
+      execute(ast->children[0]);
+      break;
+    case ASTType::While:break;
+    case ASTType::Block:break;
+  }
+}
+
 template<typename T>
 T Interpreter::calculate(shared_ptr<Statement> ast) {
   switch (ast->type) {
@@ -146,6 +192,16 @@ T Interpreter::calculate(shared_ptr<Statement> ast) {
       return binaryCalculator<T>(this, ast);
     case ASTType::LSelf:
       return lSelfCalculator<T>(this, ast);
+    case ASTType::RSelf:
+      return rSelfCalculator<T>(this, ast);
+    case ASTType::DeclareVar:
+      return declareVar<T>(this, ast);
+    case ASTType::Final:
+      if (ast->token->token == TokenType::Num) {
+        return static_cast<T>(atof(ast->token->token_val.c_str()));
+      } else if (ast->token->token == TokenType::Var) {
+        return curContext()->get<T>(ast->token->token_val);
+      }
   }
 }
 

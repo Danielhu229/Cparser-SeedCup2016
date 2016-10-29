@@ -10,6 +10,7 @@ using namespace std;
 
 TEST(declaration, Statement) {
   auto interpreter = new Interpreter();
-  // interpreter->execute("int i = 24;");
+  interpreter->parse("int i = 24;");
+  interpreter->step();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
 }

@@ -5,30 +5,25 @@
 #include "Token.h"
 
 
-Token::Token(std::string name, TokenType symbol) {
-  this->name = name;
-  this->token = symbol;
-  // this->hash = m_hash(this->name);
+Token::Token(std::string name, TokenType symbol)
+    :name(name), token(symbol) {
   this->token_val = "";
   this->clz = 0;
   this->type = 0;
 }
 
-Token::Token(std::string name, TokenType symbol, std::string value) {
-  this->name = name;
-  this->token = symbol;
-  this->token_val = value;
+Token::Token(std::string name, TokenType symbol, std::string value)
+    :name(name), token(symbol), token_val(value) {
 }
 
-Token::Token(const Token &obj) {
+Token::Token(const Token &obj):token(obj.token) {
   this->token_val = obj.token_val;
-  this->token = obj.token;
   this->name = obj.name;
   this->clz = obj.clz;
   this->type = obj.type;
 }
 
-Token::Token() {
+Token::Token():token(TokenType::S_Colon) {
   this->token_val = "";
   this->clz = 0;
   this->type = 0;
@@ -102,6 +97,7 @@ std::ostream &operator<<(std::ostream &os, const Token &token) {
   os << "<" << token.name << ", " << token.token_val << ">";
   return os;
 }
+
 bool Token::operator==(const Token &rhs) const {
   return token == rhs.token &&
       name == rhs.name;

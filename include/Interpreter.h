@@ -18,12 +18,11 @@ using namespace std;
 
 namespace cParser {
 
-
-enum class ValueType {
-  Int,
-  Float,
-  Double,
-  Void
+enum class ContextMode {
+  Global,
+  If,
+  Call,
+  Loop
 };
 
 class Interpreter;
@@ -38,6 +37,7 @@ class Context {
   map<string, double> doubles;
   map<string, float> floats;
  public:
+  ContextMode mode;
   template <class T>
   map<string, T>& getVars();
   template <class T>
@@ -48,23 +48,28 @@ class Context {
   T get(string name);
   template <class T>
   bool has(string name);
-  Context(Context* parent):parent(parent) {}
+  Context():parent(nullptr) {}
+  Context(Context* parent):parent(parent), mode(ContextMode::Global) {}
+  Context(Context* parent, ContextMode mode):parent(parent), mode(mode) {}
 };
 
 class Interpreter {
   stack<Context*> contexts;
   vector<shared_ptr<Statement>> statements;
+  map<shared_ptr<Statement>, int> lineOfStatement;
+  int currentStatement;
 public:
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();
   void rSelfOperation();
   void parse(string source);
+  void execute(shared_ptr<Statement> ast);
   void step();
   template <typename T>
   T calculate(shared_ptr<Statement> ast);
-  Interpreter() {
-    contexts.push(new Context(nullptr));
+  Interpreter():currentStatement(0) {
+    contexts.push(new Context());
   }
 };
 }
