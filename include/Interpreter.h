@@ -18,13 +18,6 @@ using namespace std;
 
 namespace cParser {
 
-enum class ContextMode {
-  Global,
-  If,
-  Call,
-  Loop
-};
-
 class Interpreter;
 
 template <typename ValueType>
@@ -37,7 +30,6 @@ class Context {
   map<string, double> doubles;
   map<string, float> floats;
  public:
-  ContextMode mode;
   template <class T>
   map<string, T>& getVars();
   template <class T>
@@ -49,8 +41,7 @@ class Context {
   template <class T>
   bool has(string name);
   Context():parent(nullptr) {}
-  Context(Context* parent):parent(parent), mode(ContextMode::Global) {}
-  Context(Context* parent, ContextMode mode):parent(parent), mode(mode) {}
+  Context(Context* parent):parent(parent) {}
 };
 
 class Interpreter {
@@ -63,6 +54,8 @@ public:
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();
+  void pushContext();
+  void popContext();
   void rSelfOperation();
   void execute(Statement* ast);
   void step();

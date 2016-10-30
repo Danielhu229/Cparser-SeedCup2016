@@ -88,7 +88,7 @@ ValueType declareVar(Interpreter *interpreter, Statement *statement) {
     if (child->token.type == TokenType::Assign) {
       interpreter->curContext()->declare<ValueType>(
           child->children[0]->token.str, interpreter->calculate<ValueType>(child->children[1]));
-    } else if(child->token.type == TokenType::Var) {
+    } else {
       interpreter->curContext()->declare<ValueType>(
           child->token.str, ValueType(0));
     }
@@ -127,7 +127,7 @@ template <> map<string, double> &Context::getVars<double>() {
 }
 
 template <class T> void Context::declare(string name, int value) {
-  getVars<T>()[name] = value;
+    getVars<T>()[name] = value;
 }
 
 template <class T> void Context::set(string name, T value) {
@@ -171,6 +171,14 @@ Context *Interpreter::curContext() {
     return nullptr;
   }
   return this->contexts.top();
+}
+
+void Interpreter::pushContext() {
+  this->contexts.push(new Context(this->contexts.top()));
+}
+
+void Interpreter::popContext() {
+  this->contexts.pop();
 }
 
 void Interpreter::rSelfOperation() {
@@ -227,20 +235,24 @@ void Interpreter::execute(Statement *ast) {
       }
       break;
   case ASTType::If:
+    pushContext();
     if (calculate<int>(ast->children[0])) {
       execute(ast->children[1]);
     } else {
-      if (ast->children.size() == 3) {
+      if (ast->children.size() == 3 && ast->children[2]) {
         execute(ast->children[2]);
       }
     }
+      popContext();
     break;
   case ASTType::Else:
     break;
   case ASTType::ElseIf:
     break;
   case ASTType::For:
+    pushContext();
     forExecutor(this, ast);
+      popContext();
     break;
   case ASTType::DeclareVar:
     declareVar<int>(this, ast);
@@ -250,9 +262,13 @@ void Interpreter::execute(Statement *ast) {
     execute(ast->children[0]);
     break;
   case ASTType::While:
+    pushContext();
     whileExecutor(this, ast);
+      popContext();
     case ASTType::Do:
+      pushContext();
       whileExecutor(this, ast);
+      popContext();
     break;
   }
 }

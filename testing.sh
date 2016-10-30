@@ -1,6 +1,9 @@
-rm -rf test/build
-mkdir test/build
-cd test/build
-cmake ..
-make
+for case in `ls test/cases`
+do
+echo test $case
+cp bin/SeedCup2016 test/cases/$case
+cd test/cases/$case
+./SeedCup2016
+cd ../../../
+done
 
