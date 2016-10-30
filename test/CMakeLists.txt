@@ -18,11 +18,13 @@ set(C_PARSER_SRC
         unit/LexerTest.cpp
         unit/IoTest.cpp
         unit/InterpreterTest.cpp
+        unit/ExprTest.cpp
         ../src/Parser.cpp
         ../src/Token.cpp
         ../src/Lexer.cpp
         ../src/Utility.cpp
         ../src/Interpreter.cpp
+        ../src/Expr.cpp
         )
 
 add_executable(SeedCup2016_Test ${C_PARSER_SRC} ${C_PARSER_HEAD})

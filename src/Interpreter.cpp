@@ -2,9 +2,11 @@
 // Created by 胡一鸣 on 16/10/27.
 //
 
+#include <Expr.h>
 #include "Interpreter.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "ASTType.h
 #include "Utility.h"
 
 using namespace cParser;
@@ -170,16 +172,13 @@ void Interpreter::rSelfOperation() {
   }
 }
 
-void Interpreter::parse(string source) {
-  Lexer lexer(source);
-  lexer.lexan();
-  auto tokens = Utility::combineElseIf(lexer.tokens);
-  auto ast = Parser::parseTokens(tokens, 0, lexer.tokens.size());
-  statements.push_back(ast);
-}
 void Interpreter::step() {
   execute(statements[currentStatement]);
-  currentStatement++;
+  if (statements[currentStatement]->type == ASTType::If) {
+
+  } else {
+    currentStatement++;
+  }
 }
 
 void Interpreter::execute(Statement *ast) {
@@ -245,4 +244,18 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
 
 void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
+}
+string Interpreter::run() {
+  while (currentStatement < statements.size()) {
+    step();
+  }
+  // TODO: return line number
+  return "expect line number here";
+}
+void Interpreter::build(string source) {
+  Lexer lexer(source);
+  lexer.lexan();
+  Expr expr(lexer.tokens);
+  bool rst = expr.parse();
+  this->statements = expr.statements;
 }

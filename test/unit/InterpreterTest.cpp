@@ -9,75 +9,59 @@ using namespace cParser;
 using namespace std;
 
 
-
 TEST(calculate, Statement) {
-  std::string a("1 * 8 - 8 + 7");
+  std::string a("1 * 8 - 8 + 7;");
   auto interpreter = new Interpreter();
-  interpreter->parse(a);
+  interpreter->build(a);
   auto ast = interpreter->statements[0];
-  int result = interpreter->calculate<int>(ast);
+  int result = interpreter->calculate<int>(ast->children[0]);
   EXPECT_EQ(result, 7);
 }
-
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
   auto interpreter = new Interpreter();
-  interpreter->parse(a);
-  interpreter->step();
+  interpreter->build(a);
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
 }
 
 TEST(declarationAndCalculate, Statement) {
   std::string a("int i = (4 + 3) * 6 - 10 + 11;");
   auto interpreter = new Interpreter();
-  interpreter->parse(a);
-  interpreter->step();
+  interpreter->build(a);
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 43);
 }
 
 TEST(rselfOperation, Statement) {
-  std::string a("int i = 0, j= 0;");
-  std::string b("j = i++;");
+  std::string a("int i = 0, j= 0;\nj = i++;");
   auto interpreter = new Interpreter();
-  interpreter->parse(a);
-  interpreter->parse(b);
-  interpreter->step();
-  interpreter->step();
+  interpreter->build(a);
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 0);
 }
 
 TEST(lselfOperation, Statement) {
-  std::string a("int i = 0, j = 0;");
-  std::string b("j = ++i;");
+  std::string a("int i = 0, j = 0;\nj = ++i;");
   auto interpreter = new Interpreter();
-  interpreter->parse(a);
-  interpreter->parse(b);
-  interpreter->step();
-  interpreter->step();
+  interpreter->build(a);
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 1);
 }
 
-
 TEST(continueAssign, Statement) {
   auto interpreter = new Interpreter();
-  interpreter->parse("int a;");
-  interpreter->parse("int b;");
-  interpreter->parse("a=b=2;");
-  interpreter->step();
-  interpreter->step();
-  interpreter->step();
+  interpreter->build("int a;\nint b;\na=b=2;");
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("a"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 2);
 }
-
 TEST(continueDeclare, Statement) {
   auto interpreter = new Interpreter();
-  interpreter->parse("int a, b = 7;");
-  interpreter->parse("a=2;");
-  interpreter->step();
-  interpreter->step();
+  interpreter->build("int a, b = 7;\na=2;");
+  interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("a"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 7);
 }

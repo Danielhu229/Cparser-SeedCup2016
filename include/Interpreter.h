@@ -63,9 +63,10 @@ public:
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();
   void rSelfOperation();
-  void parse(string source);
   void execute(Statement* ast);
   void step();
+  string run();
+  void build(string source);
   template <typename T>
   T calculate(Statement* ast);
   Interpreter():currentStatement(0) {
