@@ -5,7 +5,8 @@
 #include <Token.h>
 #include <TokenType.h>
 #include <Utility.h>
-
+#include <stack>
+#include <iostream>
 using namespace cParser;
 
 vector<Token *> Utility::combineElseIf(vector<Token *> &tokens) {
@@ -32,4 +33,29 @@ string Utility::intsToString(vector<int>& src) {
     result = result.substr(0, result.length() - 1);
   }
   return result;
+}
+
+int Utility::findBr(vector<Token *> &tokens, int begin, int end) {
+  stack<int> brStack;
+  int brPos = -1;
+  int la = begin;
+  while (la < end) {
+    // TODO: parse the block recursively and if it doesn't have brackets then you should find the first occurrence of ';' instead.
+    if (tokens[la]->type == TokenType::L_BR) {
+      brStack.push(la);
+    } else if (tokens[la]->type == TokenType::R_BR) {
+      if (brStack.empty()) {
+        cout << "Invalid input" << endl;
+        break;
+      } else {
+        brStack.pop();
+      }
+      if (brStack.empty()) {
+        brPos = la;
+        break;
+      }
+    }
+    la++;
+  }
+  return brPos;
 }

@@ -299,7 +299,7 @@ TEST(shouldFindAllTokens, findAllTokens) {
 }
 
 TEST(shouldFindLineNumber, findLineNum) {
-  std::string a("#include <stdio.h> \n void main() { \n printf(\"hello world\"); \n } ");
+  std::string a("#include <stdio.h> \r\n void main() { \r\n printf(\"hello world\"); \r\n } ");
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 11);

@@ -6,7 +6,7 @@
 #include "Token.h"
 #include "TokenType.h"
 #include "gtest/gtest.h"
-
+#include "Utility.h"
 using namespace cParser;
 
 TEST(shouldDivideTokens, binaryParser) {
@@ -547,7 +547,7 @@ TEST(shouldFindLastPosOfBrackets, findBr) {
        new Token("{", TokenType::L_BR),
        new Token("}", TokenType::R_BR),
        new Token("}", TokenType::R_BR)});
-  auto ast = Parser::findBr(*tokens, 0, tokens->size());
+  auto ast = Utility::findBr(*tokens, 0, tokens->size());
   EXPECT_EQ(ast, 3);
 }
 

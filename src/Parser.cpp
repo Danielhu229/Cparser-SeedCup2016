@@ -5,8 +5,8 @@
 #include "Parser.h"
 #include <iostream>
 #include <memory>
-#include <stack>
 #include <vector>
+#include <Utility.h>
 
 #include "AST.h"
 #include "ASTType.h"
@@ -114,11 +114,12 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         elsePos++;
       }
       if (elsePos == end) {
-        int brPos = Parser::findBr(tokens, index, end - 1);
+        int brPos = Utility::findBr(tokens, index, end - 1);
         int la = index;
         while (la < end) {
           if (tokens[la]->type == TokenType::S_Colon) {
             // fixme: in case have sentence ;;; in one line, we need line number in token
+            int tmp = la;
             sColonPos = la;
             break;
           }
@@ -143,8 +144,7 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         }
         // find a else without an if behind it.
         int pos = elsePos;
-        // clear the stack
-        int brPos = Parser::findBr(tokens, pos, end - 1);
+        int brPos = Utility::findBr(tokens, pos, end - 1);
         while (pos < end) {
           if (tokens[pos]->type == TokenType::S_Colon) {
             // find the first occurrence of ';'
@@ -161,7 +161,7 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         }
       }
     } else if (tokens[index]->type == TokenType::For) {
-      int brPos = Parser::findBr(tokens, index, end - 1);
+      int brPos = Utility::findBr(tokens, index, end - 1);
       if (brPos != -1 && brPos != end) {
         ast->children.push_back(Parser::parseTokens(tokens, index, brPos + 1));
         index = brPos + 1;
@@ -186,7 +186,7 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         }
       }
     } else if (tokens[index]->type == TokenType::While) {
-      int brPos = Parser::findBr(tokens, index, end - 1);
+      int brPos = Utility::findBr(tokens, index, end - 1);
       if (brPos != -1 && brPos != end) {
         ast->children.push_back(Parser::parseTokens(tokens, index, brPos + 1));
         index = brPos + 1;
@@ -209,7 +209,7 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         }
       }
     } else if (tokens[index]->type == TokenType::L_BR) {
-      int brPos = Parser::findBr(tokens, index, end - 1);
+      int brPos = Utility::findBr(tokens, index, end - 1);
       if (brPos != -1) {
         // we find another brackets
         ast->children.push_back(Parser::blockParser(tokens, index + 1, brPos + 1, index));
@@ -307,7 +307,7 @@ ParserFun dowhileParser = [](vector<Token *> &tokens, int begin, int end,
     }
     ast->children.push_back(Parser::parseTokens(tokens, position + 1, doPos + 1));
   } else {
-    int brPos = Parser::findBr(tokens, doPos, end);
+    int brPos = Utility::findBr(tokens, doPos, end);
     ast->children.push_back(Parser::blockParser(tokens, doPos, brPos + 1, doPos));
   }
   return ast;
@@ -363,7 +363,6 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
 // TODO: deal with else and else if in this parser
 ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
                         int position) -> Statement* {
-  std::stack<int> brStack;
   auto ast =
       (new Statement(ASTType::If, *tokens[position]));
   // fixme: fix with for or while loop in else branch.
@@ -421,8 +420,8 @@ vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::Colon)},
     {e(TokenType::S_Colon)},
     {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double),
-     {e(TokenType::Assign)},
      e(TokenType::Str)},
+    {e(TokenType::Assign)},
     {e(TokenType::Lt), e(TokenType::Gt), e(TokenType::Le), e(TokenType::Ge), e(TokenType::Ne), e(TokenType::Eq)},
     {e(TokenType::Add), e(TokenType::Sub)},
     {e(TokenType::Mul), e(TokenType::Div)},
