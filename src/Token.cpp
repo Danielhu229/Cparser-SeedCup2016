@@ -16,7 +16,12 @@ Token::Token(std::string str, TokenType type, int lineNum)
 }
 
 Token::Token(const Token &obj)
-    :str(obj.str), type(obj.type) {
+    :str(obj.str), type(obj.type), lineNum(obj.lineNum) {
+}
+
+Token::Token(const Token &obj, int lineNum)
+    :str(obj.str), type(obj.type), lineNum(lineNum) {
+
 }
 
 Token::Token():type(TokenType::S_Colon), str("") {
