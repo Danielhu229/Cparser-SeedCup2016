@@ -523,3 +523,418 @@ TEST(shouldGetForWhileExprComplex, parse) {
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
 }
+
+TEST(shouldGetIfForExprComplex, parse) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("{", TokenType::L_BR), new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 2);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[1]->token->type, TokenType::For);
+}
+
+TEST(shouldGetIfWhileExprComplex, parse) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("{", TokenType::L_BR), new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
+
+
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 2);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[1]->token->type, TokenType::While);
+}
+
+TEST(shouldGetWhileInsideIf, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+
+
+
+
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[2], nullptr);
+}
+
+
+TEST(shouldGetWhileNoBracketsInsideIf, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[2], nullptr);
+}
+
+TEST(shouldGetWhileInsideIfNoneBrackets, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+}
+
+TEST(shouldGetWhileInsideIfElse, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+                                        new Token("else", TokenType::Else), new Token("{", TokenType::L_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
+}
+
+TEST(shouldGetWhileInsideIfElseNoBrackets, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("else", TokenType::Else),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::While);
+}
+
+TEST(shouldGetWhileInsideIfElseNoneBrackets, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("else", TokenType::Else),
+                                        new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::S_Colon);
+}
+
+TEST(shouldGetForInsideIf, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->children[2], nullptr);
+}
+
+TEST(shouldGetForNoBracketsInsideIf, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->children[2], nullptr);
+}
+
+TEST(shouldGetForInsideIfNoneBrackets, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->children[2], nullptr);
+}
+
+TEST(shouldGetForInsideIfElse, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+
+                                        new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+
+
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+
+
+                                        new Token("}", TokenType::R_BR),
+
+
+
+
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
+}
+
+TEST(shouldGetForNoBracketsInsideIfElse, parseIfExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::For);
+}
+

@@ -6,6 +6,7 @@
 #include <vector>
 #include <Parser.h>
 #include <iostream>
+#include <stack>
 using namespace std;
 
 bool Expr::parse() {
@@ -53,37 +54,53 @@ shared_ptr<Statement> Expr::parseVarDeclaration() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
+// fixme: fix with while or for inside.
 shared_ptr<cParser::Statement> Expr::parseIfExpr() {
   int begin = pos - 1;
   int elsePos = pos;
-  int r_brPos = pos;
-  int sColonCount = 0;
-  int sColonPos = (int) (mTokens.size() - 1);
+  int r_brPos = (int) mTokens.size();
+  stack<int> brStack;
+  int index = pos;
+  int sColonPos = pos;
   int end = pos;
   while (elsePos < mTokens.size() && mTokens[elsePos]->type != TokenType::Else) {
     elsePos++;
   }
-  // no else branch find,then we just find the first occurrence of '}' or ';'
+  // TODO: find last occurrence of ';'
+  // no else branch find,then we just find the last occurrence of '}' or the last occurrence of ';'
   if (elsePos == mTokens.size()) {
-    while (r_brPos < mTokens.size() && mTokens[r_brPos]->type != TokenType::R_BR) {
-      if (mTokens[r_brPos]->type == TokenType::S_Colon) {
-        // find the first occurrence of ';'
-        if (sColonPos > r_brPos) {
-          sColonPos = r_brPos;
+
+    while (index < mTokens.size()) {
+      if (mTokens[index]->type == TokenType::L_BR) {
+        brStack.push(index);
+      } else if (mTokens[index]->type == TokenType::R_BR) {
+        if (brStack.empty()) {
+          // we don't have any L_BR before, something wrong happened!
+          break;
         }
-        sColonCount++;
+        brStack.pop();
+        if (brStack.empty()) {
+          r_brPos = index;
+          break;
+        }
       }
-      r_brPos++;
+      index++;
+    }
+    // find the last occurrence of '}'
+    index = pos;
+    while (index < mTokens.size()) {
+      if (mTokens[index]->type == TokenType::S_Colon) {
+        // find the first occurrence of ';'
+        sColonPos = index;
+      }
+      index++;
     }
     // find '}'
     if (r_brPos != mTokens.size()) {
       end = r_brPos + 1;
-      // in case you have an empty statements like ';;'
-    } else if (sColonCount >= 1) {
-      end = sColonPos + 1;
     } else {
-      cout << "Incomplete input in if expr" << endl;
-      end = begin;
+      // '}' not found, use semiColon pos instead
+      end = sColonPos + 1;
     }
   } else {
     // we find a else.
@@ -95,13 +112,35 @@ shared_ptr<cParser::Statement> Expr::parseIfExpr() {
       elsePos++;
     }
     // find a else without an if behind it.
-    sColonPos = r_brPos = elsePos;
-    while (r_brPos < mTokens.size() && mTokens[r_brPos]->type != TokenType::R_BR) {
-      if (mTokens[r_brPos]->type == TokenType::S_Colon) {
-        sColonPos = r_brPos;
-        sColonCount++;
+    index = elsePos;
+    // clear the stack
+    while (!brStack.empty()) {
+      brStack.pop();
+    }
+    // find the last occurrence of '}'
+    while (index < mTokens.size()) {
+      if (mTokens[index]->type == TokenType::L_BR) {
+        brStack.push(index);
+      } else if (mTokens[index]->type == TokenType::R_BR) {
+        if (brStack.empty()) {
+          // we don't have any L_BR before, something wrong happened!
+          break;
+        }
+        brStack.pop();
+        if (brStack.empty()) {
+          r_brPos = index;
+          break;
+        }
       }
-      r_brPos++;
+      index++;
+    }
+    index = elsePos;
+    while (index < mTokens.size()) {
+      if (mTokens[index]->type == TokenType::S_Colon) {
+        // find the first occurrence of ';'
+        sColonPos = index;
+      }
+      index++;
     }
     // find '}'
     if (r_brPos != mTokens.size()) {
@@ -136,6 +175,7 @@ shared_ptr<cParser::Statement> Expr::parseSwitchExpr() {
   return shared_ptr<Statement>();
 }
 
+// fixme: fix with if or while inside.
 shared_ptr<cParser::Statement> Expr::parseForExpr() {
   // in for loop if we should look for the last occurrence of ';'
   int begin = pos - 1;
@@ -166,29 +206,42 @@ shared_ptr<cParser::Statement> Expr::parseForExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
+// fixme: fix with if or for inside.
 shared_ptr<cParser::Statement> Expr::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;
-  int end;
-  int r_brPos = pos;
-  int sColonPos = (int) (mTokens.size() - 1);
   int sColonCount = 0;
-  while (r_brPos < mTokens.size() && mTokens[r_brPos]->type != TokenType::R_BR) {
-    if (mTokens[r_brPos]->type == TokenType::S_Colon) {
-      if (sColonPos > r_brPos) {
-        sColonPos = r_brPos;
-      }
-      sColonCount++;
+  int r_brPos = (int) mTokens.size();
+  stack<int> brStack;
+  int index = pos;
+  int sColonPos = pos;
+  int end = pos;
+  while (index < mTokens.size()) {
+    if (mTokens[index]->type == TokenType::S_Colon) {
+      sColonPos = index;
+      break;
     }
-    r_brPos++;
+    index++;
+  }
+  index = pos;
+  while (index < mTokens.size()) {
+    if (mTokens[index]->type == TokenType::L_BR) {
+      brStack.push(index);
+    } else if (mTokens[index]->type == TokenType::R_BR) {
+      if (brStack.empty()) {
+        // we don't have any L_BR before, something wrong happened!
+        break;
+      }
+      brStack.pop();
+      if (brStack.empty()) {
+        r_brPos = index;
+        break;
+      }
+    }
+    index++;
   }
   if (r_brPos == mTokens.size()) {
-    if (sColonCount >= 1) {
-      end = sColonPos + 1;
-    } else {
-      cout << "Incomplete while expression!" << endl;
-      end = begin;
-    }
+    end = sColonPos + 1;
   } else {
     end = r_brPos + 1;
   }

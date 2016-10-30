@@ -10,6 +10,11 @@ Token::Token(std::string str, TokenType type)
     :str(str), type(type) {
 }
 
+Token::Token(std::string str, TokenType type, int lineNum)
+    :str(str), type(type), lineNum(lineNum) {
+
+}
+
 Token::Token(const Token &obj)
     :str(obj.str), type(obj.type) {
 }
