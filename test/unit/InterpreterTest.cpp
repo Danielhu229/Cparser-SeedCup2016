@@ -35,15 +35,28 @@ TEST(declarationAndCalculate, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 43);
 }
 
-TEST(selfOperation, Statement) {
-  std::string a("int i;");
-  std::string b("i++;");
+TEST(rselfOperation, Statement) {
+  std::string a("int i = 0, j= 0;");
+  std::string b("j = i++;");
   auto interpreter = new Interpreter();
   interpreter->parse(a);
   interpreter->parse(b);
   interpreter->step();
   interpreter->step();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 0);
+}
+
+TEST(lselfOperation, Statement) {
+  std::string a("int i = 0, j = 0;");
+  std::string b("j = ++i;");
+  auto interpreter = new Interpreter();
+  interpreter->parse(a);
+  interpreter->parse(b);
+  interpreter->step();
+  interpreter->step();
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 1);
 }
 
 
@@ -57,4 +70,14 @@ TEST(continueAssign, Statement) {
   interpreter->step();
   EXPECT_EQ(interpreter->curContext()->get<int>("a"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 2);
+}
+
+TEST(continueDeclare, Statement) {
+  auto interpreter = new Interpreter();
+  interpreter->parse("int a, b = 7;");
+  interpreter->parse("a=2;");
+  interpreter->step();
+  interpreter->step();
+  EXPECT_EQ(interpreter->curContext()->get<int>("a"), 2);
+  EXPECT_EQ(interpreter->curContext()->get<int>("b"), 7);
 }

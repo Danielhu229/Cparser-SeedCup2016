@@ -71,9 +71,10 @@ ValueType binaryCalculator(Interpreter *interpreter,
 
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
-  return (
-      static_cast<ValueType>(atof(statement->children[0]->token.str.c_str())) +
-      1);
+  ValueType result = interpreter->curContext()->get<ValueType>(statement->children[0]->token.str) +
+      1;
+  interpreter->curContext()->set<ValueType>(statement->children[0]->token.str, result);
+  return result;
 }
 
 template <typename ValueType>
@@ -86,8 +87,15 @@ ValueType rSelfCalculator(Interpreter *interpreter, Statement *statement) {
 
 template <typename ValueType>
 ValueType declareVar(Interpreter *interpreter, Statement *statement) {
-  interpreter->curContext()->declare<ValueType>(
-      statement->children[0]->token.str, ValueType(0));
+  for (auto child : statement->children) {
+    if (child->token.type == TokenType::Assign) {
+      interpreter->curContext()->declare<ValueType>(
+          child->children[0]->token.str, interpreter->calculate<ValueType>(child->children[1]));
+    } else if(child->token.type == TokenType::Var) {
+      interpreter->curContext()->declare<ValueType>(
+          child->token.str, ValueType(0));
+    }
+  }
   return ValueType(0);
 }
 
@@ -228,7 +236,7 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     if (ast->token.type == TokenType::Num) {
       auto s = ast->token.str;
       cout << atof(s.c_str()) << endl;
-      return (atof(s.c_str()));
+      return static_cast<T>(atof(s.c_str()));
     } else if (ast->token.type == TokenType::Var) {
       return curContext()->get<T>(ast->token.str);
     }

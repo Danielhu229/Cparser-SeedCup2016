@@ -19,7 +19,15 @@ ParserFun declareVarParser = [](vector<Token *> &tokens, int begin, int end,
                                 int position) -> Statement* {
   Statement* ast =
       new Statement(ASTType::DeclareVar, *tokens[position]);
-  auto child = Parser::parseTokens(tokens, position + 1, end);
+  int lastBegin = position + 1;
+  for(int i = lastBegin; i < end; ++i) {
+    if (tokens[i]->type == TokenType::Comma) {
+      auto child = Parser::parseTokens(tokens, lastBegin, i);
+      ast->children.push_back(child);
+      lastBegin = i + 1;
+    }
+  }
+  auto child = Parser::parseTokens(tokens, lastBegin, end);
   ast->children.push_back(child);
   return ast;
 };
@@ -218,8 +226,8 @@ vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::L_BR)},
     {e(TokenType::Colon)},
     {e(TokenType::S_Colon)},
-    {e(TokenType::Assign)},
     {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double),
+     {e(TokenType::Assign)},
      e(TokenType::Str)},
     {e(TokenType::Lt), e(TokenType::Gt), e(TokenType::Le), e(TokenType::Ge),
      e(TokenType::Ne), e(TokenType::Eq)},
