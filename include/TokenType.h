@@ -152,7 +152,11 @@ enum class TokenType {
   /*!
    * punctuation !
    */
-  Not
+  Not,
+  /*!
+   * keywords printf
+   */
+  Printf
 };
 
 

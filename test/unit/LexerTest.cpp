@@ -157,6 +157,13 @@ TEST(shouldFindReturn, findReturn) {
   EXPECT_EQ(lexer.tokens[0]->type, TokenType::Return);
 }
 
+TEST(shouldFindPrintf, findPrintf) {
+  std::string a("printf(0)");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 4);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Printf);
+}
 
 TEST(shouldFindComment, findComment) {
   std::string a(" //This is a comment.");
@@ -287,7 +294,7 @@ TEST(shouldFindAllTokens, findAllTokens) {
   EXPECT_EQ(lexer.tokens[2]->type, TokenType::L_PH);
   EXPECT_EQ(lexer.tokens[3]->type, TokenType::R_PH);
   EXPECT_EQ(lexer.tokens[4]->type, TokenType::L_BR);
-  EXPECT_EQ(lexer.tokens[5]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[5]->type, TokenType::Printf);
   EXPECT_EQ(lexer.tokens[5]->str, "printf");
   EXPECT_EQ(lexer.tokens[6]->type, TokenType::L_PH);
   EXPECT_EQ(lexer.tokens[7]->type, TokenType::Str);
@@ -299,7 +306,7 @@ TEST(shouldFindAllTokens, findAllTokens) {
 }
 
 TEST(shouldFindLineNumber, findLineNum) {
-  std::string a("#include <stdio.h> \n void main() { \n printf(\"hello world\"); \n } ");
+  std::string a("#include <stdio.h> \r\n void main() { \r\n printf(\"hello world\"); \r\n } ");
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 11);
@@ -315,6 +322,8 @@ TEST(shouldFindLineNumber, findLineNum) {
   EXPECT_EQ(lexer.tokens[9]->lineNum, 3);
   EXPECT_EQ(lexer.tokens[10]->lineNum, 4);
 }
+
+
 
 
 

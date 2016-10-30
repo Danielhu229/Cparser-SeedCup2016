@@ -53,6 +53,7 @@ void Lexer::init() {
   COLON = Token(":", TokenType::Colon);
   S_COLON = Token(";", TokenType::S_Colon);
   COMMA = Token(",", TokenType::Comma);
+  PRINTF = Token("printf", TokenType::Printf);
   keywords["int"] = INT;
   keywords["do"] = DO;
   keywords["double"] = DOUBLE;
@@ -72,6 +73,7 @@ void Lexer::init() {
   keywords["return"] = RETURN;
   keywords["sizeof"] = SIZEOF;
   keywords["case"] = CASE;
+  keywords["printf"] = PRINTF;
 }
 
 Lexer::Lexer(const string &code) : code(code) {

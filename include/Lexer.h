@@ -53,6 +53,7 @@ class Lexer {
   Token L_PH, R_PH;
   Token S_COLON, COLON, COMMA;
   Token DO;
+  Token PRINTF;
 
 };
 

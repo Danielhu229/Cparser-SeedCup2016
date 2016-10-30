@@ -87,18 +87,6 @@ TEST(If, runControl) {
 }
 
 
-TEST(IfWithoutBracket2, runControl) {
-  std::string a("int i = 1;\n"
-                    "int b = 9;\n"
-                    "if (0) b++;");
-  auto interpreter = new Interpreter();
-  interpreter->build(a);
-  interpreter->run();
-  auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(test, "1 2 3");
-  EXPECT_EQ(interpreter->curContext()->get<int>("b"), 10);
-}
-
 TEST(IfWithoutBracket, runControl) {
   std::string a("int i, j, k;\nif(i > 1) j--;else i++;");
   auto interpreter = new Interpreter();
