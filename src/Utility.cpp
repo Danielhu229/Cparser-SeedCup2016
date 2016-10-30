@@ -40,7 +40,6 @@ int Utility::findBr(vector<Token *> &tokens, int begin, int end) {
   int brPos = -1;
   int la = begin;
   while (la < end) {
-    // TODO: parse the block recursively and if it doesn't have brackets then you should find the first occurrence of ';' instead.
     if (tokens[la]->type == TokenType::L_BR) {
       brStack.push(la);
     } else if (tokens[la]->type == TokenType::R_BR) {
@@ -58,4 +57,22 @@ int Utility::findBr(vector<Token *> &tokens, int begin, int end) {
     la++;
   }
   return brPos;
+}
+
+int Utility::findLastSColon(vector<Token *> &tokens, int begin, int end) {
+  int pos = begin;
+  int sColonPos = begin;
+  while (pos < end) {
+    if (tokens[pos]->type == TokenType::S_Colon) {
+      // find the first occurrence of ';'
+      int tmp = pos;
+      while (tmp < end && tokens[tmp]->type == TokenType::S_Colon && tokens[tmp]->lineNum == tokens[pos]->lineNum) {
+        tmp++;
+      }
+      sColonPos = tmp - 1;
+      break;
+    }
+    pos++;
+  }
+  return sColonPos;
 }

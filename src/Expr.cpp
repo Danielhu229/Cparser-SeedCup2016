@@ -97,7 +97,6 @@ cParser::Statement* Expr::parseIfExpr() {
     // find the last occurrence of '}'
     index = pos;
     while (index < mTokens.size()) {
-      // TODO: find last occurrence of ';'
       if (mTokens[index]->type == TokenType::S_Colon) {
         // find the first occurrence of ';'
         sColonPos = index;

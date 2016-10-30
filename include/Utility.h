@@ -15,6 +15,7 @@ namespace Utility {
   vector<Token*> combineElseIf(vector<Token*>& tokens);
   string intsToString(vector<int>& src);
   int findBr(vector<Token *> &tokens, int begin, int end);
+  int findLastSColon(vector<Token *> &tokens, int begin, int end);
 }
 }
 
