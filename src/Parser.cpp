@@ -401,29 +401,9 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
-/*
- * Function for parsing block
- * "{" { <Expression> } "}"
- */
-ParserFun blockParser = [](vector<Token *> &tokens, int begin, int end,
-                           int position) -> Statement* {
-  auto ast =
-      new Statement(ASTType::Block, *tokens[position]);
-  int prev = position + 1;
-  // find each s_colon pos
-  int scolonPos = position + 1;
-  while (scolonPos < end) {
-    if (tokens[scolonPos]->type == TokenType::S_Colon) {
-      ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos + 1));
-      prev = scolonPos + 1;
-    }
-    scolonPos++;
-  }
-  return ast;
-};
 
 unordered_set<int> Parser::finalTokens = {
-    e(TokenType::Num), e(TokenType::Comma), e(TokenType::Var)};
+    e(TokenType::Num), e(TokenType::Comma), e(TokenType::Break), e(TokenType::Var)};
 
 // we ignore the '}' so we don't need to put '}' in this table
 vector<unordered_set<int>> Parser::priorityTable = {
@@ -492,7 +472,6 @@ ParserFun Parser::getUnFinalParser(TokenType t) {
 }
 
 Statement* Parser::parseTokens(vector<Token *> &tokens, int begin,
-// TODO: make sure that it cannot ask priority for any '{' and '}'
                                           int end) {
   if (end - begin < 1) {
     cout << "no token" << endl;

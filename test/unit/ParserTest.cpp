@@ -586,3 +586,58 @@ TEST(shouldParseDoWhileNoBracketsExpr, dowhileParser) {
   EXPECT_EQ(ast->children[0]->children[0]->token.type, TokenType::Ne);
   EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
 }
+
+TEST(shouldParseBreak, parse) {
+  auto tokens = new vector<Token *>({
+                                        new Token("break", TokenType::Break),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::ChildStatement);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Break);
+}
+
+TEST(shouldParseBreakInFor, forParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("i", TokenType::Var), new Token("<", TokenType::Lt),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("k", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("1", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("break", TokenType::Break),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::For);
+  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token.type, TokenType::Break);
+}
+
+
+TEST(shouldParseBreakInWhile, whileParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("i", TokenType::Var), new Token("<", TokenType::Lt),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("k", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("1", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("break", TokenType::Break),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::For);
+  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token.type, TokenType::Break);
+}
