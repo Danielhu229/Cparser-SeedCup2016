@@ -49,6 +49,7 @@ class Expr {
 
   cParser::Statement *parseFuncDeclaration();
 
+  cParser::Statement* parseDowhileExpr();
 };
 }
 #endif //C_PARSER_EXPR_H

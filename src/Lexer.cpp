@@ -76,7 +76,7 @@ void Lexer::init() {
 
 Lexer::Lexer(const string &code) : code(code) {
   pos = 0;
-  line = 0;
+  line = code == "" ? 0 : 1;
   init();
   initFunctions();
 }
@@ -88,9 +88,9 @@ void Lexer::lexan() {
   while (pos < code.length()) {
     next();
   }
-  if (pos != 0) {
-    line++;
-  }
+//  if (pos != 0) {
+//    line++;
+//  }
 }
 
 void Lexer::push(Token *token) {
@@ -120,9 +120,9 @@ void Lexer::next() {
       string name = code.substr((size_t)last_pos, (size_t)(pos - last_pos));
       if (keywords.find(name) != keywords.end()) {
         Token *t = &keywords.find(name)->second;
-        push(t);
+        push(new Token(*t, line));
       } else {
-        Token *t = new Token(name, TokenType::Var);
+        Token *t = new Token(name, TokenType::Var, line);
         identifiers[name] = *t;
         push(t);
       }
@@ -147,7 +147,7 @@ void Lexer::next() {
           }
         }
       }
-      Token *t = new Token(to_string(str), TokenType::Num);
+      Token *t = new Token(to_string(str), TokenType::Num, line);
       push(t);
 
     } else if (token == '"' || token == '\'') {
@@ -166,11 +166,11 @@ void Lexer::next() {
         pos = cur_pos;
       }
       if (pos - cur_pos == 1) {
-        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num);
+        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num, line);
         push(curr_token);
       } else if (pos - cur_pos > 0) {
         string name = code.substr((size_t)cur_pos, (size_t)(pos - cur_pos));
-        Token *t = new Token(name, TokenType::Str);
+        Token *t = new Token(name, TokenType::Str, line);
         push(t);
       }
     } else if (functions.find(token) != functions.end()) {
@@ -180,45 +180,45 @@ void Lexer::next() {
 }
 
 void Lexer::initFunctions() {
-  auto comma = [this]() { push(&COMMA); };
+  auto comma = [this]() { push(new Token(COMMA, line)); };
   auto add = [this]() {
     if (code[pos] == '+') {
       pos++;
-      push(&INC);
+      push(new Token(INC, line));
     } else {
-      push(&ADD);
+      push(new Token(ADD, line));
     }
   };
   auto sub = [this]() {
     if (code[pos] == '-') {
       pos++;
-      push(&DEC);
+      push(new Token(DEC, line));
     } else {
-      push(&SUB);
+      push(new Token(SUB, line));
     }
   };
   auto eq = [this]() {
     if (code[pos] == '=') {
       pos++;
-      push(&EQ);
+      push(new Token(EQ, line));
     } else {
-      push(&ASSIGN);
+      push(new Token(ASSIGN, line));
     }
   };
   auto _not = [this]() {
     if (code[pos] == '=') {
       pos++;
-      push(&NE);
+      push(new Token(NE, line));
     } else {
-      push(&NOT);
+      push(new Token(NOT, line));
     }
   };
   auto gt = [this]() {
     if (code[pos] == '=') {
       pos++;
-      push(&GE);
+      push(new Token(GE, line));
     } else {
-      push(&GT);
+      push(new Token(GT, line));
     }
   };
   auto div = [this]() {
@@ -237,38 +237,38 @@ void Lexer::initFunctions() {
         ++pos;
       }
     } else {
-      push(&DIV);
+      push(new Token(DIV, line));
     }
   };
   auto lt = [this]() {
     if (code[pos] == '=') {
       pos++;
-      push(&LE);
+      push(new Token(LE, line));
     } else {
-      push(&LT);
+      push(new Token(LT, line));
     }
   };
-  auto colon = [this]() { push(&COLON); };
-  auto s_colon = [this]() { push(&S_COLON); };
-  auto r_ph = [this]() { push(&R_PH); };
-  auto l_ph = [this]() { push(&L_PH); };
-  auto r_br = [this]() { push(&R_BR); };
-  auto l_br = [this]() { push(&L_BR); };
-  auto l_brak = [this]() { push(&L_BRAK); };
-  auto r_brak = [this]() { push(&R_BRAK); };
-  auto cond = [this]() { push(&COND); };
-  auto mul = [this]() { push(&MUL); };
-  auto mod = [this]() { push(&MOD); };
+  auto colon = [this]() { push(new Token(COLON, line)); };
+  auto s_colon = [this]() { push(new Token(S_COLON, line)); };
+  auto r_ph = [this]() { push(new Token(R_PH, line)); };
+  auto l_ph = [this]() { push(new Token(L_PH, line)); };
+  auto r_br = [this]() { push(new Token(R_BR, line)); };
+  auto l_br = [this]() { push(new Token(L_BR, line)); };
+  auto l_brak = [this]() { push(new Token(L_BRAK, line)); };
+  auto r_brak = [this]() { push(new Token(R_BRAK, line)); };
+  auto cond = [this]() { push(new Token(COND, line)); };
+  auto mul = [this]() { push(new Token(MUL, line)); };
+  auto mod = [this]() { push(new Token(MOD, line)); };
   auto _and = [this]() {
     if (code[pos] == '&') {
       pos++;
-      push(&LAN);
+      push(new Token(LAN, line));
     }
   };
   auto _or = [this]() {
     if (code[pos] == '|') {
       pos++;
-      push(&LOR);
+      push(new Token(LOR, line));
     }
   };
   auto hash = [this]() {

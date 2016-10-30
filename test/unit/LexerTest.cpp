@@ -298,6 +298,24 @@ TEST(shouldFindAllTokens, findAllTokens) {
   EXPECT_EQ(lexer.line, 2);
 }
 
+TEST(shouldFindLineNumber, findLineNum) {
+  std::string a("#include <stdio.h> \n void main() { \n printf(\"hello world\"); \n } ");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 11);
+  EXPECT_EQ(lexer.tokens[0]->lineNum, 2);
+  EXPECT_EQ(lexer.tokens[1]->lineNum, 2);
+  EXPECT_EQ(lexer.tokens[2]->lineNum, 2);
+  EXPECT_EQ(lexer.tokens[3]->lineNum, 2);
+  EXPECT_EQ(lexer.tokens[4]->lineNum, 2);
+  EXPECT_EQ(lexer.tokens[5]->lineNum, 3);
+  EXPECT_EQ(lexer.tokens[6]->lineNum, 3);
+  EXPECT_EQ(lexer.tokens[7]->lineNum, 3);
+  EXPECT_EQ(lexer.tokens[8]->lineNum, 3);
+  EXPECT_EQ(lexer.tokens[9]->lineNum, 3);
+  EXPECT_EQ(lexer.tokens[10]->lineNum, 4);
+}
+
 
 
 

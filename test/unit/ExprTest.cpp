@@ -403,9 +403,12 @@ TEST(shouldGetForExpr, parseForExpr) {
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
   EXPECT_EQ(expr.statements[0]->token.type, TokenType::For);
-  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Assign);
-  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::Lt);
-  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[0]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::Lt);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Inc);
   EXPECT_EQ(expr.statements[0]->children[3]->token.type, TokenType::L_BR);
   EXPECT_EQ(expr.statements[0]->children[3]->children[0]->token.type, TokenType::S_Colon);
   EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children[0]->token.type, TokenType::Inc);
@@ -939,4 +942,167 @@ TEST(shouldGetForNoBracketsInsideIfElse, parseIfExpr) {
   EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
   EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
   EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::For);
+}
+
+TEST(shouldGetDoWhileExpr, parseDowhileExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::DO);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[0]->children[0]->token.type, TokenType::Ne);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
+}
+
+TEST(shouldGetDoWhileNoBrackets, parseDowhileExpr) {
+
+}
+
+TEST(shouldGetComplexExpr1, parse) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("b", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("1", TokenType::Num), new Token("+", TokenType::Add),
+                                        new Token("2", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("else", TokenType::Else), new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token(">=", TokenType::Ge),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("{", TokenType::L_BR), new Token("k", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("10", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("k", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("10", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+
+}
+
+
+TEST(shouldGetComplexExpr2, parse) {
+  auto tokens = new vector<Token *>({
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("b", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("1", TokenType::Num), new Token("+", TokenType::Add),
+                                        new Token("2", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("{", TokenType::L_BR),
+
+
+                                        new Token("}", TokenType::R_BR),
+                                        new Token("else", TokenType::Else),
+
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token(">=", TokenType::Ge),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("{", TokenType::L_BR), new Token("k", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("10", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("k", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("10", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+
+}
+
+
+TEST(shouldGetComplexExprNoneBrackets, parse) {
+  auto tokens = new vector<Token *>({
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+
+
+                                        new Token("else", TokenType::Else),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token(">=", TokenType::Ge),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("k", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("10", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
 }

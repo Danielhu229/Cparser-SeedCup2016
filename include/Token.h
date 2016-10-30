@@ -23,6 +23,7 @@ class Token {
   Token(const Token &obj);
   Token(string, TokenType);
   Token(string, TokenType, int);
+  Token(const Token &obj, int lineNum);
   bool operator==(const Token &rhs) const;
   bool operator!=(const Token &rhs) const;
   bool operator<(const Token &rhs) const;
