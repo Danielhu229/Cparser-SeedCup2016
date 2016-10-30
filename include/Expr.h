@@ -25,36 +25,29 @@ class Expr {
   }
 
  public:
-  std::vector<shared_ptr<cParser::Statement>> statements;
+  std::vector<cParser::Statement*> statements;
   Expr(const vector<Token *> &tokens) : mTokens(tokens) {}
 
   bool parse();
 
-  shared_ptr<cParser::Statement> parseIfExpr();
+  cParser::Statement* parseIfExpr();
 
-  shared_ptr<cParser::Statement> parseStatement();
+  cParser::Statement* parseStatement();
 
-  shared_ptr<cParser::Statement> parseBlock();
 
-  shared_ptr<cParser::Statement> parseSColon();
+  cParser::Statement* parseDeclare();
 
-  shared_ptr<cParser::Statement> parseDeclare();
+  cParser::Statement* parseSwitchExpr();
 
-  shared_ptr<cParser::Statement> parseSwitchExpr();
+  cParser::Statement* parseForExpr();
 
-  shared_ptr<cParser::Statement> parseBinary();
+  cParser::Statement* parseWhileExpr();
 
-  shared_ptr<cParser::Statement> parseSelf();
+  cParser::Statement* parseExpr();
 
-  shared_ptr<cParser::Statement> parseForExpr();
+  cParser::Statement* parseVarDeclaration();
 
-  shared_ptr<cParser::Statement> parseWhileExpr();
-
-  shared_ptr<cParser::Statement> parseExpr();
-
-  shared_ptr<Statement> parseVarDeclaration();
-
-  shared_ptr<Statement> parseFuncDeclaration();
+  cParser::Statement* parseFuncDeclaration();
 
 };
 

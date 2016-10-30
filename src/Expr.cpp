@@ -10,7 +10,7 @@
 using namespace std;
 
 bool Expr::parse() {
-  shared_ptr<cParser::Statement> newStat = nullptr;
+  cParser::Statement* newStat = nullptr;
   while (pos < mTokens.size()) {
     getNextToken();
     newStat = this->parseStatement();
@@ -21,7 +21,7 @@ bool Expr::parse() {
   return true;
 }
 
-shared_ptr<cParser::Statement> Expr::parseStatement() {
+cParser::Statement* Expr::parseStatement() {
   switch (curToken->type) {
     case TokenType::Int:return this->parseDeclare();
     case TokenType::If:return this->parseIfExpr();
@@ -32,7 +32,7 @@ shared_ptr<cParser::Statement> Expr::parseStatement() {
   }
 }
 
-shared_ptr<cParser::Statement> Expr::parseDeclare() {
+cParser::Statement* Expr::parseDeclare() {
   TokenType aheadToken = lookAheadToken(2)->type;
   // func declaration
   if (aheadToken == TokenType::L_PH) {
@@ -42,7 +42,7 @@ shared_ptr<cParser::Statement> Expr::parseDeclare() {
   }
 }
 
-shared_ptr<Statement> Expr::parseVarDeclaration() {
+cParser::Statement* Expr::parseVarDeclaration() {
   int begin = pos - 1;
   int sColonPos = pos;
   int end;
@@ -54,8 +54,7 @@ shared_ptr<Statement> Expr::parseVarDeclaration() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-// fixme: fix with while or for inside.
-shared_ptr<cParser::Statement> Expr::parseIfExpr() {
+cParser::Statement* Expr::parseIfExpr() {
   int begin = pos - 1;
   int elsePos = pos;
   int r_brPos = (int) mTokens.size();
@@ -89,6 +88,7 @@ shared_ptr<cParser::Statement> Expr::parseIfExpr() {
     // find the last occurrence of '}'
     index = pos;
     while (index < mTokens.size()) {
+      //TODO: maybe the last occurrence of ';' would be correct.
       if (mTokens[index]->type == TokenType::S_Colon) {
         // find the first occurrence of ';'
         sColonPos = index;
@@ -153,7 +153,7 @@ shared_ptr<cParser::Statement> Expr::parseIfExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-shared_ptr<cParser::Statement> Expr::parseExpr() {
+cParser::Statement* Expr::parseExpr() {
   int begin = pos - 1;
   int sColonPos = pos;
   int end;
@@ -166,17 +166,17 @@ shared_ptr<cParser::Statement> Expr::parseExpr() {
 }
 
 //TODO: implement this one
-shared_ptr<Statement> Expr::parseFuncDeclaration() {
-  return shared_ptr<cParser::Statement>();
+cParser::Statement* Expr::parseFuncDeclaration() {
+  return nullptr;
 }
 
 // TODO: implement this one
-shared_ptr<cParser::Statement> Expr::parseSwitchExpr() {
-  return shared_ptr<Statement>();
+cParser::Statement* Expr::parseSwitchExpr() {
+  return nullptr;
 }
 
 // fixme: fix with if or while inside.
-shared_ptr<cParser::Statement> Expr::parseForExpr() {
+cParser::Statement* Expr::parseForExpr() {
   // in for loop if we should look for the last occurrence of ';'
   int begin = pos - 1;
   int end;
@@ -207,7 +207,7 @@ shared_ptr<cParser::Statement> Expr::parseForExpr() {
 }
 
 // fixme: fix with if or for inside.
-shared_ptr<cParser::Statement> Expr::parseWhileExpr() {
+cParser::Statement* Expr::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;
   int sColonCount = 0;

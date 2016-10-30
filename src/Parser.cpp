@@ -83,12 +83,12 @@ ParserFun exprParser = [](vector<Token *> &tokens, int begin, int end,
  * Function for parsing block
  * "{" { <Expression> } "}"
  */
-shared_ptr<Statement> Parser::blockParser(vector<Token *> &tokens, int begin, int end,
+Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
                                           int position) {
   if (begin > end)
     return nullptr;
   auto ast =
-      shared_ptr<Statement>(new Statement(ASTType::Block, tokens[position]));
+      new Statement(ASTType::Block, *tokens[position]);
 
 
   if (tokens[begin + 1]->type == TokenType::L_BR && tokens[end - 2]->type == TokenType::R_BR) {
@@ -201,7 +201,7 @@ shared_ptr<Statement> Parser::blockParser(vector<Token *> &tokens, int begin, in
         }
       }
     } else if (tokens[index]->type == TokenType::L_BR) {
-      int brPos = Parser::findBr(tokens, index, end);
+      int brPos = Parser::findBr(tokens, index, end - 1);
       if (brPos != -1) {
         // we find another brackets
         ast->children.push_back(Parser::blockParser(tokens, index + 1, brPos + 1, index));
@@ -257,8 +257,8 @@ ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
 
 //TODO: implement this method.
 ParserFun switchParser = [](vector<Token *> &tokens, int begin, int end,
-                            int position) -> shared_ptr<Statement> {
-  auto ast = new Statement(ASTType::Switch, tokens[position]);
+                            int position) -> Statement* {
+  auto ast = new Statement(ASTType::Switch, *tokens[position]);
   return ast;
 
 };
@@ -363,9 +363,9 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
  * "{" { <Expression> } "}"
  */
 ParserFun blockParser = [](vector<Token *> &tokens, int begin, int end,
-                           int position) -> shared_ptr<Statement> {
+                           int position) -> Statement* {
   auto ast =
-      shared_ptr<Statement>(new Statement(ASTType::Block, tokens[position]));
+      new Statement(ASTType::Block, *tokens[position]);
   int prev = position + 1;
   // find each s_colon pos
   int scolonPos = position + 1;
@@ -457,7 +457,7 @@ Statement* Parser::parseTokens(vector<Token *> &tokens, int begin,
     return nullptr;
   }
   if (end - begin == 1) {
-    return shared_ptr<Statement>(new Statement(ASTType::Final, tokens[begin]));
+    return new Statement(ASTType::Final, *tokens[begin]);
   }
   // ignore '(' and ')' outside
   if (tokens[begin]->type == TokenType::L_PH &&

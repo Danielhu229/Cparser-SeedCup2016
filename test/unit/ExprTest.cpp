@@ -19,11 +19,11 @@ TEST(shouldGetIfExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldGetIfExprNoBrackets, parseIfExpr) {
@@ -39,10 +39,10 @@ TEST(shouldGetIfExprNoBrackets, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldGetIfElseExpr, parseIfExpr) {
@@ -63,12 +63,12 @@ TEST(shouldGetIfElseExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldGetIfNoBracketsElseExpr, parseIfExpr) {
@@ -87,12 +87,12 @@ TEST(shouldGetIfNoBracketsElseExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->children[0]->token->type, TokenType::Dec);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->children[0]->token.type, TokenType::Dec);
 }
 
 TEST(shouldGetIfElseNoBracketsExpr, parseIfExpr) {
@@ -115,13 +115,13 @@ TEST(shouldGetIfElseNoBracketsExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[1]->children[0]->token->type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[1]->children[0]->token.type, TokenType::Assign);
 }
 
 TEST(shouldGetIfElseEitherNoBracketsExpr, parseIfExpr) {
@@ -140,12 +140,12 @@ TEST(shouldGetIfElseEitherNoBracketsExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::Dec);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Dec);
 }
 
 TEST(shouldGetIfElseIfExpr, parseIfExpr) {
@@ -172,18 +172,18 @@ TEST(shouldGetIfElseIfExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token->type, TokenType::Dec);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->children[0]->token->type,
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token.type, TokenType::Dec);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->children[0]->token.type,
             TokenType::Var);
 }
 
@@ -208,11 +208,11 @@ TEST(shouldGetIfElseIfNoneBracketsExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::If);
 }
 
 TEST(shouldGetIfNoBracketsElseIfExpr, parseIfExpr) {
@@ -236,18 +236,18 @@ TEST(shouldGetIfNoBracketsElseIfExpr, parseIfExpr) {
   Expr expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token->type, TokenType::Dec);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->children[0]->token->type,
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token.type, TokenType::Dec);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->children[0]->token.type,
             TokenType::Var);
 }
 
@@ -274,17 +274,17 @@ TEST(shouldGetIfElseIfNoBracketsExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token->type, TokenType::Dec);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token->type,
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->children[0]->token.type, TokenType::Dec);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[2]->children[0]->children[0]->token.type,
             TokenType::Var);
 
 }
@@ -320,13 +320,13 @@ TEST(shouldGetMultiIfElseIfExpr, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(expr.statements[0]->children[2]->children[1]->children[0]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldGetVarDec, parseDeclare) {
@@ -339,8 +339,8 @@ TEST(shouldGetVarDec, parseDeclare) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Assign);
 }
 
 TEST(shouldGetWhileExpr, parseWhileExpr) {
@@ -356,11 +356,11 @@ TEST(shouldGetWhileExpr, parseWhileExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::While);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Lt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Lt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldGetWhileNoBrackets, parseWhileExpr) {
@@ -376,10 +376,10 @@ TEST(shouldGetWhileNoBrackets, parseWhileExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::While);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Lt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Lt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldGetForExpr, parseForExpr) {
@@ -399,13 +399,13 @@ TEST(shouldGetForExpr, parseForExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::For);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::Lt);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::Inc);
-  EXPECT_EQ(expr.statements[0]->children[3]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::Lt);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::Inc);
+  EXPECT_EQ(expr.statements[0]->children[3]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children[0]->token.type, TokenType::Inc);
 
 }
 
@@ -420,7 +420,7 @@ TEST(shouldGetExpr, parseExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldGetMultiExpr, parseExpr) {
@@ -434,8 +434,8 @@ TEST(shouldGetMultiExpr, parseExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(expr.statements[1]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[1]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldGetMultiExprComplex, parse) {
@@ -459,9 +459,9 @@ TEST(shouldGetMultiExprComplex, parse) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 3);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(expr.statements[1]->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(expr.statements[2]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[1]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(expr.statements[2]->token.type, TokenType::For);
 
 }
 
@@ -494,8 +494,8 @@ TEST(shouldGetForIfExprComplex, parse) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::For);
-  EXPECT_EQ(expr.statements[1]->token->type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::For);
+  EXPECT_EQ(expr.statements[1]->token.type, TokenType::If);
 }
 
 TEST(shouldGetForWhileExprComplex, parse) {
@@ -554,8 +554,8 @@ TEST(shouldGetIfForExprComplex, parse) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[1]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[1]->token.type, TokenType::For);
 }
 
 TEST(shouldGetIfWhileExprComplex, parse) {
@@ -585,8 +585,8 @@ TEST(shouldGetIfWhileExprComplex, parse) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[1]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[1]->token.type, TokenType::While);
 }
 
 TEST(shouldGetWhileInsideIf, parseIfExpr) {
@@ -615,10 +615,10 @@ TEST(shouldGetWhileInsideIf, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::While);
   EXPECT_EQ(expr.statements[0]->children[2], nullptr);
 }
 
@@ -644,10 +644,10 @@ TEST(shouldGetWhileNoBracketsInsideIf, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::While);
   EXPECT_EQ(expr.statements[0]->children[2], nullptr);
 }
 
@@ -699,10 +699,10 @@ TEST(shouldGetWhileInsideIfElse, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::L_BR);
 }
 
 TEST(shouldGetWhileInsideIfElseNoBrackets, parseIfExpr) {
@@ -731,10 +731,10 @@ TEST(shouldGetWhileInsideIfElseNoBrackets, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::While);
 }
 
 TEST(shouldGetWhileInsideIfElseNoneBrackets, parseIfExpr) {
@@ -760,10 +760,10 @@ TEST(shouldGetWhileInsideIfElseNoneBrackets, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::While);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::While);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldGetForInsideIf, parseIfExpr) {
@@ -792,10 +792,10 @@ TEST(shouldGetForInsideIf, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::For);
   EXPECT_EQ(expr.statements[0]->children[2], nullptr);
 }
 
@@ -825,10 +825,10 @@ TEST(shouldGetForNoBracketsInsideIf, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[1]->children[0]->token.type, TokenType::For);
   EXPECT_EQ(expr.statements[0]->children[2], nullptr);
 }
 
@@ -855,9 +855,9 @@ TEST(shouldGetForInsideIfNoneBrackets, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::For);
   EXPECT_EQ(expr.statements[0]->children[2], nullptr);
 }
 
@@ -900,10 +900,10 @@ TEST(shouldGetForInsideIfElse, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::L_BR);
 }
 
 TEST(shouldGetForNoBracketsInsideIfElse, parseIfExpr) {
@@ -932,9 +932,8 @@ TEST(shouldGetForNoBracketsInsideIfElse, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
-  EXPECT_EQ(expr.statements[0]->token->type, TokenType::If);
-  EXPECT_EQ(expr.statements[0]->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(expr.statements[0]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(expr.statements[0]->children[2]->token->type, TokenType::For);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
+  EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(expr.statements[0]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(expr.statements[0]->children[2]->token.type, TokenType::For);
 }
-

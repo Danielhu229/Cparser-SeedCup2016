@@ -77,7 +77,7 @@ TEST(shouldParseBlock, blockParser) {
        new Token("}", TokenType::R_BR),
       });
   auto ast = Parser::blockParser(*tokens, 0, (int) tokens->size(), 0);
-  EXPECT_EQ(ast->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->token.type, TokenType::L_BR);
   EXPECT_EQ(ast->children.size(), 2);
 
 }
@@ -88,7 +88,7 @@ TEST(shouldParseEmptyBlock, blockParser) {
        new Token("}", TokenType::R_BR),
       });
   auto ast = Parser::blockParser(*tokens, 0, (int) tokens->size(), 0);
-  EXPECT_EQ(ast->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->token.type, TokenType::L_BR);
   EXPECT_EQ(ast->children.size(), 0);
 }
 TEST(shouldParseExpression, Parse) {
@@ -237,7 +237,7 @@ TEST(shouldParserIfElseIf, ifParser) {
                                     });
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
+  EXPECT_EQ(ast->token.type, TokenType::If);
   EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
   EXPECT_EQ(ast->children[1]->children[1]->children[0]->token.type, TokenType::Dec);
   EXPECT_EQ(ast->children[2]->token.type, TokenType::If);
@@ -248,7 +248,7 @@ TEST(shouldParserIfElseIf, ifParser) {
   EXPECT_EQ(
       ast->children[2]->children[1]->children[0]->children[0]->token.type,
       TokenType::Dec);
-  EXPECT_EQ(ast->children[2]->children[2]->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[2]->children[2]->token.type, TokenType::L_BR);
 }
 
 TEST(shouldParserIfElseIfNoneBrackets, ifParser) {
@@ -461,7 +461,7 @@ TEST(shouldParseForExpr, forParser) {
                                     });
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
+  EXPECT_EQ(ast->token.type, TokenType::For);
   EXPECT_EQ(ast->children[0]->token.type, TokenType::Assign);
   EXPECT_EQ(ast->children[1]->token.type, TokenType::Lt);
   EXPECT_EQ(ast->children[2]->token.type, TokenType::Inc);
@@ -488,15 +488,15 @@ TEST(shouldParseForExprInBlock, forParser) {
                                     });
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[3]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token.type,
             TokenType::Assign);
 }
 
@@ -514,12 +514,12 @@ TEST(shouldParseForExprNoBrackets, forParser) {
                                     });
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->token.type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldParseSimiColon, Parse) {

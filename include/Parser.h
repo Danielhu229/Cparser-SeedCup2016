@@ -50,7 +50,7 @@ public:
   static Statement* parseTokens(vector<Token *> &tokens, int begin,
                                            int end);
 
-  static shared_ptr<Statement> blockParser(vector<Token *> &tokens, int begin, int end,
+  static Statement* blockParser(vector<Token *> &tokens, int begin, int end,
                                            int position);
 
   static int findBr(vector<Token *> &tokens, int begin, int end) {
