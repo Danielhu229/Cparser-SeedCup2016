@@ -67,6 +67,30 @@ TEST(shouldParseComplex, SingleParser) {
   EXPECT_EQ(ast->children[0]->token->str, "a");
 }
 
+TEST(shouldParseBlock, blockParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("{", TokenType::L_BR),
+       new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+       new Token(";", TokenType::S_Colon),
+       new Token("a", TokenType::Var),
+       new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+       new Token("}", TokenType::R_BR),
+      });
+  auto ast = Parser::blockParser(*tokens, 0, (int) tokens->size(), 0);
+  EXPECT_EQ(ast->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->children.size(), 2);
+
+}
+
+TEST(shouldParseEmptyBlock, blockParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("{", TokenType::L_BR),
+       new Token("}", TokenType::R_BR),
+      });
+  auto ast = Parser::blockParser(*tokens, 0, (int) tokens->size(), 0);
+  EXPECT_EQ(ast->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->children.size(), 0);
+}
 TEST(shouldParseExpression, Parse) {
   auto tokens = new vector<Token *>(
       {new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
@@ -80,26 +104,26 @@ TEST(shouldParseExpression, Parse) {
 
 TEST(shouldParseIfExpression, ifParser) {
   auto tokens = new vector<Token *>({
-      new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
-      new Token("a", TokenType::Var), new Token(")", TokenType::R_PH),
-      new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-      new Token("++", TokenType::Inc), new Token("}", TokenType::R_BR),
-  });
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc), new Token("}", TokenType::R_BR),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
 }
 
 TEST(shouldParseIfExpressionCond, ifParser) {
   auto tokens = new vector<Token *>({
-      new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
-      new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
-      new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
-      new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-      new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
-      new Token("}", TokenType::R_BR),
-  });
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
@@ -117,8 +141,10 @@ TEST(shouldParseIfElseExpression, ifParser) {
        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
        new Token("{", TokenType::L_BR), new Token("j", TokenType::Var),
        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+       new Token("k", TokenType::Var), new Token("++", TokenType::Inc),
+       new Token(";", TokenType::S_Colon),
        new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -129,6 +155,8 @@ TEST(shouldParseIfElseExpression, ifParser) {
   EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children[2]->children[0]->children[0]->token->type,
             TokenType::Dec);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+            TokenType::Inc);
 }
 
 TEST(shouldParseIfNoBracketsElse, ifParser) {
@@ -140,8 +168,10 @@ TEST(shouldParseIfNoBracketsElse, ifParser) {
        new Token(";", TokenType::S_Colon), new Token("else", TokenType::Else),
        new Token("{", TokenType::L_BR), new Token("j", TokenType::Var),
        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+       new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+       new Token(";", TokenType::S_Colon),
        new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -151,47 +181,65 @@ TEST(shouldParseIfNoBracketsElse, ifParser) {
   EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children[2]->children[0]->children[0]->token->type,
             TokenType::Dec);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+            TokenType::Inc);
 }
 
 TEST(shouldParseIfElseNoBrackets, ifParser) {
   auto tokens = new vector<Token *>({
-      new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
-      new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
-      new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
-      new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-      new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
-      new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
-      new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
-      new Token(";", TokenType::S_Colon),
-  });
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+                                        new Token("h", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(";", TokenType::S_Colon),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
   EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
             TokenType::Inc);
+  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token->type,
+            TokenType::Dec);
   EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Dec);
 }
 
 TEST(shouldParserIfElseIf, ifParser) {
-  auto tokens = new vector<Token *>(
-      {new Token("if", TokenType::If),  new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),  new Token(">", TokenType::Gt),
-       new Token("0", TokenType::Num),  new Token(")", TokenType::R_PH),
-       new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-       new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
-       new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
-       new Token("if", TokenType::If),  new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),  new Token("==", TokenType::Eq),
-       new Token("0", TokenType::Num),  new Token(")", TokenType::R_PH),
-       new Token("{", TokenType::L_BR), new Token("j", TokenType::Var),
-       new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
-       new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+                                        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("==", TokenType::Eq),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("j", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("h", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+                                        new Token("{", TokenType::L_BR), new Token("h", TokenType::Var),
+                                        new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
+                                        new Token("k", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token->type, TokenType::Dec);
   EXPECT_EQ(ast->children[2]->token->type, TokenType::If);
   EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Eq);
   EXPECT_EQ(ast->children[2]->children[1]->token->type, TokenType::L_BR);
@@ -200,7 +248,7 @@ TEST(shouldParserIfElseIf, ifParser) {
   EXPECT_EQ(
       ast->children[2]->children[1]->children[0]->children[0]->token->type,
       TokenType::Dec);
-  EXPECT_EQ(ast->children[2]->children[2], nullptr);
+  EXPECT_EQ(ast->children[2]->children[2]->token->type, TokenType::L_BR);
 }
 
 TEST(shouldParserIfElseIfNoneBrackets, ifParser) {
@@ -215,7 +263,7 @@ TEST(shouldParserIfElseIfNoneBrackets, ifParser) {
        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
        new Token(";", TokenType::S_Colon)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -229,18 +277,18 @@ TEST(shouldParserIfElseIfNoneBrackets, ifParser) {
 
 TEST(shouldParserIfElseIfNoBrackets, ifParser) {
   auto tokens = new vector<Token *>(
-      {new Token("if", TokenType::If),    new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),    new Token(">", TokenType::Gt),
-       new Token("0", TokenType::Num),    new Token(")", TokenType::R_PH),
-       new Token("{", TokenType::L_BR),   new Token("i", TokenType::Var),
-       new Token("++", TokenType::Inc),   new Token(";", TokenType::S_Colon),
-       new Token("}", TokenType::R_BR),   new Token("else", TokenType::Else),
-       new Token("if", TokenType::If),    new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),    new Token("==", TokenType::Eq),
-       new Token("0", TokenType::Num),    new Token(")", TokenType::R_PH),
-       new Token("j", TokenType::Var),    new Token("--", TokenType::Dec),
+      {new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+       new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+       new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+       new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+       new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+       new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
+       new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+       new Token("a", TokenType::Var), new Token("==", TokenType::Eq),
+       new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+       new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
        new Token(";", TokenType::S_Colon)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -253,21 +301,20 @@ TEST(shouldParserIfElseIfNoBrackets, ifParser) {
             TokenType::Dec);
 }
 
-
 TEST(shouldParseIfNoBracketsElseIf, ifParser) {
   auto tokens = new vector<Token *>(
-      {new Token("if", TokenType::If),     new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),     new Token(">", TokenType::Gt),
-       new Token("0", TokenType::Num),     new Token(")", TokenType::R_PH),
-       new Token("i", TokenType::Var),     new Token("++", TokenType::Inc),
+      {new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+       new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+       new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+       new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
        new Token(";", TokenType::S_Colon), new Token("else", TokenType::Else),
-       new Token("if", TokenType::If),     new Token("(", TokenType::L_PH),
-       new Token("a", TokenType::Var),     new Token("==", TokenType::Eq),
-       new Token("0", TokenType::Num),     new Token(")", TokenType::R_PH),
-       new Token("{", TokenType::L_BR),    new Token("j", TokenType::Var),
-       new Token("--", TokenType::Dec),    new Token(";", TokenType::S_Colon),
+       new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+       new Token("a", TokenType::Var), new Token("==", TokenType::Eq),
+       new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+       new Token("{", TokenType::L_BR), new Token("j", TokenType::Var),
+       new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
        new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -285,15 +332,15 @@ TEST(shouldParseIfNoBracketsElseIf, ifParser) {
 
 TEST(shouldParseIfElseEitherNoBrackets, ifParser) {
   auto tokens = new vector<Token *>({
-      new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
-      new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
-      new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
-      new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
-      new Token(";", TokenType::S_Colon), new Token("else", TokenType::Else),
-      new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
-      new Token(";", TokenType::S_Colon),
-  });
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("else", TokenType::Else),
+                                        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(";", TokenType::S_Colon),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
@@ -304,15 +351,20 @@ TEST(shouldParseIfElseEitherNoBrackets, ifParser) {
 
 TEST(shouldParseIfExpressionComplex, ifParser) {
   auto tokens = new vector<Token *>({
-      new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
-      new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
-      new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
-      new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-      new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
-      new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
-      new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
-  });
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+                                        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children.size(), 3);
@@ -320,6 +372,8 @@ TEST(shouldParseIfExpressionComplex, ifParser) {
   EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
             TokenType::Inc);
   EXPECT_EQ(ast->children[1]->children[1]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[2]->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[1]->children[2]->children.size(), 0);
   EXPECT_EQ(ast->children[1]->children[1]->children[0]->token->type,
             TokenType::Dec);
   EXPECT_EQ(ast->children[2], nullptr);
@@ -332,7 +386,7 @@ TEST(shouldParseIfNoBrackets, ifParser) {
        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
        new Token(";", TokenType::S_Colon)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
   EXPECT_EQ(ast->token->type, TokenType::If);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -348,7 +402,7 @@ TEST(shouldParseWhileExpr, whileParser) {
        new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
        new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
   EXPECT_EQ(ast->token->type, TokenType::While);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -366,7 +420,7 @@ TEST(shouldParseWhileExprInBlock, whileParser) {
        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
        new Token("j", TokenType::Var), new Token("--", TokenType::Dec),
        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
   EXPECT_EQ(ast->token->type, TokenType::While);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -386,7 +440,7 @@ TEST(shouldParseWhileNoBrackets, whileParser) {
        new Token("0", TokenType::Num), new Token(")", TokenType::R_PH),
        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
        new Token(";", TokenType::S_Colon)});
-  auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
   EXPECT_EQ(ast->token->type, TokenType::While);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
@@ -402,7 +456,6 @@ TEST(shouldParseForExpr, forParser) {
                                         new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
                                         new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-                                        new Token(";", TokenType::S_Colon),
                                         new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
                                         new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
@@ -410,71 +463,65 @@ TEST(shouldParseForExpr, forParser) {
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
   EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->token->type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->type, TokenType::Inc);
   EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
   EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type, TokenType::Inc);
 }
 
-//TEST(shouldParseForExprInBlock, forParser) {
-//  auto tokens = new vector<Token *>({
-//                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
-//                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
-//                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
-//                                        new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
-//                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
-//                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-//                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
-//                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
-//                                        new Token(";", TokenType::S_Colon), new Token("a", TokenType::Var),
-//                                        new Token("=", TokenType::Assign), new Token("1", TokenType::Num),
-//                                        new Token("+", TokenType::Add), new Token("2", TokenType::Num),
-//                                        new Token(";", TokenType::S_Colon),
-//                                        new Token("}", TokenType::R_BR)
-//                                    });
-//  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
-//  EXPECT_EQ(ast->type, ASTType::For);
-//  EXPECT_EQ(ast->token->type, TokenType::For);
-//  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
-//  EXPECT_EQ(ast->children[0]->children[0]->token->type, TokenType::Assign);
-//  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Lt);
-//  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Inc);
-//  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type,
-//            TokenType::Inc);
-//  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token->type,
-//            TokenType::Assign);
-//}
-//
-//TEST(shouldParseForExprNoBrackets, forParser) {
-//  auto tokens = new vector<Token *>({
-//                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
-//                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
-//                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
-//                                        new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
-//                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
-//                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
-//                                        new Token(")", TokenType::R_PH),
-//                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
-//                                        new Token(";", TokenType::S_Colon)
-//                                    });
-//  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
-//  EXPECT_EQ(ast->type, ASTType::For);
-//  EXPECT_EQ(ast->token->type, TokenType::For);
-//  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[3]->token->type, TokenType::S_Colon);
-//  EXPECT_EQ(ast->children[0]->children[0]->token->type, TokenType::Assign);
-//  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Lt);
-//  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Inc);
-//  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::Inc);
-//}
+TEST(shouldParseForExprInBlock, forParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("a", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("1", TokenType::Num),
+                                        new Token("+", TokenType::Add), new Token("2", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::For);
+  EXPECT_EQ(ast->token->type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token->type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type,
+            TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token->type,
+            TokenType::Assign);
+}
+
+TEST(shouldParseForExprNoBrackets, forParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("=", TokenType::Assign),
+                                        new Token("0", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("<", TokenType::Lt),
+                                        new Token("10", TokenType::Num), new Token(";", TokenType::S_Colon),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::For);
+  EXPECT_EQ(ast->token->type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token->type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->token->type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::Inc);
+}
 
 TEST(shouldParseSimiColon, Parse) {
   auto tokens = new vector<Token *>(
@@ -484,4 +531,14 @@ TEST(shouldParseSimiColon, Parse) {
   EXPECT_EQ(ast->token->type, TokenType::S_Colon);
   EXPECT_EQ(ast->children.size(), 1);
   EXPECT_EQ(ast->children[0]->token->type, TokenType::Num);
+}
+
+TEST(shouldFindLastPosOfBrackets, findBr) {
+  auto tokens = new vector<Token *>(
+      {new Token("{", TokenType::L_BR),
+       new Token("{", TokenType::L_BR),
+       new Token("}", TokenType::R_BR),
+       new Token("}", TokenType::R_BR)});
+  auto ast = Parser::findBr(*tokens, 0, tokens->size());
+  EXPECT_EQ(ast, 3);
 }

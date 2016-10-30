@@ -18,9 +18,11 @@ class Token {
   TokenType type;
   // value of this token, used in var, char, string literal
   std::string str;
+  int lineNum;
   Token();
   Token(const Token &obj);
   Token(string, TokenType);
+  Token(string, TokenType, int);
   bool operator==(const Token &rhs) const;
   bool operator!=(const Token &rhs) const;
   bool operator<(const Token &rhs) const;
