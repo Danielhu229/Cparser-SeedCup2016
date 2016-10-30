@@ -8,6 +8,7 @@
 #include <iostream>
 #include <stack>
 using namespace std;
+using namespace cParser;
 
 bool Expr::parse() {
   cParser::Statement* newStat = nullptr;

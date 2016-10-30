@@ -55,17 +55,19 @@ class Context {
 
 class Interpreter {
   stack<Context*> contexts;
-  map<Statement*, int> lineOfStatement;
   int currentStatement;
+  void recode(int line);
 public:
+  vector<int> runLines;
   vector<Statement*> statements;
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();
   void rSelfOperation();
-  void parse(string source);
   void execute(Statement* ast);
   void step();
+  string run();
+  void build(string source);
   template <typename T>
   T calculate(Statement* ast);
   Interpreter():currentStatement(0) {

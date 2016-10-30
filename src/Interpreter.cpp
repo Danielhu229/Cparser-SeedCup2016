@@ -2,9 +2,11 @@
 // Created by 胡一鸣 on 16/10/27.
 //
 
+#include <Expr.h>
 #include "Interpreter.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "ASTType.h"
 #include "Utility.h"
 
 using namespace cParser;
@@ -29,19 +31,15 @@ ValueType binaryCalculator(Interpreter *interpreter,
   auto rr = statement->children[1];
   auto left = interpreter->calculate<ValueType>(lr);
   auto right = interpreter->calculate<ValueType>(rr);
-  cout << right << ", " << left;
   ValueType result;
   switch (statement->token.type) {
   case TokenType::Add:
-    cout << " add ";
     result = left + right;
     break;
   case TokenType::Sub:
-    cout << " sub ";
     result = left - right;
     break;
   case TokenType::Mul:
-    cout << " mul ";
     result = left * right;
     break;
   case TokenType::Div:
@@ -65,15 +63,15 @@ ValueType binaryCalculator(Interpreter *interpreter,
     result = static_cast<int>(left >= right);
     break;
   }
-  cout << "->" << result << endl;
   return result;
 }
 
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
-  return (
-      static_cast<ValueType>(atof(statement->children[0]->token.str.c_str())) +
-      1);
+  ValueType result = interpreter->curContext()->get<ValueType>(statement->children[0]->token.str) +
+      1;
+  interpreter->curContext()->set<ValueType>(statement->children[0]->token.str, result);
+  return result;
 }
 
 template <typename ValueType>
@@ -86,8 +84,15 @@ ValueType rSelfCalculator(Interpreter *interpreter, Statement *statement) {
 
 template <typename ValueType>
 ValueType declareVar(Interpreter *interpreter, Statement *statement) {
-  interpreter->curContext()->declare<ValueType>(
-      statement->children[0]->token.str, ValueType(0));
+  for (auto child : statement->children) {
+    if (child->token.type == TokenType::Assign) {
+      interpreter->curContext()->declare<ValueType>(
+          child->children[0]->token.str, interpreter->calculate<ValueType>(child->children[1]));
+    } else if(child->token.type == TokenType::Var) {
+      interpreter->curContext()->declare<ValueType>(
+          child->token.str, ValueType(0));
+    }
+  }
   return ValueType(0);
 }
 
@@ -115,6 +120,7 @@ template <class T> void Context::set(string name, T value) {
     current = current->parent;
   }
 }
+
 template <class T> T Context::get(string name) {
   auto current = this;
   while (current != nullptr) {
@@ -162,16 +168,23 @@ void Interpreter::rSelfOperation() {
   }
 }
 
-void Interpreter::parse(string source) {
-  Lexer lexer(source);
-  lexer.lexan();
-  auto tokens = Utility::combineElseIf(lexer.tokens);
-  auto ast = Parser::parseTokens(tokens, 0, lexer.tokens.size());
-  statements.push_back(ast);
-}
 void Interpreter::step() {
   execute(statements[currentStatement]);
-  currentStatement++;
+  if (statements[currentStatement]->type == ASTType::If) {
+
+  } else {
+    currentStatement++;
+  }
+}
+
+void Interpreter::recode(int line) {
+  if (!runLines.empty()) {
+    if (runLines.back() != line) {
+      runLines.push_back(line);
+    }
+  } else {
+    runLines.push_back(line);
+  }
 }
 
 void Interpreter::execute(Statement *ast) {
@@ -185,7 +198,6 @@ void Interpreter::execute(Statement *ast) {
     break;
   case ASTType::RSelf:
     calculate<int>(ast);
-      rSelfOperation();
     break;
   case ASTType::Final:
     calculate<int>(ast);
@@ -193,6 +205,7 @@ void Interpreter::execute(Statement *ast) {
   case ASTType::Call:
     break;
   case ASTType::If:
+    execute(ast->children[0]);
     break;
   case ASTType::Else:
     break;
@@ -201,7 +214,7 @@ void Interpreter::execute(Statement *ast) {
   case ASTType::For:
     break;
   case ASTType::DeclareVar:
-    calculate<int>(ast);
+    declareVar<int>(this, ast);
       rSelfOperation();
     break;
   case ASTType::ChildStatement:
@@ -215,6 +228,7 @@ void Interpreter::execute(Statement *ast) {
 }
 
 template <typename T> T Interpreter::calculate(Statement *ast) {
+  recode(ast->token.lineNum);
   switch (ast->type) {
   case ASTType::Binary:
     return binaryCalculator<T>(this, ast);
@@ -222,13 +236,11 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     return lSelfCalculator<T>(this, ast);
   case ASTType::RSelf:
     return rSelfCalculator<T>(this, ast);
-  case ASTType::DeclareVar:
-    return declareVar<T>(this, ast);
   case ASTType::Final:
     if (ast->token.type == TokenType::Num) {
       auto s = ast->token.str;
       cout << atof(s.c_str()) << endl;
-      return (atof(s.c_str()));
+      return static_cast<T>(atof(s.c_str()));
     } else if (ast->token.type == TokenType::Var) {
       return curContext()->get<T>(ast->token.str);
     }
@@ -237,4 +249,19 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
 
 void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
+}
+string Interpreter::run() {
+  while (currentStatement < statements.size()) {
+    step();
+  }
+  // TODO: return line number
+  return "expect line number here";
+}
+
+void Interpreter::build(string source) {
+  Lexer lexer(source);
+  lexer.lexan();
+  Expr expr(lexer.tokens);
+  bool rst = expr.parse();
+  this->statements = expr.statements;
 }

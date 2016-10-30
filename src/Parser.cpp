@@ -19,7 +19,15 @@ ParserFun declareVarParser = [](vector<Token *> &tokens, int begin, int end,
                                 int position) -> Statement* {
   Statement* ast =
       new Statement(ASTType::DeclareVar, *tokens[position]);
-  auto child = Parser::parseTokens(tokens, position + 1, end);
+  int lastBegin = position + 1;
+  for(int i = lastBegin; i < end; ++i) {
+    if (tokens[i]->type == TokenType::Comma) {
+      auto child = Parser::parseTokens(tokens, lastBegin, i);
+      ast->children.push_back(child);
+      lastBegin = i + 1;
+    }
+  }
+  auto child = Parser::parseTokens(tokens, lastBegin, end);
   ast->children.push_back(child);
   return ast;
 };
@@ -73,7 +81,6 @@ ParserFun exprParser = [](vector<Token *> &tokens, int begin, int end,
       break;
     }
   }
-  cout << tokens[fixedPosition]->str;
   auto ast = (new Statement(ASTType::Binary, *tokens[fixedPosition]));
   ast->children.push_back(Parser::parseTokens(tokens, begin, fixedPosition));
   ast->children.push_back(Parser::parseTokens(tokens, fixedPosition + 1, end));
@@ -263,7 +270,7 @@ ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
-//TODO: implement this method.
+// TODO: implement this method.
 ParserFun switchParser = [](vector<Token *> &tokens, int begin, int end,
                             int position) -> Statement* {
   auto ast = new Statement(ASTType::Switch, *tokens[position]);
@@ -413,8 +420,8 @@ vector<unordered_set<int>> Parser::priorityTable = {
      e(TokenType::While)},
     {e(TokenType::Colon)},
     {e(TokenType::S_Colon)},
-    {e(TokenType::Assign)},
     {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double),
+     {e(TokenType::Assign)},
      e(TokenType::Str)},
     {e(TokenType::Lt), e(TokenType::Gt), e(TokenType::Le), e(TokenType::Ge), e(TokenType::Ne), e(TokenType::Eq)},
     {e(TokenType::Add), e(TokenType::Sub)},
@@ -474,7 +481,6 @@ ParserFun Parser::getUnFinalParser(TokenType t) {
 Statement* Parser::parseTokens(vector<Token *> &tokens, int begin,
                                           int end) {
   if (end - begin < 1) {
-    cout << "no token" << endl;
     return nullptr;
   }
   if (end > tokens.size() || begin < 0) {
