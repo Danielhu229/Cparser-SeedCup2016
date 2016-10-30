@@ -96,6 +96,26 @@ ValueType declareVar(Interpreter *interpreter, Statement *statement) {
   return ValueType(0);
 }
 
+void forExecutor(Interpreter* interpreter, Statement* ast) {
+  interpreter->execute(ast->children[0]);
+  while(interpreter->calculate<int>(ast->children[1]->children[0])) {
+    interpreter->execute(ast->children[3]);
+    interpreter->execute(ast->children[2]);
+  }
+}
+
+void whileExecutor(Interpreter* interpreter, Statement* ast) {
+  Statement* condition = ast->children[0];
+  while(condition->type == ASTType::ChildStatement) {
+    condition = condition->children[0];
+  }
+  while(interpreter->calculate<int>(condition)) {
+    interpreter->execute(ast->children[1]);
+  }
+}
+
+
+
 template <> map<string, int> &Context::getVars<int>() { return this->ints; }
 
 template <> map<string, float> &Context::getVars<float>() {
@@ -170,11 +190,7 @@ void Interpreter::rSelfOperation() {
 
 void Interpreter::step() {
   execute(statements[currentStatement]);
-  if (statements[currentStatement]->type == ASTType::If) {
-
-  } else {
-    currentStatement++;
-  }
+  currentStatement++;
 }
 
 void Interpreter::recode(int line) {
@@ -198,20 +214,33 @@ void Interpreter::execute(Statement *ast) {
     break;
   case ASTType::RSelf:
     calculate<int>(ast);
+      rSelfOperation();
     break;
   case ASTType::Final:
     calculate<int>(ast);
     break;
   case ASTType::Call:
     break;
+    case ASTType::Block:
+      for (auto child : ast->children) {
+         execute(child);
+      }
+      break;
   case ASTType::If:
-    execute(ast->children[0]);
+    if (calculate<int>(ast->children[0])) {
+      execute(ast->children[1]);
+    } else {
+      if (ast->children.size() == 3) {
+        execute(ast->children[2]);
+      }
+    }
     break;
   case ASTType::Else:
     break;
   case ASTType::ElseIf:
     break;
   case ASTType::For:
+    forExecutor(this, ast);
     break;
   case ASTType::DeclareVar:
     declareVar<int>(this, ast);
@@ -221,8 +250,9 @@ void Interpreter::execute(Statement *ast) {
     execute(ast->children[0]);
     break;
   case ASTType::While:
-    break;
-  case ASTType::Block:
+    whileExecutor(this, ast);
+    case ASTType::Do:
+      whileExecutor(this, ast);
     break;
   }
 }
@@ -239,7 +269,7 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
   case ASTType::Final:
     if (ast->token.type == TokenType::Num) {
       auto s = ast->token.str;
-      cout << atof(s.c_str()) << endl;
+      // cout << atof(s.c_str()) << endl;
       return static_cast<T>(atof(s.c_str()));
     } else if (ast->token.type == TokenType::Var) {
       return curContext()->get<T>(ast->token.str);

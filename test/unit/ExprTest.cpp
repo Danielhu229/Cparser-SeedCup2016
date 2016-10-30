@@ -807,7 +807,6 @@ TEST(shouldGetForInsideIf, parseIfExpr) {
 
 TEST(shouldGetForNoBracketsInsideIf, parseIfExpr) {
   auto tokens = new vector<Token *>({
-
                                         new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
                                         new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
                                         new Token("0", TokenType::Num),
@@ -875,15 +874,10 @@ TEST(shouldGetForInsideIfElse, parseIfExpr) {
                                         new Token("0", TokenType::Num),
                                         new Token(")", TokenType::R_PH),
                                         new Token("{", TokenType::L_BR),
-
-
                                         new Token("a", TokenType::Var),
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
-
-
                                         new Token("}", TokenType::R_BR), new Token("else", TokenType::Else),
                                         new Token("{", TokenType::L_BR),
-
                                         new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
                                         new Token("i", TokenType::Var),
                                         new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
@@ -894,13 +888,7 @@ TEST(shouldGetForInsideIfElse, parseIfExpr) {
                                         new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
-
-
                                         new Token("}", TokenType::R_BR),
-
-
-
-
                                     });
   Expr expr(*tokens);
   bool rst = expr.parse();

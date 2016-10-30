@@ -2,13 +2,12 @@
 // Created by 胡一鸣 on 16/10/28.
 //
 
-#include "gtest/gtest.h"
 #include "Interpreter.h"
 #include "Utility.h"
+#include "gtest/gtest.h"
 
 using namespace cParser;
 using namespace std;
-
 
 TEST(calculate, Statement) {
   std::string a("1 * 8 - 8 + 7;");
@@ -68,7 +67,6 @@ TEST(continueDeclare, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 7);
 }
 
-
 TEST(sequence, runControl) {
   std::string a("int i, j, k;\ni = 2;\nj = 3;\nk = 4;");
   auto interpreter = new Interpreter();
@@ -77,3 +75,87 @@ TEST(sequence, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "2 3 4");
 }
+
+TEST(If, runControl) {
+  std::string a("int i, j, k;\nif(i > 1) {\nj--;}\nelse {\n i++;}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 5");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+}
+
+TEST(IfWithoutBracket, runControl) {
+  std::string a("int i, j, k;\nif(i > 1) j--;else i++;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+}
+
+
+TEST(For, runControl) {
+  std::string a("int j = 0;\n for(int i = 0; i < 2; i++) {\n j = 2; \n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 2 3 2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 3);
+}
+
+TEST(ForWithOutBracket, runControl) {
+  std::string a("int j = 0;\n for(int i = 0; i < 2; i++)j = 2;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 3);
+}
+
+
+TEST(While, runControl) {
+  std::string a("int j;\n while(j < 2) {\nj++;\n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3 2 3 2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+TEST(WhileWithoutBracket, runControl) {
+  std::string a("int j;\n while(j < 2) j++;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+
+TEST(DoWhile, runControl) {
+  std::string a("int j;\n do j++; while (j < 2);");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+/*
+TEST(IfWithElseIf, runControl) {
+  std::string a("int i, j, k;\nif(i > 1) {\nj--;}\nelse if(i == 0) {\n i++;}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 5");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+}*/
