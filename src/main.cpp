@@ -8,8 +8,8 @@
 using namespace std;
 using namespace cParser;
 
-void printAST(shared_ptr<Statement> ast) {
-  cout << ast->token->str << " ";
+void printAST(Statement *ast) {
+  cout << ast->token.str << " ";
   for (auto childAST : ast->children) {
     printAST(childAST);
   }

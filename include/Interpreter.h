@@ -28,7 +28,7 @@ enum class ContextMode {
 class Interpreter;
 
 template <typename ValueType>
-ValueType calculator(Interpreter* interpreter, shared_ptr<Statement> statement);
+ValueType calculator(Interpreter* interpreter, Statement* statement);
 
 
 class Context {
@@ -55,19 +55,19 @@ class Context {
 
 class Interpreter {
   stack<Context*> contexts;
-  map<shared_ptr<Statement>, int> lineOfStatement;
+  map<Statement*, int> lineOfStatement;
   int currentStatement;
 public:
-  vector<shared_ptr<Statement>> statements;
+  vector<Statement*> statements;
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);
   Context* curContext();
   void rSelfOperation();
   void parse(string source);
-  void execute(shared_ptr<Statement> ast);
+  void execute(Statement* ast);
   void step();
   template <typename T>
-  T calculate(shared_ptr<Statement> ast);
+  T calculate(Statement* ast);
   Interpreter():currentStatement(0) {
     contexts.push(new Context());
   }
