@@ -550,3 +550,39 @@ TEST(shouldFindLastPosOfBrackets, findBr) {
   auto ast = Parser::findBr(*tokens, 0, tokens->size());
   EXPECT_EQ(ast, 3);
 }
+
+TEST(shouldParseDoWhileExpr, dowhileParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::Do);
+  EXPECT_EQ(ast->token.type, TokenType::DO);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->children[0]->token.type, TokenType::Ne);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type, TokenType::Inc);
+}
+
+TEST(shouldParseDoWhileNoBracketsExpr, dowhileParser) {
+  auto tokens = new vector<Token *>({
+                                        new Token("do", TokenType::DO),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
+  EXPECT_EQ(ast->type, ASTType::Do);
+  EXPECT_EQ(ast->token.type, TokenType::DO);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->children[0]->token.type, TokenType::Ne);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
+}

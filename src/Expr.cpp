@@ -28,6 +28,7 @@ cParser::Statement* Expr::parseStatement() {
     case TokenType::While:return this->parseWhileExpr();
     case TokenType::For:return this->parseForExpr();
     case TokenType::Switch:return this->parseSwitchExpr();
+    case TokenType::DO:return this->parseDowhileExpr();
     default:return this->parseExpr();
   }
 }
@@ -53,6 +54,31 @@ cParser::Statement* Expr::parseVarDeclaration() {
   pos = end;
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
+
+
+cParser::Statement* Expr::parseDowhileExpr() {
+  int begin = pos - 1;
+  // simple way to find end, firstly we find the while pos
+  int whilePos = pos - 1;
+
+  while (whilePos < mTokens.size() && mTokens[whilePos]->type != TokenType::While) {
+    whilePos++;
+  }
+  if (whilePos == mTokens.size()) {
+    return nullptr;
+  }
+  int sColonPos = whilePos;
+  while (sColonPos < mTokens.size() && mTokens[sColonPos]->type != TokenType::S_Colon) {
+    sColonPos++;
+  }
+  if (sColonPos == mTokens.size()) {
+    return nullptr;
+  }
+  int end = sColonPos + 1;
+  pos = end;
+  return cParser::Parser::parseTokens(mTokens, begin, end);
+}
+
 
 cParser::Statement* Expr::parseIfExpr() {
   int begin = pos - 1;

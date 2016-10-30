@@ -50,6 +50,7 @@ ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
     ast->children.push_back(right);
     return ast;
   }
+
 };
 
 
@@ -271,6 +272,41 @@ ParserFun switchParser = [](vector<Token *> &tokens, int begin, int end,
 };
 
 /*
+ * Function for parsing "do...while" expression
+ */
+ParserFun dowhileParser = [](vector<Token *> &tokens, int begin, int end,
+                             int position) -> Statement* {
+  auto ast = new Statement(ASTType::Do, *tokens[position]);
+  int whilePos = position + 1; // plus 1 to skip 'do'
+  while (tokens[whilePos]->type != TokenType::While) {
+    whilePos++;
+  }
+  int rPos = whilePos + 1;
+  while (tokens[rPos]->type != TokenType::R_PH) {
+    rPos++;
+  }
+  // skip since we don't need to parse while
+  ast->children.push_back(Parser::parseTokens(tokens, whilePos + 1, end));
+
+
+  int doPos = position + 1;
+  if (tokens[doPos]->type != TokenType::L_BR) {
+    // no brackets found ,then find the first occurrence of ';'
+    while (doPos < whilePos) {
+      if (tokens[doPos]->type == TokenType::S_Colon) {
+        break;
+      }
+      doPos++;
+    }
+    ast->children.push_back(Parser::parseTokens(tokens, position + 1, doPos + 1));
+  } else {
+    int brPos = Parser::findBr(tokens, doPos, end);
+    ast->children.push_back(Parser::blockParser(tokens, doPos, brPos + 1, doPos));
+  }
+  return ast;
+};
+
+/*
  * Function for parsing "for" expression
  * "while" "(" <Expression> ")" { <Block> | <Expression> }
  */
@@ -392,7 +428,9 @@ unordered_set<int> Parser::finalTokens = {
 // we ignore the '}' so we don't need to put '}' in this table
 vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::If), e(TokenType::For), e(TokenType::Switch),
-     e(TokenType::While), e(TokenType::Else)},
+     e(TokenType::Else),
+     e(TokenType::DO),
+     e(TokenType::While)},
     {e(TokenType::Colon)},
     {e(TokenType::S_Colon)},
     {e(TokenType::Assign)},
@@ -416,16 +454,17 @@ unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::Mul), exprParser},
     {e(TokenType::Div), exprParser},
     {e(TokenType::Eq), binaryParser},
+    {e(TokenType::Ne), binaryParser},
     {e(TokenType::Gt), binaryParser},
     {e(TokenType::Lt), binaryParser},
     {e(TokenType::Ge), binaryParser},
+    {e(TokenType::Le), binaryParser},
     {e(TokenType::Float), declareVarParser},
     {e(TokenType::Int), declareVarParser},
     {e(TokenType::Double), declareVarParser},
     {e(TokenType::Str), declareVarParser},
-    {e(TokenType::Le), binaryParser},
     {e(TokenType::If), ifParser},
-    {e(TokenType::L_BR), blockParser},
+    {e(TokenType::DO), dowhileParser},
     {e(TokenType::While), whileParser},
     {e(TokenType::For), forParser}};
 

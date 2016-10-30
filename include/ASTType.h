@@ -20,6 +20,7 @@ enum class ASTType {
   ChildStatement,
   While,
   Switch,
+  Do,
   Block};
 }
 #endif // C_PARSER_ASTTYPE_H
