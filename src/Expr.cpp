@@ -175,7 +175,6 @@ cParser::Statement* Expr::parseSwitchExpr() {
   return nullptr;
 }
 
-// fixme: fix with if or while inside.
 cParser::Statement* Expr::parseForExpr() {
   // in for loop if we should look for the last occurrence of ';'
   int begin = pos - 1;
@@ -206,7 +205,6 @@ cParser::Statement* Expr::parseForExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-// fixme: fix with if or for inside.
 cParser::Statement* Expr::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;

@@ -231,21 +231,28 @@ Statement* Parser::blockParser(vector<Token *> &tokens, int begin, int end,
  * "for" "(" <Expression> ";" <Expression> ";" <Expression> ")" { <Block> |
  * <Expression> }
  */
-// TODO: Do remember that in for we ignore the ';' !!!!
 ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
                          int position) -> Statement* {
   auto ast =
       (new Statement(ASTType::For, *tokens[position]));
   int prev = position + 2;
   int scolonPos = position + 1;
+  // fixme: Error handling if have ';' more than twice
   while (tokens[scolonPos]->type != TokenType::R_PH && scolonPos < end) {
     if (tokens[scolonPos]->type == TokenType::S_Colon) {
-      ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos));
+      ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos + 1));
       prev = scolonPos + 1;
     }
     scolonPos++;
   }
-  ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos));
+
+  /*
+   * tricky part of for loop, we add a fake ';' at the end of condition.
+   * remove the fake ';' after parsing it.
+   */
+  tokens.insert(tokens.begin() + scolonPos, new Token(";", TokenType::S_Colon));
+  ast->children.push_back(Parser::parseTokens(tokens, prev, scolonPos + 1));
+  tokens.erase (tokens.begin()+ scolonPos + 1);
   // minus 1 because offset by one!
   if (tokens[scolonPos + 1]->type == TokenType::L_BR) {
     ast->children.push_back(Parser::blockParser(tokens, scolonPos + 1, end, scolonPos + 1));
