@@ -18,7 +18,7 @@ using namespace std;
 
 namespace cParser {
 
-typedef function<shared_ptr<Statement>(vector<Token *> &tokens, int begin, int end,
+typedef function<Statement*(vector<Token *> &tokens, int begin, int end,
                                        int position)>
     ParserFun;
 
@@ -45,7 +45,7 @@ public:
   /**
    * parse token recurisive
    */
-  static shared_ptr<Statement> parseTokens(vector<Token *> &tokens, int begin,
+  static Statement* parseTokens(vector<Token *> &tokens, int begin,
                                            int end);
 };
 }

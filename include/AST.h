@@ -17,9 +17,9 @@ namespace cParser {
 
 struct Statement {
   ASTType type;
-  Token *token;
-  vector<shared_ptr<Statement>> children;
-  Statement(ASTType type, Token * token) : type(type), token(token), children({}) {}
+  Token token;
+  vector<Statement*> children;
+  Statement(ASTType type, Token token) : type(type), token(token), children({}) {}
   virtual ~Statement() {}
 };
 }

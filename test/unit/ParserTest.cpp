@@ -16,8 +16,8 @@ TEST(shouldDivideTokens, binaryParser) {
   ParserFun binaryParser = Parser::getUnFinalParser(TokenType::Add);
   auto ast = binaryParser(*tokens, 0, 3, 1);
   EXPECT_EQ(ast->children.size(), 2);
-  EXPECT_EQ(ast->children[0]->token->str, "3435");
-  EXPECT_EQ(ast->children[1]->token->str, "78");
+  EXPECT_EQ(ast->children[0]->token.str, "3435");
+  EXPECT_EQ(ast->children[1]->token.str, "78");
 }
 
 TEST(shouldTakeBracket, binaryParser) {
@@ -29,9 +29,9 @@ TEST(shouldTakeBracket, binaryParser) {
   ParserFun binaryParser = Parser::getUnFinalParser(TokenType::Mul);
   auto ast = binaryParser(*tokens, 0, 7, 5);
   EXPECT_EQ(ast->children.size(), 2);
-  EXPECT_EQ(ast->token->str, "*");
-  EXPECT_EQ(ast->children[0]->token->str, "+");
-  EXPECT_EQ(ast->children[1]->token->str, "57");
+  EXPECT_EQ(ast->token.str, "*");
+  EXPECT_EQ(ast->children[0]->token.str, "+");
+  EXPECT_EQ(ast->children[1]->token.str, "57");
 }
 
 TEST(shouldParseLeft, SingleParser) {
@@ -40,7 +40,7 @@ TEST(shouldParseLeft, SingleParser) {
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
   auto ast = selfPerser(*tokens, 0, tokens->size(), 0);
   EXPECT_EQ(ast->children.size(), 1);
-  EXPECT_EQ(ast->children[0]->token->str, "i");
+  EXPECT_EQ(ast->children[0]->token.str, "i");
 }
 
 TEST(shouldParseRight, SingleParser) {
@@ -49,7 +49,7 @@ TEST(shouldParseRight, SingleParser) {
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
   auto ast = selfPerser(*tokens, 0, tokens->size(), 1);
   EXPECT_EQ(ast->children.size(), 1);
-  EXPECT_EQ(ast->children[0]->token->str, "i");
+  EXPECT_EQ(ast->children[0]->token.str, "i");
 }
 
 TEST(shouldParseComplex, SingleParser) {
@@ -60,11 +60,11 @@ TEST(shouldParseComplex, SingleParser) {
   ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Inc);
   auto ast = selfPerser(*tokens, 0, 2, 1);
   EXPECT_EQ(ast->children.size(), 1);
-  EXPECT_EQ(ast->children[0]->token->str, "i");
+  EXPECT_EQ(ast->children[0]->token.str, "i");
 
   ast = selfPerser(*tokens, 3, 5, 4);
   EXPECT_EQ(ast->children.size(), 1);
-  EXPECT_EQ(ast->children[0]->token->str, "a");
+  EXPECT_EQ(ast->children[0]->token.str, "a");
 }
 
 TEST(shouldParseExpression, Parse) {
@@ -75,7 +75,7 @@ TEST(shouldParseExpression, Parse) {
        new Token("4", TokenType::Num)});
   auto ast = Parser::parseTokens(*tokens, 0, tokens->size());
   EXPECT_EQ(ast->type, ASTType::Binary);
-  EXPECT_EQ(ast->token->type, TokenType::Add);
+  EXPECT_EQ(ast->token.type, TokenType::Add);
 }
 
 TEST(shouldParseIfExpression, ifParser) {
@@ -87,7 +87,7 @@ TEST(shouldParseIfExpression, ifParser) {
   });
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
+  EXPECT_EQ(ast->token.type, TokenType::If);
 }
 
 TEST(shouldParseIfExpressionCond, ifParser) {
@@ -101,9 +101,9 @@ TEST(shouldParseIfExpressionCond, ifParser) {
   });
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
 }
 
@@ -120,14 +120,14 @@ TEST(shouldParseIfElseExpression, ifParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[0]->children[0]->token.type,
             TokenType::Dec);
 }
 
@@ -143,13 +143,13 @@ TEST(shouldParseIfNoBracketsElse, ifParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[0]->children[0]->token.type,
             TokenType::Dec);
 }
 
@@ -166,13 +166,13 @@ TEST(shouldParseIfElseNoBrackets, ifParser) {
   });
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Dec);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Dec);
 }
 
 TEST(shouldParserIfElseIf, ifParser) {
@@ -191,14 +191,14 @@ TEST(shouldParserIfElseIf, ifParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(ast->children[2]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(ast->children[2]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token.type,
             TokenType::S_Colon);
   EXPECT_EQ(
-      ast->children[2]->children[1]->children[0]->children[0]->token->type,
+      ast->children[2]->children[1]->children[0]->children[0]->token.type,
       TokenType::Dec);
   EXPECT_EQ(ast->children[2]->children[2], nullptr);
 }
@@ -217,13 +217,13 @@ TEST(shouldParserIfElseIfNoneBrackets, ifParser) {
        new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(ast->children[2]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(ast->children[2]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token.type,
             TokenType::Dec);
 }
 
@@ -242,14 +242,14 @@ TEST(shouldParserIfElseIfNoBrackets, ifParser) {
        new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(ast->children[2]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(ast->children[2]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token.type,
             TokenType::Dec);
 }
 
@@ -268,17 +268,17 @@ TEST(shouldParseIfNoBracketsElseIf, ifParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Eq);
-  EXPECT_EQ(ast->children[2]->children[1]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Eq);
+  EXPECT_EQ(ast->children[2]->children[1]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[2]->children[1]->children[0]->token.type,
             TokenType::S_Colon);
   EXPECT_EQ(
-      ast->children[2]->children[1]->children[0]->children[0]->token->type,
+      ast->children[2]->children[1]->children[0]->children[0]->token.type,
       TokenType::Dec);
 }
 
@@ -294,11 +294,11 @@ TEST(shouldParseIfElseEitherNoBrackets, ifParser) {
   });
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Dec);
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Dec);
 }
 
 TEST(shouldParseIfExpressionComplex, ifParser) {
@@ -313,13 +313,13 @@ TEST(shouldParseIfExpressionComplex, ifParser) {
   });
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
+  EXPECT_EQ(ast->token.type, TokenType::If);
   EXPECT_EQ(ast->children.size(), 3);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[1]->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->children[1]->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token.type,
             TokenType::Dec);
   EXPECT_EQ(ast->children[2], nullptr);
 }
@@ -333,9 +333,9 @@ TEST(shouldParseIfNoBrackets, ifParser) {
        new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::If);
-  EXPECT_EQ(ast->token->type, TokenType::If);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->token.type, TokenType::If);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
   EXPECT_EQ(ast->children[2], nullptr);
 }
 
@@ -349,10 +349,10 @@ TEST(shouldParseWhileExpr, whileParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
-  EXPECT_EQ(ast->token->type, TokenType::While);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::While);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
 }
 
@@ -367,15 +367,15 @@ TEST(shouldParseWhileExprInBlock, whileParser) {
        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
-  EXPECT_EQ(ast->token->type, TokenType::While);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
+  EXPECT_EQ(ast->token.type, TokenType::While);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
   EXPECT_EQ(ast->children.size(), 2);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->children[1]->children[1]->children[0]->token.type,
             TokenType::Dec);
-  EXPECT_EQ(ast->children[1]->children[1]->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[1]->token.type, TokenType::S_Colon);
 }
 
 TEST(shouldParseWhileNoBrackets, whileParser) {
@@ -387,10 +387,10 @@ TEST(shouldParseWhileNoBrackets, whileParser) {
        new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::While);
-  EXPECT_EQ(ast->token->type, TokenType::While);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Gt);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->token.type, TokenType::While);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Gt);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldParseForExpr, forParser) {
@@ -407,13 +407,13 @@ TEST(shouldParseForExpr, forParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[3]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token.type,
             TokenType::Inc);
 }
 
@@ -434,18 +434,18 @@ TEST(shouldParseForExprInBlock, forParser) {
        new Token("}", TokenType::R_BR)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->token->type, TokenType::L_BR);
-  EXPECT_EQ(ast->children[0]->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token->type,
+  EXPECT_EQ(ast->token.type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->token.type, TokenType::L_BR);
+  EXPECT_EQ(ast->children[0]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->children[0]->children[0]->token.type,
             TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token->type,
+  EXPECT_EQ(ast->children[3]->children[1]->children[0]->token.type,
             TokenType::Assign);
 }
 
@@ -462,15 +462,15 @@ TEST(shouldParseForExprNoBrackets, forParser) {
        new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, (int)tokens->size());
   EXPECT_EQ(ast->type, ASTType::For);
-  EXPECT_EQ(ast->token->type, TokenType::For);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[1]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[2]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[3]->token->type, TokenType::S_Colon);
-  EXPECT_EQ(ast->children[0]->children[0]->token->type, TokenType::Assign);
-  EXPECT_EQ(ast->children[1]->children[0]->token->type, TokenType::Lt);
-  EXPECT_EQ(ast->children[2]->children[0]->token->type, TokenType::Inc);
-  EXPECT_EQ(ast->children[3]->children[0]->token->type, TokenType::Inc);
+  EXPECT_EQ(ast->token.type, TokenType::For);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[1]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[2]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[3]->token.type, TokenType::S_Colon);
+  EXPECT_EQ(ast->children[0]->children[0]->token.type, TokenType::Assign);
+  EXPECT_EQ(ast->children[1]->children[0]->token.type, TokenType::Lt);
+  EXPECT_EQ(ast->children[2]->children[0]->token.type, TokenType::Inc);
+  EXPECT_EQ(ast->children[3]->children[0]->token.type, TokenType::Inc);
 }
 
 TEST(shouldParseSimiColon, Parse) {
@@ -478,7 +478,7 @@ TEST(shouldParseSimiColon, Parse) {
       {new Token("4", TokenType::Num), new Token(";", TokenType::S_Colon)});
   auto ast = Parser::parseTokens(*tokens, 0, tokens->size());
   EXPECT_EQ(ast->type, ASTType::ChildStatement);
-  EXPECT_EQ(ast->token->type, TokenType::S_Colon);
+  EXPECT_EQ(ast->token.type, TokenType::S_Colon);
   EXPECT_EQ(ast->children.size(), 1);
-  EXPECT_EQ(ast->children[0]->token->type, TokenType::Num);
+  EXPECT_EQ(ast->children[0]->token.type, TokenType::Num);
 }

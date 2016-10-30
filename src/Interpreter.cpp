@@ -10,72 +10,84 @@
 using namespace cParser;
 using namespace std;
 
-string getVarName(shared_ptr<Statement> declareOrVar) {
+string getVarName(Statement *declareOrVar) {
   if (declareOrVar->type == ASTType::DeclareVar) {
-    return declareOrVar->children[0]->token->str;
+    return declareOrVar->children[0]->token.str;
   }
   if (declareOrVar->type == ASTType::Final &&
-      declareOrVar->token->type == TokenType::Var) {
-    return declareOrVar->token->str;
+      declareOrVar->token.type == TokenType::Var) {
+    return declareOrVar->token.str;
   }
-  cerr << "cannot get var name from ast of" << declareOrVar->token->str << endl;
+  cerr << "cannot get var name from ast of" << declareOrVar->token.str << endl;
   return "";
 }
 
 template <typename ValueType>
 ValueType binaryCalculator(Interpreter *interpreter,
-                           shared_ptr<Statement> statement) {
-
-  auto right = interpreter->calculate<ValueType>(statement->children[1]);
-  auto left = interpreter->calculate<ValueType>(statement->children[0]);
-  getchar();
-  switch (statement->token->type) {
+                           const Statement *statement) {
+  auto lr = statement->children[0];
+  auto rr = statement->children[1];
+  auto left = interpreter->calculate<ValueType>(lr);
+  auto right = interpreter->calculate<ValueType>(rr);
+  cout << right << ", " << left;
+  ValueType result;
+  switch (statement->token.type) {
   case TokenType::Add:
-    return left + right;
+    cout << " add ";
+    result = left + right;
+    break;
   case TokenType::Sub:
-    return left - right;
+    cout << " sub ";
+    result = left - right;
+    break;
   case TokenType::Mul:
-    return left * right;
+    cout << " mul ";
+    result = left * right;
+    break;
   case TokenType::Div:
-    return left / right;
+    result = left / right;
+    break;
   case TokenType::Assign:
     interpreter->curContext()->set<ValueType>(
         getVarName(statement->children[0]), right);
-    interpreter->rSelfOperation();
-    return right;
+    result = right;
+    break;
   case TokenType::Lt:
-    return static_cast<int>(left < right);
+    result = static_cast<int>(left < right);
+    break;
   case TokenType::Gt:
-    return static_cast<int>(left > right);
+    result = static_cast<int>(left > right);
+    break;
   case TokenType::Le:
-    return static_cast<int>(left <= right);
+    result = static_cast<int>(left <= right);
+    break;
   case TokenType::Ge:
-    return static_cast<int>(left >= right);
+    result = static_cast<int>(left >= right);
+    break;
   }
+  cout << "->" << result << endl;
+  return result;
 }
 
 template <typename ValueType>
-ValueType lSelfCalculator(Interpreter *interpreter,
-                          shared_ptr<Statement> statement) {
+ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
   return (
-      static_cast<ValueType>(atof(statement->children[0]->token->str.c_str())) +
+      static_cast<ValueType>(atof(statement->children[0]->token.str.c_str())) +
       1);
 }
 
 template <typename ValueType>
-ValueType rSelfCalculator(Interpreter *interpreter,
-                          shared_ptr<Statement> statement) {
-  interpreter->markRSelf(statement->children[0]->token->str,
-                         statement->token->type);
+ValueType rSelfCalculator(Interpreter *interpreter, Statement *statement) {
+  interpreter->markRSelf(statement->children[0]->token.str,
+                         statement->token.type);
   return static_cast<ValueType>(
-      atof(statement->children[0]->token->str.c_str()));
+      atof(statement->children[0]->token.str.c_str()));
 }
 
 template <typename ValueType>
-ValueType declareVar(Interpreter *interpreter,
-                     shared_ptr<Statement> statement) {
+ValueType declareVar(Interpreter *interpreter, Statement *statement) {
   interpreter->curContext()->declare<ValueType>(
-      statement->children[0]->token->str, ValueType(0));
+      statement->children[0]->token.str, ValueType(0));
   return ValueType(0);
 }
 
@@ -112,7 +124,7 @@ template <class T> T Context::get(string name) {
     }
     current = current->parent;
   }
-  cerr << "undifined var " << name << endl;
+  cerr << "undefined var " << name << endl;
   return T(0);
 }
 
@@ -154,20 +166,26 @@ void Interpreter::parse(string source) {
   Lexer lexer(source);
   lexer.lexan();
   auto tokens = Utility::combineElseIf(lexer.tokens);
-  statements.push_back(Parser::parseTokens(tokens, 0, lexer.tokens.size()));
+  auto ast = Parser::parseTokens(tokens, 0, lexer.tokens.size());
+  statements.push_back(ast);
 }
-void Interpreter::step() { execute(statements[currentStatement]); }
+void Interpreter::step() {
+  execute(statements[currentStatement]);
+  currentStatement++;
+}
 
-void Interpreter::execute(shared_ptr<Statement> ast) {
+void Interpreter::execute(Statement *ast) {
   switch (ast->type) {
   case ASTType::Binary:
     calculate<int>(ast);
+      rSelfOperation();
     break;
   case ASTType::LSelf:
     calculate<int>(ast);
     break;
   case ASTType::RSelf:
     calculate<int>(ast);
+      rSelfOperation();
     break;
   case ASTType::Final:
     calculate<int>(ast);
@@ -184,6 +202,7 @@ void Interpreter::execute(shared_ptr<Statement> ast) {
     break;
   case ASTType::DeclareVar:
     calculate<int>(ast);
+      rSelfOperation();
     break;
   case ASTType::ChildStatement:
     execute(ast->children[0]);
@@ -195,7 +214,7 @@ void Interpreter::execute(shared_ptr<Statement> ast) {
   }
 }
 
-template <typename T> T Interpreter::calculate(shared_ptr<Statement> ast) {
+template <typename T> T Interpreter::calculate(Statement *ast) {
   switch (ast->type) {
   case ASTType::Binary:
     return binaryCalculator<T>(this, ast);
@@ -206,10 +225,12 @@ template <typename T> T Interpreter::calculate(shared_ptr<Statement> ast) {
   case ASTType::DeclareVar:
     return declareVar<T>(this, ast);
   case ASTType::Final:
-    if (ast->token->type == TokenType::Num) {
-      return static_cast<T>(atof(ast->token->str.c_str()));
-    } else if (ast->token->type == TokenType::Var) {
-      return curContext()->get<T>(ast->token->str);
+    if (ast->token.type == TokenType::Num) {
+      auto s = ast->token.str;
+      cout << atof(s.c_str()) << endl;
+      return (atof(s.c_str()));
+    } else if (ast->token.type == TokenType::Var) {
+      return curContext()->get<T>(ast->token.str);
     }
   }
 }
