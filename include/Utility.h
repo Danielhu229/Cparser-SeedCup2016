@@ -13,6 +13,7 @@ using namespace std;
 namespace cParser {
 namespace Utility {
   vector<Token*> combineElseIf(vector<Token*>& tokens);
+  string intsToString(vector<int>& src);
 }
 }
 

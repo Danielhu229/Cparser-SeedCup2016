@@ -81,7 +81,6 @@ ParserFun exprParser = [](vector<Token *> &tokens, int begin, int end,
       break;
     }
   }
-  cout << tokens[fixedPosition]->str;
   auto ast = (new Statement(ASTType::Binary, *tokens[fixedPosition]));
   ast->children.push_back(Parser::parseTokens(tokens, begin, fixedPosition));
   ast->children.push_back(Parser::parseTokens(tokens, fixedPosition + 1, end));
@@ -271,7 +270,7 @@ ParserFun forParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
-//TODO: implement this method.
+// TODO: implement this method.
 ParserFun switchParser = [](vector<Token *> &tokens, int begin, int end,
                             int position) -> Statement* {
   auto ast = new Statement(ASTType::Switch, *tokens[position]);
@@ -503,7 +502,6 @@ Statement* Parser::parseTokens(vector<Token *> &tokens, int begin,
 // TODO: make sure that it cannot ask priority for any '{' and '}'
                                           int end) {
   if (end - begin < 1) {
-    cout << "no token" << endl;
     return nullptr;
   }
   if (end > tokens.size() || begin < 0) {

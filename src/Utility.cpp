@@ -8,7 +8,7 @@
 
 using namespace cParser;
 
-vector<Token *> cParser::Utility::combineElseIf(vector<Token *> &tokens) {
+vector<Token *> Utility::combineElseIf(vector<Token *> &tokens) {
   vector<Token *> combinedTokens;
   for (int i = 0; i < tokens.size(); ++i) {
     if (tokens[i]->type == TokenType::Else && i + 1 < tokens.size() &&
@@ -20,4 +20,16 @@ vector<Token *> cParser::Utility::combineElseIf(vector<Token *> &tokens) {
     }
   }
   return combinedTokens;
+}
+
+string Utility::intsToString(vector<int>& src) {
+  string result;
+  for (int num : src) {
+    result += to_string(num);
+    result += " ";
+  }
+  if (result.length() > 0) {
+    result = result.substr(0, result.length() - 1);
+  }
+  return result;
 }

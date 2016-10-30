@@ -55,9 +55,10 @@ class Context {
 
 class Interpreter {
   stack<Context*> contexts;
-  map<Statement*, int> lineOfStatement;
   int currentStatement;
+  void recode(int line);
 public:
+  vector<int> runLines;
   vector<Statement*> statements;
   unordered_map <string, TokenType> marks;
   void markRSelf(string varname, TokenType selfOp);

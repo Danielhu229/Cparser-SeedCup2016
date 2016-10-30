@@ -4,6 +4,7 @@
 
 #include "gtest/gtest.h"
 #include "Interpreter.h"
+#include "Utility.h"
 
 using namespace cParser;
 using namespace std;
@@ -17,6 +18,7 @@ TEST(calculate, Statement) {
   int result = interpreter->calculate<int>(ast->children[0]);
   EXPECT_EQ(result, 7);
 }
+
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
   auto interpreter = new Interpreter();
@@ -64,4 +66,14 @@ TEST(continueDeclare, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("a"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 7);
+}
+
+
+TEST(sequence, runControl) {
+  std::string a("int i, j, k;\ni = 2;\nj = 3;\nk = 4;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3 4");
 }
