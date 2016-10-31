@@ -1,1 +1,2 @@
-
+/* comment */
+int a = 1;
