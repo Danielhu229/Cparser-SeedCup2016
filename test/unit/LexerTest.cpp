@@ -2,6 +2,7 @@
 // Created by aLIEzTed on 10/26/16.
 //
 #include "Lexer.h"
+#include <functional>
 #include "gtest/gtest.h"
 
 using namespace cParser;

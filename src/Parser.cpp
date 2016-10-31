@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <functional>
 #include <Utility.h>
 
 #include "AST.h"
@@ -58,7 +59,8 @@ ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
     ast->children.push_back(right);
     return ast;
   }
-
+  cerr << "self operation parser error, return nullptr" << endl;
+  return nullptr;
 };
 
 ParserFun binaryParser = [](vector<Token *> &tokens, int begin, int end,

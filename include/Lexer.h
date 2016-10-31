@@ -5,6 +5,7 @@
 #ifndef SEEDCUP_PHASER_H
 #define SEEDCUP_PHASER_H
 #include <iostream>
+#include <functional>
 #include <fstream>
 #include <string>
 #include <map>

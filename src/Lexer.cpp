@@ -2,7 +2,8 @@
 // Created by aLIEzTed on 10/24/16.
 //
 
-#include "../include/Lexer.h"
+#include "Lexer.h"
+#include <functional>
 using namespace std;
 using namespace cParser;
 

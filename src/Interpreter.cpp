@@ -3,6 +3,7 @@
 //
 
 #include "Interpreter.h"
+#include <functional>
 #include "ASTType.h"
 #include "Lexer.h"
 #include "Parser.h"
@@ -64,6 +65,8 @@ ValueType binaryCalculator(Interpreter *interpreter,
     case TokenType::Eq:
       result = static_cast<int>(left == right);
     break;
+      cerr << "binary parser error, return nullptr" << endl;
+    default:return 0;
   }
   return result;
 }

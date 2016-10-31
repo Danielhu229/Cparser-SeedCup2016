@@ -6,6 +6,7 @@
 #define C_PARSER_INTERPRETER_H
 
 #include <string>
+#include <functional>
 #include <list>
 #include <stack>
 #include <utility>

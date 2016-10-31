@@ -7,20 +7,20 @@
 using namespace cParser;
 
 Token::Token(std::string str, TokenType type)
-    :str(str), type(type) {
+    :type(type), str(str) {
 }
 
 Token::Token(std::string str, TokenType type, int lineNum)
-    :str(str), type(type), lineNum(lineNum) {
+    :type(type), str(str), lineNum(lineNum) {
 
 }
 
 Token::Token(const Token &obj)
-    :str(obj.str), type(obj.type), lineNum(obj.lineNum) {
+    :type(obj.type), str(obj.str), lineNum(obj.lineNum) {
 }
 
 Token::Token(const Token &obj, int lineNum)
-    :str(obj.str), type(obj.type), lineNum(lineNum) {
+    :type(obj.type), str(obj.str), lineNum(lineNum) {
 
 }
 

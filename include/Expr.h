@@ -15,7 +15,7 @@ class Expr {
   std::vector<Token *> mTokens;
 
   Token *curToken;
-  int pos = 0;
+  int pos;
   Token *&getNextToken() {
     return curToken = mTokens[pos++];
   }
@@ -26,7 +26,7 @@ class Expr {
 
  public:
   std::vector<cParser::Statement *> statements;
-  Expr(const vector<Token *> &tokens) : mTokens(tokens) { }
+  Expr(const vector<Token *> &tokens) : mTokens(tokens), pos(0){ }
 
   bool parse();
 
