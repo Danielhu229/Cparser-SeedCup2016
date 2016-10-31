@@ -108,6 +108,43 @@ TEST(IfWithoutBracket, runControl) {
 }
 
 
+TEST(IfWithElseIf, runControl) {
+  std::string a("int i, j, k;\nif(i > 1) {\nj--;}\nelse if(i == 0) {\n i++;}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 5");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+}
+
+TEST(multi, runControl) {
+  std::string a("int apple;\n"
+                    "int orange;\n"
+                    "orange = 2;\n"
+                    "apple = 1;\n"
+                    "apple = apple + 1;\n"
+                    "orange = apple + orange;\n"
+                    "if (orange == 2){\n"
+                    "\tprintf(\"%d\", apple);\n"
+                    "}\n"
+                    "else if(orange == 3){\n"
+                    "\tprintf(\"%d\", apple);\n"
+                    "}\n"
+                    "else{\n"
+                    "\tprintf(\"%d\", orange);\n"
+                    "}\n"
+                    "printf(\"%d\", orange);");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(interpreter->curContext()->get<int>("apple"), 2);
+  EXPECT_EQ(interpreter->curContext()->get<int>("orange"), 4);
+}
+
+
+
 TEST(For, runControl) {
   std::string a("int j = 0;\n for(int i = 0; i < 5; i++) {\n j = 2; \n}");
   auto interpreter = new Interpreter();
@@ -161,40 +198,3 @@ TEST(DoWhile, runControl) {
   EXPECT_EQ(test, "2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
 }
-
-/*
-TEST(multi, runControl) {
-  std::string a("int pen;\n"
-                    "int apple;\n"
-                    "int apple_pen;\n"
-                    "\n"
-                    "pen = 1;\n"
-                    "apple = 2;\n"
-                    "apple_pen = apple + pen;\n"
-                    "\n"
-                    "int pineapple = 4;\n"
-                    "int pineapple_pen = pineapple + pen;\n"
-                    "\n"
-                    "printf(\"I have a pen. %d\\n\", pen);\n"
-                    "printf(\"I have an apple. %d\\n\", apple);\n"
-
-                    "printf(\"Pen-pineapple-apple pen.\\n\");");
-  auto interpreter = new Interpreter();
-  interpreter->build(a);
-  interpreter->run();
-  auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(interpreter->curContext()->get<int>("apple"), 2);
-  EXPECT_EQ(interpreter->curContext()->get<int>("orange"), 2);
-}
-*/
-
-/*
-TEST(IfWithElseIf, runControl) {
-  std::string a("int i, j, k;\nif(i > 1) {\nj--;}\nelse if(i == 0) {\n i++;}");
-  auto interpreter = new Interpreter();
-  interpreter->build(a);
-  interpreter->run();
-  auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(test, "2 5");
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
-}*/

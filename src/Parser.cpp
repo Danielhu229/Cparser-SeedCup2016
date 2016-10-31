@@ -457,6 +457,7 @@ unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::Int), declareVarParser},
     {e(TokenType::Double), declareVarParser},
     {e(TokenType::Printf), printfParser},
+    {e(TokenType::L_BR), blockParser},
     {e(TokenType::If), ifParser},
     {e(TokenType::DO), dowhileParser},
     {e(TokenType::While), whileParser},
