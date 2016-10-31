@@ -114,8 +114,8 @@ TEST(IfWithElseIf, runControl) {
   interpreter->build(a);
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(test, "2 5");
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
+  EXPECT_EQ(test, "2 4 5");
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
 TEST(multi, runControl) {
