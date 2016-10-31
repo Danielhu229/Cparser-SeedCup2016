@@ -271,6 +271,16 @@ TEST(While, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
 }
 
+TEST(WhileComplex, runControl) {
+  std::string a("int j;\n while(j < 2) {\nj++;\n}\nj;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3 2 3 2 5");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
 TEST(WhileWithoutBracket, runControl) {
   std::string a("int j;\n while(j < 2) j++;");
   auto interpreter = new Interpreter();
@@ -289,4 +299,13 @@ TEST(DoWhile, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+TEST(IfInsideFor, runControl) {
+  std::string a("int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+
 }

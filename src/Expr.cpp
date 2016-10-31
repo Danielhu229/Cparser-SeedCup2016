@@ -60,18 +60,25 @@ cParser::Statement *Expr::parseDowhileExpr() {
   int begin = pos - 1;
   // simple way to find end, firstly we find the while pos
   int whilePos = pos - 1;
-
-  while (whilePos < mTokens.size() && mTokens[whilePos]->type != TokenType::While) {
+  int doPos = pos;
+  while (doPos < mTokens.size() && mTokens[doPos]->type != TokenType::DO) {
+    doPos++;
+  }
+  int initial = doPos;
+  while (whilePos < initial) {
+    if (mTokens[whilePos]->type == TokenType::While)
+      break;
     whilePos++;
   }
-  if (whilePos == mTokens.size()) {
+
+  if (whilePos == initial) {
     return nullptr;
   }
   int sColonPos = whilePos;
   while (sColonPos < mTokens.size() && mTokens[sColonPos]->type != TokenType::S_Colon) {
     sColonPos++;
   }
-  if (sColonPos == mTokens.size()) {
+  if (sColonPos == initial) {
     return nullptr;
   }
   int end = sColonPos + 1;
@@ -251,24 +258,39 @@ cParser::Statement *Expr::parseForExpr() {
   // in for loop if we should look for the last occurrence of ';'
   int begin = pos - 1;
   int end;
-  int r_brPos = pos;
+  int r_brPos = -1;
   int sColonPos = pos;
-  int sColonCount = 0;
-  while (r_brPos < mTokens.size() && mTokens[r_brPos]->type != TokenType::R_BR) {
-    if (mTokens[r_brPos]->type == TokenType::S_Colon) {
-      sColonPos = r_brPos;
-      sColonCount++;
+  int r_phPos = begin;
+  while (r_phPos < (int) mTokens.size()) {
+    if (mTokens[r_phPos]->type == TokenType::R_PH) {
+      break;
     }
-    r_brPos++;
+    r_phPos++;
   }
-  if (r_brPos == mTokens.size()) {
-    // no '}' found
-    if (sColonCount >= 1) {
-      end = sColonPos + 1;
-    } else {
-      cout << "Incomplete for expression!" << endl;
-      end = begin;
+  int l_brPos = r_phPos + 1;
+  if (mTokens[l_brPos]->type == TokenType::L_BR) {
+    r_brPos = Utility::findBr(mTokens, r_phPos, (int) mTokens.size());
+  } else {
+    // we find no '{' in the outer for loop
+    // then find have to check the next token
+    int forPos = r_phPos;
+    while (forPos < mTokens.size()) {
+      if (mTokens[forPos]->type == TokenType::For && mTokens[forPos - 1]->type == TokenType::S_Colon) {
+        break;
+      }
+      forPos++;
     }
+    int tmp = forPos - 1;
+      while (mTokens[tmp]->type == TokenType::S_Colon
+          && mTokens[tmp - 1]->type == TokenType::S_Colon
+          && mTokens[tmp]->lineNum == mTokens[tmp - 1]->lineNum) {
+        tmp--;
+      }
+    sColonPos = tmp;
+  }
+  if (r_brPos == -1) {
+    // no '}' found
+    end = sColonPos + 1;
   } else {
     // find '}'
     end = r_brPos + 1;
@@ -280,25 +302,40 @@ cParser::Statement *Expr::parseForExpr() {
 cParser::Statement *Expr::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;
-  // int sColonCount = 0;
-  int r_brPos = (int) mTokens.size();
-  int index = pos;
+  int doPos = pos - 1;
+  int r_brPos = -1;
   int sColonPos = pos;
   int end = pos;
-  while (index < mTokens.size()) {
-    if (mTokens[index]->type == TokenType::S_Colon) {
-      sColonPos = index;
-      break;
-    }
-    index++;
+  int r_phPos = pos;
+  while (r_phPos < mTokens.size() && mTokens[r_phPos]->type != TokenType::R_PH) {
+    r_phPos++;
   }
-  index = pos;
-  r_brPos = Utility::findBr(mTokens, index, (int) mTokens.size());
-  if (r_brPos == mTokens.size() || r_brPos == -1) {
+  while (doPos < mTokens.size() && mTokens[doPos]->type != TokenType::DO) {
+    doPos++;
+  }
+
+  if (mTokens[r_phPos + 1]->type == TokenType::L_BR) {
+    r_brPos = Utility::findBr(mTokens, r_phPos + 1, (int) mTokens.size());
+  } else {
+    // no brackets in while
+    int keywords = r_phPos + 1;
+    if (mTokens[keywords]->type == TokenType::DO) {
+      // we find do in the while body
+      r_phPos = keywords;
+      while (r_phPos < mTokens.size() && mTokens[r_phPos]->type != TokenType::R_PH) {
+        r_phPos++;
+      }
+      sColonPos = Utility::findLastSColon(mTokens, r_phPos + 1, (int) mTokens.size());
+    } else {
+      // no do in the while body
+      sColonPos = Utility::findLastSColon(mTokens, r_phPos + 1, (int) mTokens.size());
+    }
+  }
+  if (r_brPos == -1) {
     end = sColonPos + 1;
   } else {
     end = r_brPos + 1;
   }
-  pos = end - 1;
+  pos = end;
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }

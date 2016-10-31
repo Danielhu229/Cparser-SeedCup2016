@@ -14,7 +14,8 @@ TEST(shouldGetIfExpr, parseIfExpr) {
                                         new Token("0", TokenType::Num),
                                         new Token(")", TokenType::R_PH),
                                         new Token("{", TokenType::L_BR),
-                                        new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token("i", TokenType::Var), new Token("=", TokenType::Inc),
+                                        new Token("4", TokenType::Num),
                                         new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
@@ -1268,6 +1269,27 @@ TEST(shouldGetDoubleFor, parseForExpr) {
   EXPECT_EQ(expr.statements.size(), 2);
 }
 
+TEST(shouldGetDoubleWhile, parseWhileExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 2);
+}
+
 TEST(shouldGetUltraIf, parseIfExpr) {
   auto tokens = new vector<Token *>({
                                         new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
@@ -1291,4 +1313,232 @@ TEST(shouldGetUltraIf, parseIfExpr) {
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 3);
+}
+
+TEST(shouldGetIfInsideFor, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("i", TokenType::Var), new Token("=", TokenType::Inc),
+                                        new Token("4", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children[1]->token.type, TokenType::L_BR);
+}
+
+TEST(shouldGetWhileInsideFor, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("4", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children.size(), 2);
+}
+
+TEST(shouldGetDowhileInsideFor, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+}
+
+TEST(shouldGetDowhileInsideWhile, parseWhileExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("10", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon),
+
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+}
+
+TEST(shouldGetDoubleDowhile, parseDowhileExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 2);
+  EXPECT_EQ(expr.statements[0]->token.type, TokenType::DO);
+  EXPECT_EQ(expr.statements[1]->token.type, TokenType::DO);
+}
+
+
+TEST(shouldGetForInsideFor, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH), new Token("{", TokenType::L_BR),
+
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR),
+
+                                        new Token("}", TokenType::R_BR)
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+}
+
+TEST(shouldGetForNobrackets, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For, 1), new Token("(", TokenType::L_PH, 1),
+                                        new Token("i", TokenType::Var, 1),
+                                        new Token("=", TokenType::Assign, 1), new Token("0", TokenType::Num, 1),
+                                        new Token(";", TokenType::S_Colon, 1), new Token("i", TokenType::Var, 1),
+                                        new Token("<", TokenType::Lt, 1), new Token("5", TokenType::Num, 1),
+                                        new Token(";", TokenType::S_Colon, 1), new Token("i", TokenType::Var, 1),
+                                        new Token("++", TokenType::Inc, 1),
+                                        new Token(")", TokenType::R_PH, 1),
+                                        new Token("a", TokenType::Var, 2), new Token("++", TokenType::Inc, 2),
+                                        new Token(";", TokenType::S_Colon, 2),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+  EXPECT_EQ(expr.statements.size(), 1);
+}
+
+
+TEST(shouldGetForInsideNonebracketsFor, parseForExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+
+                                        new Token("for", TokenType::For), new Token("(", TokenType::L_PH),
+                                        new Token("i", TokenType::Var),
+                                        new Token("=", TokenType::Assign), new Token("0", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("<", TokenType::Lt), new Token("5", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon), new Token("i", TokenType::Var),
+                                        new Token("++", TokenType::Inc),
+                                        new Token(")", TokenType::R_PH),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
 }

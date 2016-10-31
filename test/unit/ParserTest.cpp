@@ -142,7 +142,8 @@ TEST(shouldParseIfExpression, ifParser) {
                                         new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
                                         new Token("a", TokenType::Var), new Token(")", TokenType::R_PH),
                                         new Token("{", TokenType::L_BR), new Token("i", TokenType::Var),
-                                        new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
+                                        new Token("=", TokenType::Assign), new Token("4", TokenType::Num),
+                                        new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
   auto ast = Parser::parseTokens(*tokens, 0, (int) tokens->size());
