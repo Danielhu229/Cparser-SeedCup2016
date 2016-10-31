@@ -233,12 +233,13 @@ void Lexer::initFunctions() {
         line++;
       }
     } else if (code[pos] == '*') {
-      while (pos < code.length() && !(code[pos] == '*' && code[pos] == '/')) {
+      while (pos < code.length() && !(code[pos] == '*' && code[pos + 1] == '/')) {
         if (code[pos] == '\n') {
           line++;
         }
         ++pos;
       }
+      pos += 2;
     } else {
       push(new Token(DIV, line));
     }
