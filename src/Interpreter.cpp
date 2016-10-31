@@ -61,6 +61,8 @@ ValueType binaryCalculator(Interpreter *interpreter,
     break;
   case TokenType::Ge:
     result = static_cast<int>(left >= right);
+    case TokenType::Eq:
+      result = static_cast<int>(left == right);
     break;
   }
   return result;
@@ -102,7 +104,12 @@ ValueType declareVar(Interpreter *interpreter, Statement *statement) {
 void forExecutor(Interpreter *interpreter, Statement *ast) {
   interpreter->execute(ast->children[0]);
   while (interpreter->calculate<int>(ast->children[1]->children[0])) {
-    interpreter->execute(ast->children[3]);
+    for (auto child : ast->children[3]->children) {
+      if (child->token.type == TokenType::Break) {
+        break;
+      }
+      interpreter->execute(child);
+    }
     interpreter->execute(ast->children[2]);
   }
 }
@@ -113,7 +120,17 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
     condition = condition->children[0];
   }
   while (interpreter->calculate<int>(condition)) {
-    interpreter->execute(ast->children[1]);
+    bool breakFlag(false);
+    for (auto child : ast->children[1]->children) {
+      if (child->token.type == TokenType::Break) {
+        breakFlag = true;
+        break;
+      }
+      interpreter->execute(child);
+    }
+    if(breakFlag) {
+      break;
+    }
   }
 }
 
@@ -134,7 +151,7 @@ template <class T> void Context::declare(string name, int value) {
 template <class T> void Context::set(string name, T value) {
   auto current = this;
   while (current != nullptr) {
-    if (current->getVars<T>().find(name) != getVars<T>().end()) {
+    if (current->getVars<T>().find(name) != current->getVars<T>().end()) {
       current->getVars<T>()[name] = value;
       break;
     }
@@ -146,7 +163,7 @@ template <class T> T Context::get(string name) {
   auto current = this;
   while (current != nullptr) {
     auto value = current->getVars<T>().find(name);
-    if (value != getVars<T>().end()) {
+    if (value != current->getVars<T>().end()) {
       return value->second;
     }
     current = current->parent;
