@@ -310,3 +310,12 @@ TEST(DoWhile, runControl) {
   EXPECT_EQ(test, "2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
 }
+
+TEST(IfInsideFor, runControl) {
+  std::string a("int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+
+}

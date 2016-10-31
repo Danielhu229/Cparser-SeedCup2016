@@ -207,6 +207,20 @@ Statement *Parser::blockParser(vector<Token *> &tokens, int begin, int end,
         ast->children.push_back(Parser::blockParser(tokens, index + 1, brPos + 1, index));
         index = brPos + 1;
       }
+    } else if (tokens[index]->type == TokenType::DO) {
+      // find the while
+      int sColonPos = index;
+      int whilePos = index;
+      while (tokens[whilePos]->type != TokenType::While) {
+        whilePos++;
+      }
+      int tmp = whilePos;
+      while (tokens[tmp]->type != TokenType::S_Colon) {
+        tmp++;
+      }
+      sColonPos = Utility::findLastSColon(tokens, tmp, end);
+      ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
+      index = sColonPos + 1;
     } else {
       // try find the occurrence of ';'
       int sColonPos = index;
