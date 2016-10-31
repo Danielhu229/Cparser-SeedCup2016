@@ -401,6 +401,20 @@ TEST(shouldFindStringPlain2, findString) {
   EXPECT_EQ(lexer.tokens[0]->str, "I have a pen. %d\n");
 }
 
+TEST(shouldGetAllTokens2, getAllTokens) {
+  std::string a("int j = 0;\n (int a = 4, b = 3, c = 5, d = 2; a + b*2 < c + d;\"\"a = a - b, b++, c--) {\n j = 2; \n}");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 52);
+}
+
+TEST(shouldGetEmptyStr, getEmptyStr) {
+  std::string a("\"\"");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+}
+
 
 
 
