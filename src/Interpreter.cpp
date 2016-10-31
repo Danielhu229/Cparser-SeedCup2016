@@ -63,11 +63,15 @@ ValueType binaryCalculator(Interpreter *interpreter,
     break;
   case TokenType::Ge:
     result = static_cast<int>(left >= right);
+      break;
   case TokenType::Eq:
     result = static_cast<int>(left == right);
     break;
-    cerr << "binary parser error, return nullptr" << endl;
+    case TokenType::Ne:
+      result = static_cast<int>(left != right);
+      break;
   default:
+    cerr << "binary parser error, return nullptr" << endl;
     return 0;
   }
   return result;
@@ -109,11 +113,16 @@ ValueType declareVar(Interpreter *interpreter, Statement *statement) {
 void forExecutor(Interpreter *interpreter, Statement *ast) {
   interpreter->execute(ast->children[0]);
   while (interpreter->calculate<int>(ast->children[1]->children[0])) {
+    bool breakFlag(false);
     for (auto child : ast->children[3]->children) {
-      if (child->token.type == TokenType::Break) {
+      if (child->type == ASTType::ChildStatement && child->children[0]->token.type == TokenType::Break) {
+        breakFlag = true;
         break;
       }
       interpreter->execute(child);
+    }
+    if (breakFlag) {
+      break;
     }
     interpreter->execute(ast->children[2]);
   }
@@ -127,7 +136,7 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
   while (interpreter->calculate<int>(condition)) {
     bool breakFlag(false);
     for (auto child : ast->children[1]->children) {
-      if (child->token.type == TokenType::Break) {
+      if (child->type == ASTType::ChildStatement && child->children[0]->token.type == TokenType::Break) {
         breakFlag = true;
         break;
       }
@@ -294,6 +303,7 @@ void Interpreter::execute(Statement *ast) {
     pushContext();
     whileExecutor(this, ast);
     popContext();
+    break;
   case ASTType::Do:
     pushContext();
     whileExecutor(this, ast);

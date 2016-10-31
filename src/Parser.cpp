@@ -40,6 +40,8 @@ ParserFun colonParser = [](vector<Token *> &tokens, int begin, int end,
   if (begin < position) {
     auto child = Parser::parseTokens(tokens, begin, position);
     ast->children.push_back(child);
+  } else {
+    cout << "empty colon" << endl;
   }
   return ast;
 };

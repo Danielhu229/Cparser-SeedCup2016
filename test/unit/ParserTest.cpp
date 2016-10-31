@@ -84,9 +84,71 @@ TEST(shouldParseComplex, printfParser) {
        new Token(",", TokenType::Comma),
        new Token("7", TokenType::Num),
        new Token(")", TokenType::R_PH)});
-  auto ast = Parser::parseTokens(*tokens, 0, 5);
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
   EXPECT_EQ(ast->token.type, TokenType::Printf);
   EXPECT_EQ(ast->type, ASTType::Printf);
+}
+
+
+TEST(shouldParseGt, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token(">", TokenType::Gt),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Gt);
+}
+
+
+TEST(shouldParseGe, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token(">=", TokenType::Ge),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Ge);
+}
+
+TEST(shouldParseLt, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token("<", TokenType::Lt),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Lt);
+}
+
+TEST(shouldParseLe, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token("<=", TokenType::Le),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Le);
+}
+
+TEST(shouldParseEq, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token("==", TokenType::Eq),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Eq);
+}
+
+TEST(shouldParseNe, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("1", TokenType::Num),
+      new Token("!=", TokenType::Ne),
+      new Token("1", TokenType::Num)}
+  );
+  auto ast = Parser::parseTokens(*tokens, 0, 3);
+  EXPECT_EQ(ast->token.type, TokenType::Ne);
 }
 
 TEST(shouldParseBlock, blockParser) {

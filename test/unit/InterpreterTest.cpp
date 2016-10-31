@@ -205,6 +205,16 @@ TEST(For, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
+TEST(ForWithBreak, runControl) {
+  std::string a("int j = 0;\n for(int i = 0; i < 5; i++) {\n j = 3;break; \n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 3);
+}
+
 TEST(ForMoreTimes, runControl) {
   std::string a("int j = 0;\n for(int i = 0; i < 3; i++) {\n j = 2; \n}");
   auto interpreter = new Interpreter();
@@ -269,6 +279,16 @@ TEST(While, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "2 3 2 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+TEST(WhileWithBreak, runControl) {
+  std::string a("int j;\n while(j < 2) {\nj++;break;\n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 1);
 }
 
 TEST(WhileWithoutBracket, runControl) {
