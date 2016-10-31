@@ -60,28 +60,32 @@ cParser::Statement *Expr::parseDowhileExpr() {
   int begin = pos - 1;
   // simple way to find end, firstly we find the while pos
   int whilePos = pos - 1;
-  int doPos = pos;
-  while (doPos < mTokens.size() && mTokens[doPos]->type != TokenType::DO) {
-    doPos++;
+  int l_brPos = pos;
+  int brPos;
+  int sColonPos;
+  int end;
+  if (mTokens[l_brPos]->type == TokenType::L_BR) {
+    // find a '{' at the outer part of do
+    brPos = Utility::findBr(mTokens, l_brPos, (int) mTokens.size());
+    whilePos = brPos;
+    while (whilePos < mTokens.size()) {
+      if (mTokens[whilePos]->type == TokenType::While)
+        break;
+      whilePos++;
+    }
+    sColonPos = Utility::findLastSColon(mTokens, whilePos, (int) mTokens.size());
+    end = sColonPos + 1;
+  } else {
+    // no '{' found
+    int doPos = pos;
+    while (doPos < mTokens.size()) {
+      if (mTokens[doPos]->type == TokenType::For && mTokens[doPos - 1]->type == TokenType::S_Colon) {
+        break;
+      }
+      doPos++;
+    }
+    end = doPos;
   }
-  int initial = doPos;
-  while (whilePos < initial) {
-    if (mTokens[whilePos]->type == TokenType::While)
-      break;
-    whilePos++;
-  }
-
-  if (whilePos == initial) {
-    return nullptr;
-  }
-  int sColonPos = whilePos;
-  while (sColonPos < mTokens.size() && mTokens[sColonPos]->type != TokenType::S_Colon) {
-    sColonPos++;
-  }
-  if (sColonPos == initial) {
-    return nullptr;
-  }
-  int end = sColonPos + 1;
   pos = end;
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }

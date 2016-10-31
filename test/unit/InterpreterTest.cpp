@@ -319,3 +319,19 @@ TEST(IfInsideFor, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
 
 }
+
+//TEST(WhileInsideForComplex, runControl) {
+//  std::string a("int i = 2;\n"
+//                    "int j = 0;\n"
+//                    "for ( ; i > 0; i--){\n"
+//                    "\tprintf(\"hello world!\");\n"
+//                    "\twhile (j <= 2){\n"
+//                    "\t\tprintf(\"hello world!\");\n"
+//                    "\t\tj++;\n"
+//                    "\t}\n"
+//                    "}");
+//  auto interpreter = new Interpreter();
+//  interpreter->build(a);
+//  interpreter->run();
+//  auto test = Utility::intsToString(interpreter->runLines);
+//}

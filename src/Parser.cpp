@@ -211,14 +211,13 @@ Statement *Parser::blockParser(vector<Token *> &tokens, int begin, int end,
       // find the while
       int sColonPos = index;
       int whilePos = index;
-      while (tokens[whilePos]->type != TokenType::While) {
-        whilePos++;
-      }
       int tmp = whilePos;
-      while (tokens[tmp]->type != TokenType::S_Colon) {
+      while (tmp < end) {
+        if (tokens[tmp]->type == TokenType::While)
+          whilePos = tmp;
         tmp++;
       }
-      sColonPos = Utility::findLastSColon(tokens, tmp, end);
+      sColonPos = Utility::findLastSColon(tokens, whilePos, end);
       ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
       index = sColonPos + 1;
     } else {
@@ -290,32 +289,28 @@ ParserFun dowhileParser = [](vector<Token *> &tokens, int begin, int end,
                              int position) -> Statement * {
   auto ast = new Statement(ASTType::Do, *tokens[position]);
   int whilePos = position + 1; // plus 1 to skip 'do'
-  while (tokens[whilePos]->type != TokenType::While) {
-    whilePos++;
+  int tmp = whilePos;
+  while (tmp < end) {
+    if (tokens[tmp]->type == TokenType::While) {
+      whilePos = tmp;
+    }
+    tmp++;
   }
-  int rPos = whilePos + 1;
-  while (tokens[rPos]->type != TokenType::R_PH) {
-    rPos++;
-  }
+
   // skip since we don't need to parse while
   ast->children.push_back(Parser::parseTokens(tokens, whilePos + 1, end));
 
   int doPos = position + 1;
-  int brPos = Utility::findBr(tokens, doPos, whilePos);
-  if (brPos != -1) {
-    if (tokens[doPos]->type != TokenType::L_BR) {
-      ast->children.push_back(Parser::parseTokens(tokens, doPos, brPos + 1));
+  if (tokens[doPos]->type == TokenType::L_BR) {
+    int brPos = Utility::findBr(tokens, doPos, whilePos);
+    if (brPos != -1) {
+      ast->children.push_back(Parser::blockParser(tokens, doPos, brPos, doPos));
     } else {
-      ast->children.push_back(Parser::blockParser(tokens, doPos, brPos + 1, doPos));
+      cout << "invalid input";
+      ast->children.push_back(nullptr);
     }
   } else {
-    while (doPos < whilePos) {
-      if (tokens[doPos]->type == TokenType::S_Colon) {
-        break;
-      }
-      doPos++;
-    }
-    ast->children.push_back(Parser::parseTokens(tokens, position + 1, doPos + 1));
+    ast->children.push_back(Parser::parseTokens(tokens, position + 1, whilePos));
   }
   return ast;
 };
