@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(C_parser)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -Wall")
 
 add_subdirectory(googletest/googletest)
 
@@ -29,5 +29,7 @@ set(C_PARSER_SRC
         )
 
 add_executable(SeedCup2016_Test ${C_PARSER_SRC} ${C_PARSER_HEAD})
+
+set_property(TARGET SeedCup2016_Test APPEND_STRING PROPERTY COMPILE_FLAGS "-Werror")
 
 target_link_libraries(SeedCup2016_Test gtest)

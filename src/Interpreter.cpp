@@ -10,8 +10,9 @@
 #include <Expr.h>
 #include <functional>
 
-using namespace cParser;
 using namespace std;
+
+namespace cParser {
 
 string getVarName(Statement *declareOrVar) {
   if (declareOrVar->type == ASTType::DeclareVar) {
@@ -325,9 +326,9 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     } else if (ast->token.type == TokenType::Str) {
       return T(0);
     }
-    default:
-      cerr << "calculate error" << endl;
-      return T(0);
+  default:
+    cerr << "calculate error" << endl;
+    return T(0);
   }
 }
 
@@ -348,4 +349,5 @@ void Interpreter::build(string source) {
   Expr expr(lexer.tokens);
   expr.parse();
   this->statements = expr.statements;
+}
 }
