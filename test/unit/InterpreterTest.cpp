@@ -67,6 +67,16 @@ TEST(continueDeclare, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("b"), 7);
 }
 
+TEST(printf, runControl) {
+  std::string a("int j;\n printf(\"test%d\", j++);");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 1);
+}
+
 TEST(sequence, runControl) {
   std::string a("int i, j, k;\ni = 2;\nj = 3;\nk = 4;");
   auto interpreter = new Interpreter();
@@ -99,12 +109,12 @@ TEST(IfWithoutBracket, runControl) {
 
 
 TEST(For, runControl) {
-  std::string a("int j = 0;\n for(int i = 0; i < 2; i++) {\n j = 2; \n}");
+  std::string a("int j = 0;\n for(int i = 0; i < 5; i++) {\n j = 2; \n}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(test, "1 2 3 2 3 2");
+  EXPECT_EQ(test, "1 2 3 2 3 2 3 2 3 2 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
@@ -151,6 +161,32 @@ TEST(DoWhile, runControl) {
   EXPECT_EQ(test, "2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
 }
+
+/*
+TEST(multi, runControl) {
+  std::string a("int pen;\n"
+                    "int apple;\n"
+                    "int apple_pen;\n"
+                    "\n"
+                    "pen = 1;\n"
+                    "apple = 2;\n"
+                    "apple_pen = apple + pen;\n"
+                    "\n"
+                    "int pineapple = 4;\n"
+                    "int pineapple_pen = pineapple + pen;\n"
+                    "\n"
+                    "printf(\"I have a pen. %d\\n\", pen);\n"
+                    "printf(\"I have an apple. %d\\n\", apple);\n"
+
+                    "printf(\"Pen-pineapple-apple pen.\\n\");");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(interpreter->curContext()->get<int>("apple"), 2);
+  EXPECT_EQ(interpreter->curContext()->get<int>("orange"), 2);
+}
+*/
 
 /*
 TEST(IfWithElseIf, runControl) {

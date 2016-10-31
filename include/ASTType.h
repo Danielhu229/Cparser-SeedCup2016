@@ -21,6 +21,8 @@ enum class ASTType {
   While,
   Switch,
   Do,
-  Block};
+  Block,
+  Printf
+};
 }
 #endif // C_PARSER_ASTTYPE_H

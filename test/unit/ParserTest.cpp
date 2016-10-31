@@ -67,6 +67,19 @@ TEST(shouldParseComplex, SingleParser) {
   EXPECT_EQ(ast->children[0]->token.str, "a");
 }
 
+TEST(shouldParseComplex, printfParser) {
+  auto tokens = new vector<Token *>(
+      {new Token("printf", TokenType::Printf),
+       new Token("(", TokenType::L_PH),
+       new Token("\"hello world%d\"", TokenType::Str),
+       new Token(",", TokenType::Comma),
+       new Token("7", TokenType::Num),
+       new Token(")", TokenType::R_PH)});
+  auto ast = Parser::parseTokens(*tokens, 0, 5);
+  EXPECT_EQ(ast->token.type, TokenType::Printf);
+  EXPECT_EQ(ast->type, ASTType::Printf);
+}
+
 TEST(shouldParseBlock, blockParser) {
   auto tokens = new vector<Token *>(
       {new Token("{", TokenType::L_BR),

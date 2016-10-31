@@ -340,6 +340,27 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
+ParserFun printfParser = [](vector<Token *> &tokens, int begin, int end,
+                          int position) -> Statement * {
+  auto ast =
+      (new Statement(ASTType::Printf, *tokens[position]));
+  int cur_token = begin;
+  // TODO: check call error
+  // skip (, )
+  begin++;
+  end--;
+  int lastCommaPosition = begin;
+  while (cur_token < end) {
+    if (tokens[cur_token]->type == TokenType::Comma) {
+      ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
+      lastCommaPosition = cur_token;
+    }
+    cur_token++;
+  }
+  ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
+  return ast;
+};
+
 /*
  * Function for parsing "if" expression
  * "if" "(" <Expression> ")" { <Block> | <Expression> }
@@ -390,7 +411,12 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
 };
 
 unordered_set<int> Parser::finalTokens = {
-    e(TokenType::Num), e(TokenType::Comma), e(TokenType::Break), e(TokenType::Var)};
+    e(TokenType::Num),
+    e(TokenType::Comma),
+    e(TokenType::Break),
+    e(TokenType::Var),
+    e(TokenType::Str)
+};
 
 // we ignore the '}' so we don't need to put '}' in this table
 vector<unordered_set<int>> Parser::priorityTable = {
@@ -408,6 +434,7 @@ vector<unordered_set<int>> Parser::priorityTable = {
     {e(TokenType::Mul), e(TokenType::Div)},
     {e(TokenType::Inc), e(TokenType::Dec)},
     {e(TokenType::R_BR)}, {e(TokenType::L_BR)},
+    {e(TokenType::Printf)},
     Parser::finalTokens
 };
 
@@ -429,7 +456,7 @@ unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::Float), declareVarParser},
     {e(TokenType::Int), declareVarParser},
     {e(TokenType::Double), declareVarParser},
-    {e(TokenType::Str), declareVarParser},
+    {e(TokenType::Printf), printfParser},
     {e(TokenType::If), ifParser},
     {e(TokenType::DO), dowhileParser},
     {e(TokenType::While), whileParser},
