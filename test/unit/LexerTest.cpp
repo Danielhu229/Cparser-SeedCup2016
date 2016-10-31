@@ -226,7 +226,7 @@ TEST(shouldCountNoLine, countNoLine) {
 }
 
 TEST(shouldCountThreeInComment, countThreeLine) {
-  std::string a("/*\n*This is a big comment\n*/");
+  std::string a("/*\nThis is a big comment\n*/");
   Lexer lexer(a);
   lexer.lexan();
   EXPECT_EQ(lexer.tokens.size(), 0);
@@ -323,6 +323,83 @@ TEST(shouldFindLineNumber, findLineNum) {
   EXPECT_EQ(lexer.tokens[10]->lineNum, 4);
 }
 
+TEST(shouldFindLineNumberWithComment, findLineNum) {
+  std::string a("/* This is a comment */ \r\n int a = 1;");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 5);
+  EXPECT_EQ(lexer.tokens[0]->lineNum, 2);
+}
+
+TEST(shouldFineLineNumberBetweenComment, findLineNum) {
+  std::string a("/* This is a comment */ \r\n int a = 1; \r\n // This another comment");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 5);
+  EXPECT_EQ(lexer.tokens[0]->lineNum, 2);
+}
+
+TEST(shouldFindLineNumberComplex, findLineNum) {
+  std::string a("int i = 2;\r\n"
+                    "int j = 0;\r\n"
+                    "for ( ; i > 0; i--){\r\n"
+                    "\tprintf(\"hello world!\");\r\n"
+                    "\twhile (j <= 2){\n"
+                    "\t\tprintf(\"hello world!\");\r\n"
+                    "\t\tj++;\r\n"
+                    "\t}\r\n"
+                    "}");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 43);
+}
+
+TEST(shouldFindTokenComplex, findTokens) {
+  std::string a("int apple;\n"
+                    "int orange;\n"
+                    "orange = 2;\n"
+                    "apple = 1;\n"
+                    "apple = apple + 1;\n"
+                    "orange = apple + orange;\n"
+                    "if (orange == 2){\n"
+                    "\tprintf(\"%d\", apple);\n"
+                    "}\n"
+                    "else if(orange == 3){\n"
+                    "\tprintf(\"%d\", apple);\n"
+                    "}\n"
+                    "else{\n"
+                    "\tprintf(\"%d\", orange);\n"
+                    "}\n"
+                    "printf(\"%d\", orange);");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 74);
+
+}
+
+TEST(shouldFindStringComplex, findString) {
+  std::string a("\"hello world. SeedCup\"");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+  EXPECT_EQ(lexer.tokens[0]->str, "hello world. SeedCup");
+}
+
+TEST(shouldFindStringPlain1, findString) {
+  std::string a("\"if (a > 0) a++\"");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+  EXPECT_EQ(lexer.tokens[0]->str, "if (a > 0) a++");
+}
+
+TEST(shouldFindStringPlain2, findString) {
+  std::string a("\"I have a pen. %d\n\"");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+  EXPECT_EQ(lexer.tokens[0]->str, "I have a pen. %d\n");
+}
 
 
 

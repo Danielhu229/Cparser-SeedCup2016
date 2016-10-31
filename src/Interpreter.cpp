@@ -120,11 +120,16 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
     condition = condition->children[0];
   }
   while (interpreter->calculate<int>(condition)) {
+    bool breakFlag(false);
     for (auto child : ast->children[1]->children) {
       if (child->token.type == TokenType::Break) {
+        breakFlag = true;
         break;
       }
       interpreter->execute(child);
+    }
+    if(breakFlag) {
+      break;
     }
   }
 }
