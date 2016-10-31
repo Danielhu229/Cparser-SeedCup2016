@@ -26,6 +26,16 @@ TEST(declaration, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
 }
 
+TEST(declarationWithCommnt, Statement) {
+  std::string a("/* This is a Comment */ \nint i = 24;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2");
+}
+
 TEST(declarationAndCalculate, Statement) {
   std::string a("int i = (4 + 3) * 6 - 10 + 11;");
   auto interpreter = new Interpreter();
@@ -155,6 +165,17 @@ TEST(For, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
+
+//TEST(ForMoreTimes, runControl) {
+//  std::string a("int j = 0;\n for(int i = 0; i < 3; i++) {\n j = 2; \n}");
+//  auto interpreter = new Interpreter();
+//  interpreter->build(a);
+//  interpreter->run();
+//  auto test = Utility::intsToString(interpreter->runLines);
+//  EXPECT_EQ(test, "1 2 3 2 3 2 3 2 3 2");
+//  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+//  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
+//}
 
 TEST(ForWithOutBracket, runControl) {
   std::string a("int j = 0;\n for(int i = 0; i < 2; i++)j = 2;");

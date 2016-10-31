@@ -175,7 +175,7 @@ void Lexer::next() {
         Token *t = new Token(name, TokenType::Str, line);
         push(t);
       }
-      pos += 1;
+      pos++;
     } else if (functions.find(token) != functions.end()) {
       functions.find(token)->second();
     }
