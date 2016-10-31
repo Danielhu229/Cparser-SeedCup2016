@@ -280,7 +280,7 @@ cParser::Statement *Expr::parseForExpr() {
 cParser::Statement *Expr::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;
-  int sColonCount = 0;
+  // int sColonCount = 0;
   int r_brPos = (int) mTokens.size();
   int index = pos;
   int sColonPos = pos;

@@ -3,12 +3,12 @@
 //
 
 #include "Interpreter.h"
-#include <functional>
 #include "ASTType.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Utility.h"
 #include <Expr.h>
+#include <functional>
 
 using namespace cParser;
 using namespace std;
@@ -62,11 +62,12 @@ ValueType binaryCalculator(Interpreter *interpreter,
     break;
   case TokenType::Ge:
     result = static_cast<int>(left >= right);
-    case TokenType::Eq:
-      result = static_cast<int>(left == right);
+  case TokenType::Eq:
+    result = static_cast<int>(left == right);
     break;
-      cerr << "binary parser error, return nullptr" << endl;
-    default:return 0;
+    cerr << "binary parser error, return nullptr" << endl;
+  default:
+    return 0;
   }
   return result;
 }
@@ -131,7 +132,7 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
       }
       interpreter->execute(child);
     }
-    if(breakFlag) {
+    if (breakFlag) {
       break;
     }
   }
@@ -252,7 +253,7 @@ void Interpreter::execute(Statement *ast) {
   case ASTType::Call:
     break;
   case ASTType::Printf:
-    for (auto param: ast->children) {
+    for (auto param : ast->children) {
       execute(param);
     }
     break;
@@ -297,6 +298,8 @@ void Interpreter::execute(Statement *ast) {
     whileExecutor(this, ast);
     popContext();
     break;
+  default:
+    break;
   }
 }
 
@@ -322,6 +325,9 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     } else if (ast->token.type == TokenType::Str) {
       return T(0);
     }
+    default:
+      cerr << "calculate error" << endl;
+      return T(0);
   }
 }
 
@@ -340,6 +346,6 @@ void Interpreter::build(string source) {
   Lexer lexer(source);
   lexer.lexan();
   Expr expr(lexer.tokens);
-  bool rst = expr.parse();
+  expr.parse();
   this->statements = expr.statements;
 }
