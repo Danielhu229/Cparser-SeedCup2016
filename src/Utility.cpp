@@ -11,8 +11,8 @@ using namespace cParser;
 
 vector<Token *> Utility::combineElseIf(vector<Token *> &tokens) {
   vector<Token *> combinedTokens;
-  for (int i = 0; i < tokens.size(); ++i) {
-    if (tokens[i]->type == TokenType::Else && i + 1 < tokens.size() &&
+  for (int i = 0; i < static_cast<int>(tokens.size()); ++i) {
+    if (tokens[i]->type == TokenType::Else && i + 1 < static_cast<int>(tokens.size()) &&
         tokens[i + 1]->type == TokenType::If) {
       combinedTokens.push_back(new Token("else if", TokenType::ElseIf));
       i++;

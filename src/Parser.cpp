@@ -46,6 +46,28 @@ ParserFun colonParser = [](vector<Token *> &tokens, int begin, int end,
   return ast;
 };
 
+ParserFun commaParser = [](vector<Token *> &tokens, int begin, int end,
+                           int position) -> Statement * {
+  Statement *ast =
+      new Statement(ASTType::Comma, *tokens[position]);
+  int lastCommaPosition = begin - 1;
+  int cur_token = begin;
+  int paren = 0;
+  while (cur_token < end) {
+    if (tokens[cur_token]->type == TokenType::L_PH) {
+      paren++;
+    } else if (tokens[cur_token]->type == TokenType::R_PH) {
+      paren--;
+    } else if (paren == 0 && tokens[cur_token]->type == TokenType::Comma) {
+       ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
+      lastCommaPosition = cur_token;
+    }
+    cur_token++;
+  }
+  ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
+  return ast;
+};
+
 ParserFun selfParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> Statement * {
   auto left = Parser::parseTokens(tokens, begin, position);
@@ -211,14 +233,13 @@ Statement *Parser::blockParser(vector<Token *> &tokens, int begin, int end,
       // find the while
       int sColonPos = index;
       int whilePos = index;
-      while (tokens[whilePos]->type != TokenType::While) {
-        whilePos++;
-      }
       int tmp = whilePos;
-      while (tokens[tmp]->type != TokenType::S_Colon) {
+      while (tmp < end) {
+        if (tokens[tmp]->type == TokenType::While)
+          whilePos = tmp;
         tmp++;
       }
-      sColonPos = Utility::findLastSColon(tokens, tmp, end);
+      sColonPos = Utility::findLastSColon(tokens, whilePos, end);
       ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
       index = sColonPos + 1;
     } else {
@@ -290,32 +311,28 @@ ParserFun dowhileParser = [](vector<Token *> &tokens, int begin, int end,
                              int position) -> Statement * {
   auto ast = new Statement(ASTType::Do, *tokens[position]);
   int whilePos = position + 1; // plus 1 to skip 'do'
-  while (tokens[whilePos]->type != TokenType::While) {
-    whilePos++;
+  int tmp = whilePos;
+  while (tmp < end) {
+    if (tokens[tmp]->type == TokenType::While) {
+      whilePos = tmp;
+    }
+    tmp++;
   }
-  int rPos = whilePos + 1;
-  while (tokens[rPos]->type != TokenType::R_PH) {
-    rPos++;
-  }
+
   // skip since we don't need to parse while
   ast->children.push_back(Parser::parseTokens(tokens, whilePos + 1, end));
 
   int doPos = position + 1;
-  int brPos = Utility::findBr(tokens, doPos, whilePos);
-  if (brPos != -1) {
-    if (tokens[doPos]->type != TokenType::L_BR) {
-      ast->children.push_back(Parser::parseTokens(tokens, doPos, brPos + 1));
+  if (tokens[doPos]->type == TokenType::L_BR) {
+    int brPos = Utility::findBr(tokens, doPos, whilePos);
+    if (brPos != -1) {
+      ast->children.push_back(Parser::blockParser(tokens, doPos, brPos, doPos));
     } else {
-      ast->children.push_back(Parser::blockParser(tokens, doPos, brPos + 1, doPos));
+      cout << "invalid input";
+      ast->children.push_back(nullptr);
     }
   } else {
-    while (doPos < whilePos) {
-      if (tokens[doPos]->type == TokenType::S_Colon) {
-        break;
-      }
-      doPos++;
-    }
-    ast->children.push_back(Parser::parseTokens(tokens, position + 1, doPos + 1));
+    ast->children.push_back(Parser::parseTokens(tokens, position + 1, whilePos));
   }
   return ast;
 };
@@ -328,10 +345,17 @@ ParserFun whileParser = [](vector<Token *> &tokens, int begin, int end,
                            int position) -> Statement * {
   auto ast =
       (new Statement(ASTType::While, *tokens[position]));
-  int rPos = position + 1; // plus 1 to skip 'while'
-  while (tokens[rPos]->type != TokenType::R_PH) {
+  int rPos = position + 2; // plus 1 to skip 'while' and ('
+  int balance = 1;
+  while (balance > 0) {
+    if (tokens[rPos]->type == TokenType::L_PH) {
+      balance++;
+    } else if (tokens[rPos]->type == TokenType::R_PH) {
+      balance--;
+    }
     rPos++;
   }
+  rPos--; // back behind )
   ast->children.push_back(Parser::parseTokens(tokens, position + 2, rPos));
 
   if (tokens[rPos + 1]->type == TokenType::L_BR) {
@@ -368,19 +392,10 @@ ParserFun printfParser = [](vector<Token *> &tokens, int begin, int end,
   auto ast =
       (new Statement(ASTType::Printf, *tokens[position]));
   int cur_token = begin;
-  // TODO: check call error
   // skip (, )
-  begin++;
+  begin += 2;
   end--;
-  int lastCommaPosition = begin;
-  while (cur_token < end) {
-    if (tokens[cur_token]->type == TokenType::Comma) {
-      ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
-      lastCommaPosition = cur_token;
-    }
-    cur_token++;
-  }
-  ast->children.push_back(Parser::parseTokens(tokens, lastCommaPosition + 1, cur_token));
+  ast->children.push_back(Parser::parseTokens(tokens, begin, end));
   return ast;
 };
 
@@ -435,7 +450,6 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
 
 unordered_set<int> Parser::finalTokens = {
     e(TokenType::Num),
-    e(TokenType::Comma),
     e(TokenType::Break),
     e(TokenType::Var),
     e(TokenType::Str)
@@ -449,8 +463,8 @@ vector<unordered_set<int>> Parser::priorityTable = {
      e(TokenType::While)},
     {e(TokenType::Colon)},
     {e(TokenType::S_Colon)},
-    {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double),
-     e(TokenType::Str)},
+    {e(TokenType::Float), e(TokenType::Int), e(TokenType::Double)},
+    {e(TokenType::Comma)},
     {e(TokenType::Assign)},
     {e(TokenType::Lt), e(TokenType::Gt), e(TokenType::Le), e(TokenType::Ge), e(TokenType::Ne), e(TokenType::Eq)},
     {e(TokenType::Add), e(TokenType::Sub)},
@@ -480,6 +494,7 @@ unordered_map<int, ParserFun> Parser::unFinalTokenParser = {
     {e(TokenType::Int), declareVarParser},
     {e(TokenType::Double), declareVarParser},
     {e(TokenType::Printf), printfParser},
+    {e(TokenType::Comma), commaParser},
     {e(TokenType::L_BR), blockParser},
     {e(TokenType::If), ifParser},
     {e(TokenType::DO), dowhileParser},
@@ -491,7 +506,7 @@ bool Parser::isFinal(TokenType t) {
 }
 
 int Parser::getPriority(TokenType t) {
-  for (int i = 0; i < priorityTable.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(priorityTable.size()); ++i) {
     if (priorityTable[i].find(e(t)) != priorityTable[i].end()) {
       return i;
     }
@@ -514,7 +529,7 @@ Statement *Parser::parseTokens(vector<Token *> &tokens, int begin,
   if (end - begin < 1) {
     return nullptr;
   }
-  if (end > tokens.size() || begin < 0) {
+  if (end > static_cast<int>(tokens.size()) || begin < 0) {
     cout << "token out of range" << endl;
     return nullptr;
   }

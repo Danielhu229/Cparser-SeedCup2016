@@ -18,6 +18,38 @@ TEST(calculate, Statement) {
   EXPECT_EQ(result, 7);
 }
 
+TEST(calculateOct, Statement) {
+  std::string a("1 * 0xA - 8 - 7;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  auto ast = interpreter->statements[0];
+  int result = interpreter->calculate<int>(ast->children[0]);
+  EXPECT_EQ(result, -5);
+}
+
+/*
+TEST(calculateFibonacci, Statement) {
+  std::string a("int n = 6;printf(\"%d \", __LINE__);\n"
+                    "    int result;  printf(\"%d \", __LINE__);\n"
+                    "        int previous_result;  printf(\"%d \", __LINE__);\n"
+                    "\t    int previous_pre_result;  printf(\"%d \", __LINE__);\n"
+                    "\t        result=1;  printf(\"%d \", __LINE__);\n"
+                    "\t\t    previous_result=1;  printf(\"%d \", __LINE__);\n"
+                    "\t\t        while(printf(\"%d \", __LINE__), n>2)  \n"
+                    "\t    {  \n"
+                    "\t\t            n--;  printf(\"%d \", __LINE__);\n"
+                    "\t\t\t            previous_pre_result=previous_result;  printf(\"%d \", __LINE__);\n"
+                    "\t\t\t\t            previous_result=result;  printf(\"%d \", __LINE__);\n"
+                    "\t\t\t\t\t            result=previous_result+previous_pre_result; printf(\"%d \", __LINE__); \n"
+                    "\t\t\t\t\t\t        }  \n"
+                    "    printf(\"\", result);  printf(\"%d \", __LINE__);");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  EXPECT_EQ(interpreter->curContext()->get<int>("result"), 8);
+}
+ */
+
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
   auto interpreter = new Interpreter();
@@ -25,14 +57,6 @@ TEST(declaration, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
 }
-
-//TEST(declarationWithNeg, Statement) {
-//  std::string a("int i = -1;");
-//  auto interpreter = new Interpreter();
-//  interpreter->build(a);
-//  interpreter->run();
-//  EXPECT_EQ(interpreter->curContext()->get<int>("i"), -1);
-//}
 
 TEST(declarationWithCommnt, Statement) {
   std::string a("/* This is a Comment */ \nint i = 24;");
@@ -52,6 +76,26 @@ TEST(calculateSigned, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), -8);
 }
+
+/*
+TEST(calculateComplex, Statement) {
+  std::string a("int a = +2;\n"
+                    "int b = a- -1;\n"
+                    "\n"
+                    "if (a>0)\n"
+                    "  for(;a>0;a--)\n"
+                    "    b++;\n"
+                    "\n"
+                    "if(b>0)\n"
+                    "  while(b>0)b--;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 4 5 6 5 6 5 8 9");
+  EXPECT_EQ(interpreter->curContext()->get<int>("a"), 0);
+}
+*/
 
 TEST(declarationAndCalculate, Statement) {
   std::string a("int i = (4 + 3) * 6 - 10 + 11;");
@@ -168,6 +212,8 @@ TEST(IfWithElseIf, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 */
+
+
 TEST(IfWithElseIfWithElse, runControl) {
   std::string a("int apple;\n"
                 "int orange;\n"
@@ -351,3 +397,58 @@ TEST(IfInsideFor, runControl) {
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
 }
+
+/*
+TEST(MultiIf, runControl) {
+  std::string a(
+                    "int a = 0;\n"
+                    "int b = 1;\n"
+                    "int c = 2;\n"
+                    "if (a == 0) {\n"
+                    "  if (b == 0) {\n"
+                    "    if (c == 2){\n"
+                    "      c++;\n"
+                    "    }\n"
+                    "    else\n"
+                    "      c--;\n"
+                    "  }\n"
+                    "  else {\n"
+                    "    if (c == 2)\n"
+                    "      c++;\n"
+                    "    else\n"
+                    "      c--;\n"
+                    "  }\n"
+                    "}\n"
+                    "else {\n"
+                    "  a++;\n"
+                    "}\n"
+                    "\n"
+                    "if (a== -1){\n"
+                    "  a++;\n"
+                    "}\n"
+                    "else if (a== 0){\n"
+                    "  a++;\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 4 5 13 14 23 26 27");
+}
+ */
+
+//TEST(WhileInsideForComplex, runControl) {
+//  std::string a("int i = 2;\n"
+//                    "int j = 0;\n"
+//                    "for ( ; i > 0; i--){\n"
+//                    "\tprintf(\"hello world!\");\n"
+//                    "\twhile (j <= 2){\n"
+//                    "\t\tprintf(\"hello world!\");\n"
+//                    "\t\tj++;\n"
+//                    "\t}\n"
+//                    "}");
+//  auto interpreter = new Interpreter();
+//  interpreter->build(a);
+//  interpreter->run();
+//  auto test = Utility::intsToString(interpreter->runLines);
+//}

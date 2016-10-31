@@ -78,6 +78,16 @@ ValueType binaryCalculator(Interpreter *interpreter,
 }
 
 template <typename ValueType>
+ValueType commaCalculator(Interpreter *interpreter, Statement *statement) {
+  ValueType result;
+  for (auto child: statement->children) {
+    result = interpreter->calculate<ValueType>(child);
+  }
+  return result;
+}
+
+
+template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
   ValueType result = interpreter->curContext()->get<ValueType>(
                          statement->children[0]->token.str) +
@@ -254,7 +264,10 @@ void Interpreter::recode(int line) {
 
 void Interpreter::execute(Statement *ast) {
   switch (ast->type) {
-  case ASTType::Binary:
+    case ASTType::Comma:
+      calculate<int>(ast);
+      break;
+    case ASTType::Binary:
     calculate<int>(ast);
     rSelfOperation();
     break;
@@ -271,9 +284,8 @@ void Interpreter::execute(Statement *ast) {
   case ASTType::Call:
     break;
   case ASTType::Printf:
-    for (auto param : ast->children) {
-      execute(param);
-    }
+    execute(ast->children[0]);
+      rSelfOperation();
     break;
   case ASTType::Block:
     for (auto child : ast->children) {
@@ -329,6 +341,9 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     return T(0);
   }
   switch (ast->type) {
+    case ASTType::Comma:
+      return commaCalculator<T>(this, ast);
+      break;
   case ASTType::Binary:
     recode(ast->token.lineNum);
     return binaryCalculator<T>(this, ast);
@@ -361,7 +376,7 @@ void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
 }
 void Interpreter::run() {
-  while (currentStatement < statements.size()) {
+  while (currentStatement < static_cast<int>(statements.size())) {
     step();
   }
 }

@@ -141,6 +141,21 @@ TEST(shouldParseEq, printfParser) {
   EXPECT_EQ(ast->token.type, TokenType::Eq);
 }
 
+TEST(shouldParseComma, SingleParser) {
+  auto tokens = new vector<Token *>(
+      {
+          new Token("1", TokenType::Int),
+          new Token(",", TokenType::Comma),
+          new Token("2", TokenType::Int),
+          new Token(",", TokenType::Comma),
+          new Token("3", TokenType::Int)
+      });
+  ParserFun selfPerser = Parser::getUnFinalParser(TokenType::Comma);
+  auto ast = selfPerser(*tokens, 0, tokens->size(), 1);
+  EXPECT_EQ(ast->children.size(), 3);
+  EXPECT_EQ(ast->token.type, TokenType::Comma);
+}
+
 TEST(shouldParseNe, printfParser) {
   auto tokens = new vector<Token *>(
       {new Token("1", TokenType::Num),

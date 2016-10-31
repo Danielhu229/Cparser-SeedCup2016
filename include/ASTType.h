@@ -18,6 +18,7 @@ enum class ASTType {
   RSelf,
   DeclareVar,
   ChildStatement,
+  Comma,
   While,
   Switch,
   Do,

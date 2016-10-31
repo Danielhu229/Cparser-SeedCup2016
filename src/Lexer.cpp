@@ -88,7 +88,7 @@ Lexer::Lexer(const string &code) : code(code) {
  * Get all the tokens into token list.
  */
 void Lexer::lexan() {
-  while (pos < code.length()) {
+  while (pos < static_cast<int>(code.length())) {
     next();
   }
 //  if (pos != 0) {
@@ -106,7 +106,7 @@ void Lexer::next() {
   int last_pos;
   int token;
   while (1) {
-    if (pos == code.length()) {
+    if (pos == static_cast<int>(code.length())) {
       break;
     }
     token = code[pos];
@@ -140,7 +140,7 @@ void Lexer::next() {
           token = code[++pos];
           while ((token >= '0' && token <= '9') ||
                  (token >= 'a' && token <= 'f') ||
-                 (token >= 'A' & token <= 'F')) {
+                 (token >= 'A' && token <= 'F')) {
             str = str * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
             token = code[++pos];
           }
@@ -156,7 +156,7 @@ void Lexer::next() {
     } else if (token == '"' || token == '\'') {
       // TODO: deal with escaped string.
       int cur_pos = pos;
-      while (pos < code.length()) {
+      while (pos < static_cast<int>(code.length())) {
         if (code[pos] == token) {
           break;
         }
@@ -234,7 +234,7 @@ void Lexer::initFunctions() {
         line++;
       }
     } else if (code[pos] == '*') {
-      while (pos < code.length() && !(code[pos] == '*' && code[pos + 1] == '/')) {
+      while (pos < static_cast<int>(code.length()) && !(code[pos] == '*' && code[pos + 1] == '/')) {
         if (code[pos] == '\n') {
           line++;
         }
