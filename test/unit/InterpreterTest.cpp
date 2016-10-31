@@ -26,6 +26,14 @@ TEST(declaration, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 24);
 }
 
+//TEST(declarationWithNeg, Statement) {
+//  std::string a("int i = -1;");
+//  auto interpreter = new Interpreter();
+//  interpreter->build(a);
+//  interpreter->run();
+//  EXPECT_EQ(interpreter->curContext()->get<int>("i"), -1);
+//}
+
 TEST(declarationWithCommnt, Statement) {
   std::string a("/* This is a Comment */ \nint i = 24;");
   auto interpreter = new Interpreter();
@@ -183,6 +191,7 @@ TEST(IfWithElseIfWithElse, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(interpreter->curContext()->get<int>("apple"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("orange"), 4);
+  EXPECT_EQ(test, "3 4 5 6 7 10 14 16");
 }
 
 TEST(For, runControl) {
@@ -195,19 +204,27 @@ TEST(For, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
-/*
+
+TEST(ForMoreTimes, runControl) {
+  std::string a("int j = 0;\n for(int i = 0; i < 3; i++) {\n j = 2; \n}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 2 3 2 3 2");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
+}
+
+// TODO: what the f**k, no for ahead!!!
 TEST(ForWithComma, runControl) {
   std::string a("int j = 0;\n (int a = 4, b = 3, c = 5, d = 2; a + b*2 < c + d;"
                     "a = a - b, b++, c--) {\n j = 2; \n}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
-  auto test = Utility::intsToString(interpreter->runLines);
-  EXPECT_EQ(test, "1 2 3 2 3 2 3 2 3 2 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
-*/
 
 TEST(ForWithOutBracket, runControl) {
   std::string a("int j = 0;\n for(int i = 0; i < 2; i++)j = 2;");

@@ -167,8 +167,8 @@ void Lexer::next() {
       if (code[pos] != token) {
         pos = cur_pos;
       }
-      if (pos - cur_pos == 1) {
-        Token *curr_token = new Token(string(1, code[cur_pos]), TokenType::Num, line);
+      if (pos - cur_pos == 0) {
+        Token *curr_token = new Token("", TokenType::Str, line);
         push(curr_token);
       } else if (pos - cur_pos > 0) {
         string name = code.substr((size_t)cur_pos, (size_t)(pos - cur_pos));
