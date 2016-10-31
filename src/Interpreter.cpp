@@ -63,13 +63,13 @@ ValueType binaryCalculator(Interpreter *interpreter,
     break;
   case TokenType::Ge:
     result = static_cast<int>(left >= right);
-      break;
+    break;
   case TokenType::Eq:
     result = static_cast<int>(left == right);
     break;
-    case TokenType::Ne:
-      result = static_cast<int>(left != right);
-      break;
+  case TokenType::Ne:
+    result = static_cast<int>(left != right);
+    break;
   default:
     cerr << "binary parser error, return nullptr" << endl;
     return 0;
@@ -114,13 +114,16 @@ void forExecutor(Interpreter *interpreter, Statement *ast) {
   interpreter->execute(ast->children[0]);
   while (interpreter->calculate<int>(ast->children[1]->children[0])) {
     bool breakFlag(false);
+    interpreter->pushContext();
     for (auto child : ast->children[3]->children) {
-      if (child->type == ASTType::ChildStatement && child->children[0]->token.type == TokenType::Break) {
+      if (child->type == ASTType::ChildStatement &&
+          child->children[0]->token.type == TokenType::Break) {
         breakFlag = true;
         break;
       }
       interpreter->execute(child);
     }
+    interpreter->popContext();
     if (breakFlag) {
       break;
     }
@@ -136,7 +139,9 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
   while (interpreter->calculate<int>(condition)) {
     bool breakFlag(false);
     for (auto child : ast->children[1]->children) {
-      if (child->type == ASTType::ChildStatement && child->children[0]->token.type == TokenType::Break) {
+      if (child->type == ASTType::ChildStatement &&
+          child->children[0]->token.type == TokenType::Break) {
+        interpreter->recode(child->token.lineNum);
         breakFlag = true;
         break;
       }
@@ -235,6 +240,9 @@ void Interpreter::step() {
 }
 
 void Interpreter::recode(int line) {
+  if (line == 0) {
+    getchar();
+  }
   if (!runLines.empty()) {
     if (runLines.back() != line) {
       runLines.push_back(line);
@@ -297,7 +305,9 @@ void Interpreter::execute(Statement *ast) {
     rSelfOperation();
     break;
   case ASTType::ChildStatement:
-    execute(ast->children[0]);
+    if (ast->children.size() > 0) {
+      execute(ast->children[0]);
+    }
     break;
   case ASTType::While:
     pushContext();
@@ -318,22 +328,27 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
   if (!ast) {
     return T(0);
   }
-  recode(ast->token.lineNum);
   switch (ast->type) {
   case ASTType::Binary:
+    recode(ast->token.lineNum);
     return binaryCalculator<T>(this, ast);
   case ASTType::LSelf:
+    recode(ast->token.lineNum);
     return lSelfCalculator<T>(this, ast);
   case ASTType::RSelf:
+    recode(ast->token.lineNum);
     return rSelfCalculator<T>(this, ast);
   case ASTType::Final:
     if (ast->token.type == TokenType::Num) {
+      recode(ast->token.lineNum);
       auto s = ast->token.str;
-      // cout << atof(s.c_str()) << endl;
       return static_cast<T>(atof(s.c_str()));
     } else if (ast->token.type == TokenType::Var) {
       return curContext()->get<T>(ast->token.str);
     } else if (ast->token.type == TokenType::Str) {
+      recode(ast->token.lineNum);
+      return T(0);
+    } else if (ast->token.type == TokenType::S_Colon) {
       return T(0);
     }
   default:
@@ -345,12 +360,10 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
 void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
 }
-string Interpreter::run() {
+void Interpreter::run() {
   while (currentStatement < statements.size()) {
     step();
   }
-  // TODO: return line number
-  return "expect line number here";
 }
 
 void Interpreter::build(string source) {

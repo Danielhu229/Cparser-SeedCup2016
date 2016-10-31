@@ -260,6 +260,39 @@ TEST(MultiFor, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("k"), 2);
 }
 
+TEST(MultiFor2, runControl) {
+  std::string a("int i, j;\n"
+                    "\n"
+                    "for (i = 0; i < 2; i++) {\n"
+                    "  int i = 2;\n"
+                    "  for (; i <= 2;) {\n"
+                    "    i++;j++;\n"
+                    "  }\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "3 4 5 6 5 3 4 5 6 5 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+TEST(ForIf, runControl) {
+  std::string a(
+      "int a = 0, b = 0;\n"
+          "if (a <= 0) {\n"
+          "    for (int i = 0; i != 5; i++) {\n"
+          "        b = i;\n"
+          "    }\n"
+          "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 4 3 4 3 4 3 4 3 4 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("b"), 4);
+}
+
 TEST(ForWhile, runControl) {
   std::string a(
       "int k = 0;\n for(int i = 0; i < 2; i++){\nwhile(k == 0) \n{k++;}\n}");
@@ -317,5 +350,4 @@ TEST(IfInsideFor, runControl) {
   interpreter->build(a);
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
-
 }
