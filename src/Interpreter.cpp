@@ -298,6 +298,9 @@ void Interpreter::execute(Statement *ast) {
 }
 
 template <typename T> T Interpreter::calculate(Statement *ast) {
+  if (!ast) {
+    return T(0);
+  }
   recode(ast->token.lineNum);
   switch (ast->type) {
   case ASTType::Binary:

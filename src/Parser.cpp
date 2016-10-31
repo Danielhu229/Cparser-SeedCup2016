@@ -74,8 +74,13 @@ ParserFun exprParser = [](vector<Token *> &tokens, int begin, int end,
                           int position) -> Statement * {
   int fixedPosition = position;
   int priority = Parser::getPriority(tokens[position]->type);
+  int paren = 0;
   for (int i = end - 1; i >= begin; i--) {
-    if (priority == Parser::getPriority(tokens[i]->type)) {
+    if (tokens[i]->type == TokenType::L_PH) {
+      paren++;
+    } else if (tokens[i]->type == TokenType::R_PH) {
+      paren--;
+    } else if (paren == 0 && priority == Parser::getPriority(tokens[i]->type)) {
       fixedPosition = i;
       break;
     }

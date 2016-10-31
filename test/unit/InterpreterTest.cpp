@@ -36,6 +36,15 @@ TEST(declarationWithCommnt, Statement) {
   EXPECT_EQ(test, "2");
 }
 
+
+TEST(calculateSigned, Statement) {
+  std::string a("int i = -(3+5);");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), -8);
+}
+
 TEST(declarationAndCalculate, Statement) {
   std::string a("int i = (4 + 3) * 6 - 10 + 11;");
   auto interpreter = new Interpreter();
