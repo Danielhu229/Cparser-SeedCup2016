@@ -77,8 +77,7 @@ void Lexer::init() {
   keywords["printf"] = PRINTF;
 }
 
-Lexer::Lexer(const string &code) : code(code) {
-  pos = 0;
+Lexer::Lexer(const string &code) : code(code),  pos(0), negative(false) {
   line = code == "" ? 0 : 1;
   init();
   initFunctions();
@@ -91,14 +90,11 @@ void Lexer::lexan() {
   while (pos < static_cast<int>(code.length())) {
     next();
   }
-//  if (pos != 0) {
-//    line++;
-//  }
 }
 
 void Lexer::push(Token *token) {
   curr_token = *token;
-  //  cout << "current token " << curr_token << ", at pos " << pos << endl;
+//    cout << "current token " << curr_token << ", at pos " << pos << endl;
   tokens.push_back(token);
 }
 
@@ -116,11 +112,11 @@ void Lexer::next() {
       // find a variable
       last_pos = pos - 1;
       while ((code[pos] >= 'a' && code[pos] <= 'z') ||
-             (code[pos] >= 'A' && code[pos] <= 'Z') ||
-             (code[pos] >= '0' && code[pos] <= '9') || (code[pos] == '_')) {
+          (code[pos] >= 'A' && code[pos] <= 'Z') ||
+          (code[pos] >= '0' && code[pos] <= '9') || (code[pos] == '_')) {
         pos++;
       }
-      string name = code.substr((size_t)last_pos, (size_t)(pos - last_pos));
+      string name = code.substr((size_t) last_pos, (size_t) (pos - last_pos));
       if (keywords.find(name) != keywords.end()) {
         Token *t = &keywords.find(name)->second;
         push(new Token(*t, line));
@@ -139,8 +135,8 @@ void Lexer::next() {
         if (code[pos] == 'x' || code[pos] == 'X') {
           token = code[++pos];
           while ((token >= '0' && token <= '9') ||
-                 (token >= 'a' && token <= 'f') ||
-                 (token >= 'A' && token <= 'F')) {
+              (token >= 'a' && token <= 'f') ||
+              (token >= 'A' && token <= 'F')) {
             str = str * 16 + (token & 15) + (token >= 'A' ? 9 : 0);
             token = code[++pos];
           }
@@ -149,6 +145,10 @@ void Lexer::next() {
             str = str * 8 + code[pos++] - '0';
           }
         }
+      }
+      if (negative) {
+        str = -str;
+        negative = false;
       }
       Token *t = new Token(to_string(str), TokenType::Num, line);
       push(t);
@@ -172,7 +172,7 @@ void Lexer::next() {
         Token *curr_token = new Token("", TokenType::Str, line);
         push(curr_token);
       } else if (pos - cur_pos > 0) {
-        string name = code.substr((size_t)cur_pos, (size_t)(pos - cur_pos));
+        string name = code.substr((size_t) cur_pos, (size_t) (pos - cur_pos));
         Token *t = new Token(name, TokenType::Str, line);
         push(t);
       }
@@ -185,20 +185,114 @@ void Lexer::next() {
 
 void Lexer::initFunctions() {
   auto comma = [this]() { push(new Token(COMMA, line)); };
+  // TODO: remove the boilerplate in add and sub function objects.
   auto add = [this]() {
-    if (code[pos] == '+') {
-      pos++;
-      push(new Token(INC, line));
+    // the original pos of '+'
+    int addPos = pos - 1;
+    if (addPos > 0) {
+      if (curr_token.type == TokenType::Num) {
+        // last token is a number
+        push(new Token(ADD, line));
+      } else if (curr_token.type == TokenType::Var) {
+        // last token is a var
+        if (code[pos] == '+') {
+          pos++;
+          push(new Token(INC, line));
+        } else {
+          push(new Token(ADD, line));
+        }
+      } else if (curr_token.type == TokenType::Inc) {
+        // last token is ++, then this one should be add
+        push(new Token(ADD, line));
+      } else if (curr_token.type == TokenType::S_Colon
+          || curr_token.type == TokenType::Eq) {
+        if (code[pos] == '+') {
+          // we have a '++' but we have to check it is before a var
+          if ((code[pos + 1] < 'z' && code[pos + 1] > 'a') || (code[pos + 1] < 'Z' && code[pos + 1] > 'A')) {
+            pos++;
+            push(new Token(INC, line));
+          }
+        } else {
+          push(new Token(ADD, line));
+        }
+      } else if (curr_token.type == TokenType::Assign) {
+        if (code[pos] == '+') {
+          if ((code[pos + 1] < 'z' && code[pos + 1] > 'a') || (code[pos + 1] < 'Z' && code[pos + 1] > 'A')) {
+            pos++;
+            push(new Token(INC, line));
+          }
+        } else if (code[pos] == '(') {
+          push(new Token(ADD, line));
+        } else {
+          return;
+        }
+      } else {
+        return;
+      }
+
     } else {
-      push(new Token(ADD, line));
+      if (code[pos] == '+') {
+        pos++;
+        push(new Token(INC, line));
+      } else {
+        // only one plus at the first pos, ignore it.
+        return;
+      }
     }
   };
   auto sub = [this]() {
-    if (code[pos] == '-') {
-      pos++;
-      push(new Token(DEC, line));
+    int subPos = pos - 1;
+    if (subPos > 0) {
+      if (curr_token.type == TokenType::Num) {
+        // last token is a number
+        push(new Token(SUB, line));
+      } else if (curr_token.type == TokenType::Var) {
+        // last token is a var
+        if (code[pos] == '-') {
+          pos++;
+          push(new Token(DEC, line));
+        } else {
+          push(new Token(SUB, line));
+        }
+      } else if (curr_token.type == TokenType::Dec) {
+        // last token is ++, then this one should be add
+        push(new Token(SUB, line));
+      } else if (curr_token.type == TokenType::S_Colon
+          || curr_token.type == TokenType::Eq) {
+        if (code[pos] == '-') {
+          // we have a '--' but we have to check it is before a var
+          if ((code[pos + 1] < 'z' && code[pos + 1] > 'a') || (code[pos + 1] < 'Z' && code[pos + 1] > 'A')) {
+            pos++;
+            push(new Token(DEC, line));
+          }
+        } else {
+          push(new Token(SUB, line));
+        }
+      } else if (curr_token.type == TokenType::Assign) {
+        if (code[pos] == '-') {
+          if ((code[pos + 1] < 'z' && code[pos + 1] > 'a') || (code[pos + 1] < 'Z' && code[pos + 1] > 'A')) {
+            pos++;
+            push(new Token(DEC, line));
+          }
+        } else if (code[pos] == '(') {
+          push(new Token(SUB, line));
+        } else {
+          negative = true;
+          return;
+        }
+      } else {
+        negative = true;
+        return;
+      }
     } else {
-      push(new Token(SUB, line));
+      if (code[pos] == '-') {
+        pos++;
+        push(new Token(DEC, line));
+      } else {
+        // only one minus at the first pos, set negative flag.
+        negative = true;
+        return;
+      }
     }
   };
   auto eq = [this]() {
