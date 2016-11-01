@@ -27,7 +27,7 @@ TEST(calculateOct, Statement) {
   EXPECT_EQ(result, -5);
 }
 
-/*
+
 TEST(calculateFibonacci, Statement) {
   std::string a("int n = 6;printf(\"%d \", __LINE__);\n"
                     "    int result;  printf(\"%d \", __LINE__);\n"
@@ -48,7 +48,7 @@ TEST(calculateFibonacci, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("result"), 8);
 }
-*/
+
 
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
@@ -476,7 +476,19 @@ TEST(forEmpty, runControl) {
   EXPECT_EQ(test, "2 3 4 5 6 7 5 6 7 8 10 11 4 5 6 7 8 10 11 4 5 6 7 8 10 11 12");
 }
 
-/*
+TEST(whileConst, runControl) {
+  std::string a("int a;\n"
+                    "a = 2;\n"
+                    "while(1)\n"
+                    "  if (a-- <= 0)\n"
+                    "    break;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3 4 3 4 3 4 5");
+}
+
 TEST(LoopComplex, runControl) {
   std::string a("int i = 0, j, k = 0; printf(\"%d \", __LINE__);\n"
                     "\n"
@@ -506,4 +518,4 @@ TEST(LoopComplex, runControl) {
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
 }
-*/
+

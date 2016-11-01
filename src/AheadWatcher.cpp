@@ -173,10 +173,23 @@ cParser::Statement *AheadWatcher::parseWhileExpr() {
   int r_brPos = -1;
   int sColonPos = pos;
   int end = pos;
-  int r_phPos = pos;
-  while (r_phPos < mTokens.size() && mTokens[r_phPos]->type != TokenType::R_PH) {
-    r_phPos++;
+  int r_phPos = -1;
+  int tmp = pos;
+  stack<int> phStack;
+  while (tmp < mTokens.size()) {
+    if (mTokens[tmp]->type ==TokenType::L_PH) {
+      phStack.push(tmp);
+    }
+    if (mTokens[tmp]->type == TokenType::R_PH) {
+      phStack.pop();
+      if (phStack.empty()) {
+        r_phPos = tmp;
+        break;
+      }
+    }
+    tmp++;
   }
+
   while (doPos < mTokens.size() && mTokens[doPos]->type != TokenType::DO) {
     doPos++;
   }

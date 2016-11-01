@@ -121,8 +121,8 @@ ValueType rSelfCalculator(Interpreter *interpreter, Statement *statement) {
   // mark first, will be performed later
   interpreter->markRSelf(statement->children[0]->token.str,
                          statement->token.type);
-  return static_cast<ValueType>(
-      atof(statement->children[0]->token.str.c_str()));
+  return interpreter->curContext()->get<ValueType>(
+      statement->children[0]->token.str);
 }
 
 template <typename ValueType>
@@ -146,8 +146,9 @@ void forExecutor(Interpreter *interpreter, Statement *ast) {
   // transform the calculation of condition
   while (ast->children[1]->children.empty() ||
          interpreter->calculate<int>(ast->children[1]->children[0])) {
-    // should enter a new context
+    interpreter->rSelfOperation();
     interpreter->record(ast->token.lineNum);
+    // should enter a new context
     interpreter->pushContext();
     bool insideBreakFlag;
     // execute body
@@ -178,12 +179,22 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
     condition = condition->children[0];
   }
   while (interpreter->calculate<int>(condition)) {
-    interpreter->record(condition->token.lineNum);
+    interpreter->rSelfOperation();
     bool insideBreakFlag(false);
-    // execute body
-    for (auto child : ast->children[1]->children) {
-      // break handle
-      interpreter->execute(child);
+    interpreter->record(condition->token.lineNum);
+    if (ast->type == ASTType::Block) {
+      // execute body
+      for (auto child : ast->children[1]->children) {
+        // break handle
+        interpreter->execute(child);
+        if (interpreter->breakFlag) {
+          interpreter->breakFlag = false;
+          insideBreakFlag = true;
+          break;
+        }
+      }
+    } else {
+      interpreter->execute(ast->children[1]);
       if (interpreter->breakFlag) {
         interpreter->breakFlag = false;
         insideBreakFlag = true;
@@ -334,8 +345,10 @@ Interpreter *Interpreter::execute(Statement *ast) {
   case ASTType::If:
     pushContext();
     if (calculate<int>(ast->children[0])) {
+      rSelfOperation();
       execute(ast->children[1]);
     } else {
+      rSelfOperation();
       if (ast->children.size() == 3 && ast->children[2]) {
         execute(ast->children[2]);
       }

@@ -160,7 +160,7 @@ ParserFun blockParser = [](vector<Token *> &tokens, int begin, int end,
   while (index < end - 1) {
     if (tokens[index]->type == TokenType::If) {
       int elsePos = Utility::findLastElse(tokens, index + 1, end - 1);
-      ast->children.push_back(Parser::parseTokens(tokens, index, elsePos + 1));
+      ast->children.push_back(Parser::parseTokens(tokens, index, elsePos));
       index = elsePos + 1;
     } else if (tokens[index]->type == TokenType::For) {
       int brPos = Utility::findBr(tokens, index, end - 1);
@@ -217,7 +217,7 @@ ParserFun blockParser = [](vector<Token *> &tokens, int begin, int end,
       if (brPos != -1) {
         // we find another brackets
         ast->children.push_back(
-            blockParser(tokens, index + 1, brPos + 1, index));
+            blockParser(tokens, index, brPos + 1, index));
         index = brPos + 1;
       }
     } else if (tokens[index]->type == TokenType::DO) {
