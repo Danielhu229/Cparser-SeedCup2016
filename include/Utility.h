@@ -16,6 +16,8 @@ namespace Utility {
   string intsToString(vector<int>& src);
   int findBr(vector<Token *> &tokens, int begin, int end);
   int findLastSColon(vector<Token *> &tokens, int begin, int end);
+  int findRph(vector<Token *> &tokens, int begin, int end);
+  int findLastElse(vector<Token *> &tokens, int begin, int end);
 }
 }
 

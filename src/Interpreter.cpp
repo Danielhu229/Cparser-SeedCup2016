@@ -91,12 +91,28 @@ ValueType commaCalculator(Interpreter *interpreter, Statement *statement) {
 
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
-  ValueType result = interpreter->curContext()->get<ValueType>(
-                         statement->children[0]->token.str) +
-                     1;
+  ValueType result;
+  if (statement->token.type == TokenType::Inc) {
+    result = interpreter->curContext()->get<ValueType>(
+        statement->children[0]->token.str) +
+        1;
+  } else if (statement->token.type == TokenType::Dec) {
+    result = interpreter->curContext()->get<ValueType>(
+        statement->children[0]->token.str) -
+        1;
+  }
   interpreter->curContext()->set<ValueType>(statement->children[0]->token.str,
                                             result);
   return result;
+}
+
+void realRSelfCalculator(Interpreter* interpreter, string name, TokenType type) {
+  int val = interpreter->curContext()->get<int>(name);
+  if (type == TokenType::Inc) {
+    interpreter->curContext()->set<int>(name, val + 1);
+  } else if (type == TokenType::Dec) {
+    interpreter->curContext()->set<int>(name, val - 1);
+  }
 }
 
 template <typename ValueType>
@@ -252,16 +268,13 @@ void Interpreter::popContext() { this->contexts.pop(); }
 void Interpreter::rSelfOperation() {
   for (auto mark : this->marks) {
     if (this->curContext()->has<int>(mark.first)) {
-      int val = this->curContext()->get<int>(mark.first);
-      this->curContext()->set<int>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     } else if (this->curContext()->has<float>(mark.first)) {
-      float val = this->curContext()->get<float>(mark.first);
-      this->curContext()->set<float>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     } else if (this->curContext()->has<double>(mark.first)) {
-      double val = this->curContext()->get<double>(mark.first);
-      this->curContext()->set<double>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     }
   }
@@ -366,7 +379,6 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
   switch (ast->type) {
   case ASTType::Comma:
     return commaCalculator<T>(this, ast);
-    break;
   case ASTType::Binary:
     record(ast->token.lineNum);
     return binaryCalculator<T>(this, ast);
@@ -389,6 +401,7 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     } else if (ast->token.type == TokenType::S_Colon) {
       return T(0);
     }
+      return T(0);
   default:
     cerr << "calculate error" << endl;
     return T(0);

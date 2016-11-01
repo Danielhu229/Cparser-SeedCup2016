@@ -78,3 +78,80 @@ int Utility::findLastSColon(vector<Token *> &tokens, int begin, int end) {
   }
   return sColonPos;
 }
+
+int Utility::findRph(vector<Token *> &tokens, int begin, int end) {
+  int pos = begin;
+  while (pos < end) {
+    if (tokens[pos]->type == TokenType::R_PH) {
+      break;
+    }
+    pos++;
+  }
+  return pos;
+}
+
+int Utility::findLastElse(vector<Token *> &tokens, int begin, int end) {
+  bool findSingle = false;
+  int rst = begin;
+  while (rst < end) {
+    if (tokens[rst]->type == TokenType::Else) {
+      int tmp = rst + 1;
+      if (tokens[tmp]->type == TokenType::If) {
+        rst++;
+      } else if (tokens[tmp]->type == TokenType::L_BR) {
+        rst = Utility::findBr(tokens, tmp, end) + 1;
+        break;
+      } else if (tokens[tmp]->type != TokenType::For
+          && tokens[tmp]->type != TokenType::DO
+          && tokens[tmp]->type != TokenType::While
+          && tokens[tmp]->type != TokenType::If) {
+        // found no '{' at if branch
+        rst = tmp;
+        while (rst < end) {
+          if (tokens[rst]->type == TokenType::S_Colon) {
+            return rst + 1;
+          }
+          rst++;
+        }
+      } else {
+        // find the first scolon
+        rst++;
+      }
+    } else if (tokens[rst]->type == TokenType::L_PH) {
+      int rPh = Utility::findRph(tokens, rst, end);
+      int tmp = rPh + 1;
+      if (tokens[tmp]->type == TokenType::L_BR) {
+        rst = Utility::findBr(tokens, tmp, end);
+      } else if (tokens[tmp]->type != TokenType::For
+          && tokens[tmp]->type != TokenType::While
+          && tokens[tmp]->type != TokenType::DO
+          && tokens[tmp]->type != TokenType::If) {
+        // found no '{' at if branch
+        rst = tmp;
+        while (rst < end) {
+          if (tokens[rst]->type == TokenType::S_Colon) {
+            findSingle = true;
+            break;
+          }
+          rst++;
+        }
+      } else {
+        // find the first scolon
+        rst = Utility::findRph(tokens, tmp, end);
+      }
+    } else if (tokens[rst - 1]->type == TokenType::S_Colon && findSingle) {
+      break;
+    } else if (tokens[rst]->type == TokenType::DO || tokens[rst]->type == TokenType::If || tokens[rst]->type == TokenType::For) {
+      break;
+    } else {
+      while (rst < end) {
+        if (tokens[rst]->type == TokenType::S_Colon) {
+          break;
+        }
+        rst++;
+      }
+    }
+    rst++;
+  }
+  return rst;
+}
