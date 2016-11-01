@@ -92,146 +92,9 @@ cParser::Statement *Expr::parseDowhileExpr() {
 
 cParser::Statement *Expr::parseIfExpr() {
   int begin = pos - 1;
-  int r_brPos = (int) mTokens.size();
-  int sColonPos = pos;
   int end = pos;
+  end = Utility::findLastElse(mTokens, pos, (int) mTokens.size());
   // find the initial pos of if that no else before it.
-  int initial = pos;
-  while (initial < mTokens.size()) {
-    if (mTokens[initial]->type == TokenType::If && mTokens[initial - 1]->type != TokenType::Else) {
-      break;
-    }
-    initial++;
-  }
-  int elsePos = initial;
-  int index = pos;
-  // find the last occurrence of else
-  while (index < initial) {
-    if (mTokens[index]->type == TokenType::Else) {
-      elsePos = index;
-    }
-    index++;
-  }
-
-  if (elsePos == initial) {
-    // no else branch find,then we just find the last occurrence of '}' or the last occurrence of ';'
-    // first make sure if branch has '{'
-    int r_phPos = pos;
-    // look for ')' first;
-    while (r_phPos < initial && mTokens[r_phPos]->type != TokenType::R_PH) {
-      r_phPos++;
-    }
-
-    int l_brPos = r_phPos + 1;
-
-    if (mTokens[l_brPos]->type != TokenType::L_BR) {
-      // no '{' found in if branch, then we find the correct pos of proper ';'
-      // TODO: deal with this case:
-      // if ()
-      //    int a = 1;
-      // a++;
-      // if () {
-      // }
-
-      int keywords = r_phPos + 1;
-      if (mTokens[keywords]->type == TokenType::For) {
-        // tricky part, we directly find a for,
-        // then we should look the last semi-colon that has the same line number with the third semi-colon
-        int sColonCount = 0;
-        int tmp = keywords;
-        while (sColonCount < 3) {
-          if (mTokens[tmp]->type == TokenType::S_Colon) {
-            sColonPos = tmp;
-            sColonCount++;
-          }
-          tmp++;
-        }
-        sColonPos = Utility::findLastSColon(mTokens, sColonPos, initial);
-      } else {
-        sColonPos = Utility::findLastSColon(mTokens, keywords, initial);
-      }
-    } else {
-      // we find a '{' in if branch, we should look for the '}'
-      r_brPos = Utility::findBr(mTokens, l_brPos, (int) mTokens.size());
-    }
-    // find '}'
-    if (r_brPos != -1 && r_brPos != mTokens.size()) {
-      end = r_brPos + 1;
-    } else {
-      // '}' not found, use semiColon pos instead
-      end = sColonPos + 1;
-    }
-  } else {
-
-    // we find a else, elsePos now is the last occurrence of keyword else
-    int r_phPos;
-    int l_brPos;
-    // first we check this else
-    if (mTokens[elsePos + 1]->type == TokenType::If) {
-      // we have a else if in the end
-      r_phPos = elsePos + 1;
-      while (r_phPos < initial && mTokens[r_phPos]->type != TokenType::R_PH) {
-        r_phPos++;
-      }
-      l_brPos = r_phPos + 1;
-
-      if (mTokens[l_brPos]->type != TokenType::L_BR) {
-        // no '{' after else if, find the proper pos of ';'
-        int keywords = l_brPos + 1;
-        if (mTokens[keywords]->type == TokenType::For) {
-          // tricky part, we directly find a for,
-          // then we should look the last semi-colon that has the same line number with the third semi-colon
-          int sColonCount = 0;
-          int tmp = keywords;
-          while (sColonCount < 3) {
-            if (mTokens[tmp]->type == TokenType::S_Colon) {
-              sColonPos = tmp;
-              sColonCount++;
-            }
-            tmp++;
-          }
-          sColonPos = Utility::findLastSColon(mTokens, sColonPos, initial);
-        } else {
-          sColonPos = Utility::findLastSColon(mTokens, keywords, initial);
-        }
-      } else {
-        // find '{' after else if
-        r_brPos = Utility::findBr(mTokens, elsePos, (int) mTokens.size());
-      }
-    } else {
-      // we only have a else in the end
-      l_brPos = elsePos + 1;
-      if (mTokens[l_brPos]->type != TokenType::L_BR) {
-        // no '{' after else, find the proper pos of ';'
-        int keywords = elsePos + 1;
-        if (mTokens[keywords]->type == TokenType::For) {
-          // tricky part, we directly find a for,
-          // then we should look the last semi-colon that has the same line number with the third semi-colon
-          int sColonCount = 0;
-          int tmp = keywords;
-          while (sColonCount < 3) {
-            if (mTokens[tmp]->type == TokenType::S_Colon) {
-              sColonPos = tmp;
-              sColonCount++;
-            }
-            tmp++;
-          }
-          sColonPos = Utility::findLastSColon(mTokens, sColonPos, initial);
-        } else {
-          sColonPos = Utility::findLastSColon(mTokens, keywords, initial);
-        }
-      } else {
-        // find '{' after else
-        r_brPos = Utility::findBr(mTokens, elsePos, (int) mTokens.size());
-      }
-    }
-    // find '}'
-    if (r_brPos != -1 && r_brPos != mTokens.size()) {
-      end = r_brPos + 1;
-    } else {
-      end = sColonPos + 1;
-    }
-  }
   pos = end;
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
@@ -285,11 +148,11 @@ cParser::Statement *Expr::parseForExpr() {
       forPos++;
     }
     int tmp = forPos - 1;
-      while (mTokens[tmp]->type == TokenType::S_Colon
-          && mTokens[tmp - 1]->type == TokenType::S_Colon
-          && mTokens[tmp]->lineNum == mTokens[tmp - 1]->lineNum) {
-        tmp--;
-      }
+    while (mTokens[tmp]->type == TokenType::S_Colon
+        && mTokens[tmp - 1]->type == TokenType::S_Colon
+        && mTokens[tmp]->lineNum == mTokens[tmp - 1]->lineNum) {
+      tmp--;
+    }
     sColonPos = tmp;
   }
   if (r_brPos == -1) {
