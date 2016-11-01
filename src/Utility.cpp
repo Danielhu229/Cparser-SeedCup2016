@@ -1,18 +1,19 @@
 //
-// Created by 胡一鸣 on 16/10/27.
+// Created by Danielhu <yimingdz@gmail.com> on 16/10/27.
 //
 
 #include <Token.h>
 #include <TokenType.h>
 #include <Utility.h>
-#include <stack>
 #include <iostream>
+#include <stack>
 using namespace cParser;
 
 vector<Token *> Utility::combineElseIf(vector<Token *> &tokens) {
   vector<Token *> combinedTokens;
   for (int i = 0; i < static_cast<int>(tokens.size()); ++i) {
-    if (tokens[i]->type == TokenType::Else && i + 1 < static_cast<int>(tokens.size()) &&
+    if (tokens[i]->type == TokenType::Else &&
+        i + 1 < static_cast<int>(tokens.size()) &&
         tokens[i + 1]->type == TokenType::If) {
       combinedTokens.push_back(new Token("else if", TokenType::ElseIf));
       i++;
@@ -23,7 +24,7 @@ vector<Token *> Utility::combineElseIf(vector<Token *> &tokens) {
   return combinedTokens;
 }
 
-string Utility::intsToString(vector<int>& src) {
+string Utility::intsToString(vector<int> &src) {
   string result;
   for (int num : src) {
     result += to_string(num);
@@ -66,7 +67,8 @@ int Utility::findLastSColon(vector<Token *> &tokens, int begin, int end) {
     if (tokens[pos]->type == TokenType::S_Colon) {
       // find the first occurrence of ';'
       int tmp = pos;
-      while (tmp < end && tokens[tmp]->type == TokenType::S_Colon && tokens[tmp]->lineNum == tokens[pos]->lineNum) {
+      while (tmp < end && tokens[tmp]->type == TokenType::S_Colon &&
+             tokens[tmp]->lineNum == tokens[pos]->lineNum) {
         tmp++;
       }
       sColonPos = tmp - 1;

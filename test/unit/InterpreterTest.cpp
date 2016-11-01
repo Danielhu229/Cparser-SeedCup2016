@@ -1,5 +1,5 @@
 //
-// Created by 胡一鸣 on 16/10/28.
+// Created by Danielhu <yimingdz@gmail.com> on 16/10/28.
 //
 
 #include "Interpreter.h"
@@ -32,15 +32,19 @@ TEST(calculateFibonacci, Statement) {
   std::string a("int n = 6;printf(\"%d \", __LINE__);\n"
                     "    int result;  printf(\"%d \", __LINE__);\n"
                     "        int previous_result;  printf(\"%d \", __LINE__);\n"
-                    "\t    int previous_pre_result;  printf(\"%d \", __LINE__);\n"
+                    "\t    int previous_pre_result;  printf(\"%d \",
+__LINE__);\n"
                     "\t        result=1;  printf(\"%d \", __LINE__);\n"
                     "\t\t    previous_result=1;  printf(\"%d \", __LINE__);\n"
                     "\t\t        while(printf(\"%d \", __LINE__), n>2)  \n"
                     "\t    {  \n"
                     "\t\t            n--;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t            previous_pre_result=previous_result;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t\t            previous_result=result;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t\t\t            result=previous_result+previous_pre_result; printf(\"%d \", __LINE__); \n"
+                    "\t\t\t            previous_pre_result=previous_result;
+printf(\"%d \", __LINE__);\n"
+                    "\t\t\t\t            previous_result=result;  printf(\"%d
+\", __LINE__);\n"
+                    "\t\t\t\t\t
+result=previous_result+previous_pre_result; printf(\"%d \", __LINE__); \n"
                     "\t\t\t\t\t\t        }  \n"
                     "    printf(\"\", result);  printf(\"%d \", __LINE__);");
   auto interpreter = new Interpreter();
@@ -67,7 +71,6 @@ TEST(declarationWithCommnt, Statement) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "2");
 }
-
 
 TEST(calculateSigned, Statement) {
   std::string a("int i = -(3+5);");
@@ -150,20 +153,20 @@ TEST(printf, runControl) {
 
 TEST(printfMulti, runControl) {
   std::string a("int pen;\n"
-                    "int apple;\n"
-                    "int apple_pen;\n"
-                    "\n"
-                    "pen = 1;\n"
-                    "apple = 2;\n"
-                    "apple_pen = apple + pen;\n"
-                    "\n"
-                    "int pineapple = 4;\n"
-                    "int pineapple_pen = pineapple + pen;\n"
-                    "\n"
-                    "printf(\"I have a pen. %d\\n\", pen);\n"
-                    "printf(\"I have an apple. %d\\n\", apple);\n"
-                    "/* PPAP */\n"
-                    "printf(\"Pen-pineapple-apple pen.\\n\");");
+                "int apple;\n"
+                "int apple_pen;\n"
+                "\n"
+                "pen = 1;\n"
+                "apple = 2;\n"
+                "apple_pen = apple + pen;\n"
+                "\n"
+                "int pineapple = 4;\n"
+                "int pineapple_pen = pineapple + pen;\n"
+                "\n"
+                "printf(\"I have a pen. %d\\n\", pen);\n"
+                "printf(\"I have an apple. %d\\n\", apple);\n"
+                "/* PPAP */\n"
+                "printf(\"Pen-pineapple-apple pen.\\n\");");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -212,7 +215,6 @@ TEST(IfWithElseIf, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 */
-
 
 TEST(IfWithElseIfWithElse, runControl) {
   std::string a("int apple;\n"
@@ -275,7 +277,8 @@ TEST(ForMoreTimes, runControl) {
 // TODO: what the f**k, no for ahead!!!
 /*
 TEST(ForWithComma, runControl) {
-  std::string a("int j = 0;\n for(int a = 4, b = 3, c = 5, d = 2; a + b*2 < c + d;"
+  std::string a("int j = 0;\n for(int a = 4, b = 3, c = 5, d = 2; a + b*2 < c +
+d;"
                     "a = a - b, b++, c--) {\n j = 2; \n}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
@@ -308,13 +311,13 @@ TEST(MultiFor, runControl) {
 
 TEST(MultiFor2, runControl) {
   std::string a("int i, j;\n"
-                    "\n"
-                    "for (i = 0; i < 2; i++) {\n"
-                    "  int i = 2;\n"
-                    "  for (; i <= 2;) {\n"
-                    "    i++;j++;\n"
-                    "  }\n"
-                    "}");
+                "\n"
+                "for (i = 0; i < 2; i++) {\n"
+                "  int i = 2;\n"
+                "  for (; i <= 2;) {\n"
+                "    i++;j++;\n"
+                "  }\n"
+                "}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -324,13 +327,12 @@ TEST(MultiFor2, runControl) {
 }
 
 TEST(ForIf, runControl) {
-  std::string a(
-      "int a = 0, b = 0;\n"
-          "if (a <= 0) {\n"
-          "    for (int i = 0; i != 5; i++) {\n"
-          "        b = i;\n"
-          "    }\n"
-          "}");
+  std::string a("int a = 0, b = 0;\n"
+                "if (a <= 0) {\n"
+                "    for (int i = 0; i != 5; i++) {\n"
+                "        b = i;\n"
+                "    }\n"
+                "}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -391,7 +393,8 @@ TEST(DoWhile, runControl) {
 }
 
 TEST(IfInsideFor, runControl) {
-  std::string a("int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
+  std::string a(
+      "int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -437,7 +440,7 @@ TEST(MultiIf, runControl) {
 }
  */
 
-//TEST(WhileInsideForComplex, runControl) {
+// TEST(WhileInsideForComplex, runControl) {
 //  std::string a("int i = 2;\n"
 //                    "int j = 0;\n"
 //                    "for ( ; i > 0; i--){\n"
