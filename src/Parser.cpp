@@ -115,43 +115,9 @@ Statement *Parser::blockParser(vector<Token *> &tokens, int begin, int end,
   // the tokens[end - 1] will be '}', we just iterate the inner part of '{ }'
   while (index < end - 1) {
     if (tokens[index]->type == TokenType::If) {
-      int sColonPos = -1;
-      int elsePos = index;
-      while (elsePos < end && tokens[elsePos]->type != TokenType::Else) {
-        elsePos++;
-      }
-      if (elsePos == end) {
-        int brPos = Utility::findBr(tokens, index, end - 1);
-        sColonPos = Utility::findLastSColon(tokens, index, end);
-        if (brPos != -1 && brPos != end) {
-          ast->children.push_back(Parser::parseTokens(tokens, index, brPos + 1));
-          index = brPos + 1;
-        } else {
-          ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
-          index = sColonPos + 1;
-        }
-      } else {
-        // else found
-        // we find a else.
-        while (1) {
-          if (elsePos < end
-              && (tokens[elsePos]->type == TokenType::Else && tokens[elsePos + 1]->type != TokenType::If)) {
-            break;
-          }
-          elsePos++;
-        }
-        // find a else without an if behind it.
-        int pos = elsePos;
-        int brPos = Utility::findBr(tokens, pos, end - 1);
-        sColonPos = Utility::findLastSColon(tokens, pos, end);
-        if (brPos != end) {
-          ast->children.push_back(Parser::parseTokens(tokens, index, brPos + 1));
-          index = brPos + 1;
-        } else {
-          ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
-          index = sColonPos + 1;
-        }
-      }
+      int elsePos = Utility::findLastElse(tokens, index + 1, end - 1);
+      ast->children.push_back(Parser::parseTokens(tokens, index, elsePos + 1));
+      index = elsePos + 1;
     } else if (tokens[index]->type == TokenType::For) {
       int brPos = Utility::findBr(tokens, index, end - 1);
       if (brPos != -1 && brPos != end) {
@@ -220,6 +186,8 @@ Statement *Parser::blockParser(vector<Token *> &tokens, int begin, int end,
       sColonPos = Utility::findLastSColon(tokens, whilePos, end);
       ast->children.push_back(Parser::parseTokens(tokens, index, sColonPos + 1));
       index = sColonPos + 1;
+    } else if (tokens[index]->type == TokenType::Else) {
+      index++;
     } else {
       // try find the occurrence of ';'
       int sColonPos = index;
@@ -395,35 +363,38 @@ ParserFun ifParser = [](vector<Token *> &tokens, int begin, int end,
   }
 
   ast->children.push_back(Parser::parseTokens(tokens, position + 2, rPos));
-
-  while (elsePos < end) {
-    if (tokens[elsePos]->type == TokenType::Else) {
-      break;
+  stack<int> ifStack;
+  int pos = position;
+  while (pos < end) {
+    if (tokens[pos]->type == TokenType::If) {
+      ifStack.push(pos);
+    } else if (tokens[pos]->type == TokenType::Else) {
+      ifStack.pop();
+      if (ifStack.empty()) {
+        elsePos = pos;
+        break;
+      }
     }
-    elsePos++;
+    pos++;
   }
-
-  if (tokens[elsePos - 1]->type == TokenType::S_Colon) {
-    ast->children.push_back(Parser::parseTokens(tokens, rPos + 1, elsePos));
-  } else if (tokens[elsePos - 1]->type == TokenType::R_BR) {
-    ast->children.push_back(Parser::blockParser(tokens, rPos + 1, elsePos, rPos + 1));
+  if (!ifStack.empty()) {
+    if (tokens[end - 1]->type == TokenType::R_BR) {
+      ast->children.push_back(Parser::blockParser(tokens, rPos + 1, end, rPos + 1));
+    } else {
+      ast->children.push_back(Parser::parseTokens(tokens, rPos + 1, end));
+    }
+    ast->children.push_back(nullptr);
   } else {
-    // Invalid input!
-    // TODO: error handling!
-    ast->children.push_back(Parser::parseTokens(tokens, rPos + 1, elsePos));
-  }
-
-  if (elsePos != end) {
-    // found else branch
+    if (tokens[elsePos - 1]->type == TokenType::R_BR) {
+      ast->children.push_back(Parser::blockParser(tokens, rPos + 1, elsePos, rPos + 1));
+    } else {
+      ast->children.push_back(Parser::parseTokens(tokens, rPos + 1, elsePos));
+    }
     if (tokens[elsePos + 1]->type == TokenType::L_BR) {
-      // find a '{'
       ast->children.push_back(Parser::blockParser(tokens, elsePos + 1, end, elsePos + 1));
     } else {
-      // not a '{'
       ast->children.push_back(Parser::parseTokens(tokens, elsePos + 1, end));
     }
-  } else {
-    ast->children.push_back(Parser::parseTokens(tokens, elsePos + 1, end));
   }
   return ast;
 };

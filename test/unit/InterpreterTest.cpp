@@ -335,3 +335,39 @@ TEST(IfInsideFor, runControl) {
 //  interpreter->run();
 //  auto test = Utility::intsToString(interpreter->runLines);
 //}
+
+TEST(IfElseComplex, runControl) {
+  std::string a("int a = 0;\n"
+                    "int b = 1;\n"
+                    "int c = 2;\n"
+                    "if (a == 0) {\n"
+                    "  if (b == 0) {\n"
+                    "    if (c == 2){\n"
+                    "      c++;\n"
+                    "    }\n"
+                    "    else\n"
+                    "      c--;\n"
+                    "  }\n"
+                    "  else {\n"
+                    "    if (c == 2)\n"
+                    "      c++;\n"
+                    "    else\n"
+                    "      c--;\n"
+                    "  }\n"
+                    "}\n"
+                    "else {\n"
+                    "  a++;\n"
+                    "}\n"
+                    "\n"
+                    "if (a== -1){\n"
+                    "  a++;\n"
+                    "}\n"
+                    "else if (a== 0){\n"
+                    "  a++;\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 4 5 13 14 23 26 27");
+}
