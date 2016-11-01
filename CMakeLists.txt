@@ -16,6 +16,6 @@ set(C_PARSER_SRC
         src/Lexer.cpp
         src/Token.cpp
         src/Utility.cpp
-        src/Interpreter.cpp src/Expr.cpp)
+        src/Interpreter.cpp src/AheadWatcher.cpp)
 
 add_executable(SeedCup2016 ${C_PARSER_SRC} ${C_PARSER_HEAD})

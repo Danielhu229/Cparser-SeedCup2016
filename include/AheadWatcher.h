@@ -5,24 +5,20 @@
 #ifndef C_PARSER_EXPR_H
 #define C_PARSER_EXPR_H
 
-#include "Token.h"
 #include "AST.h"
+#include "Token.h"
 #include <vector>
 
 namespace cParser {
-class Expr {
- private:
+class AheadWatcher {
+private:
   std::vector<Token *> mTokens;
 
   Token *curToken;
   int pos;
-  Token *&getNextToken() {
-    return curToken = mTokens[pos++];
-  }
+  Token *&getNextToken() { return curToken = mTokens[pos++]; }
 
-  Token *&lookAheadToken(int offset) {
-    return mTokens[pos + offset - 1];
-  }
+  Token *&lookAheadToken(int offset) { return mTokens[pos + offset - 1]; }
 
   /*!
    * parse the if statement.
@@ -64,37 +60,35 @@ class Expr {
    * parse a expression
    * @return a expression statement
    */
-  cParser::Statement *parseExpr();
+  cParser::Statement *watchExpr();
 
   /*!
    * parse a declaration statement of variable
    * @return a declaration statement of variable
    */
-  cParser::Statement *parseVarDeclaration();
+  cParser::Statement *watchVarDeclaration();
 
   /*!
    * parse a declaration statement of function
    * @return a declaration statement of function
    */
-  cParser::Statement *parseFuncDeclaration();
+  cParser::Statement *watchFuncDeclaration();
 
   /*!
    * parse a dowhile statement
    * @return a dowhile statement
    */
-  cParser::Statement* parseDowhileExpr();
+  cParser::Statement *watchDowhileExpr();
 
- public:
+public:
   std::vector<cParser::Statement *> statements;
-  Expr(const vector<Token *> &tokens) : mTokens(tokens), pos(0){ }
+  AheadWatcher(const vector<Token *> &tokens) : mTokens(tokens), pos(0) {}
 
   /*!
    * the entrance of parsing
    * @return true if parsing successly, false otherwise.
    */
   bool parse();
-
-
 };
-}
-#endif //C_PARSER_EXPR_H
+} // namespace cParser
+#endif // C_PARSER_EXPR_H

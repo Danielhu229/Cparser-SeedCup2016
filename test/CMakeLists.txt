@@ -25,7 +25,7 @@ set(C_PARSER_SRC
         ../src/Lexer.cpp
         ../src/Utility.cpp
         ../src/Interpreter.cpp
-        ../src/Expr.cpp
+        ../src/AheadWatcher.cpp
         )
 
 add_executable(SeedCup2016_Test ${C_PARSER_SRC} ${C_PARSER_HEAD})

@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "Expr.h"
+#include "AheadWatcher.h"
 
 using namespace cParser;
 
@@ -19,7 +19,7 @@ TEST(shouldGetIfExpr, parseIfExpr) {
                                         new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -39,7 +39,7 @@ TEST(shouldGetIfExprNoBrackets, parseIfExpr) {
                                         new Token("i", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -63,7 +63,7 @@ TEST(shouldGetIfElseExpr, parseIfExpr) {
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -87,7 +87,7 @@ TEST(shouldGetIfNoBracketsElseExpr, parseIfExpr) {
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -115,7 +115,7 @@ TEST(shouldGetIfElseNoBracketsExpr, parseIfExpr) {
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon)
                                     });
 
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -140,7 +140,7 @@ TEST(shouldGetIfElseEitherNoBracketsExpr, parseIfExpr) {
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon)
                                     });
 
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -172,7 +172,7 @@ TEST(shouldGetIfElseIfExpr, parseIfExpr) {
                                         new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -208,7 +208,7 @@ TEST(shouldGetIfElseIfNoneBracketsExpr, parseIfExpr) {
                                         new Token("else", TokenType::Else), new Token("h", TokenType::Var),
                                         new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -237,7 +237,7 @@ TEST(shouldGetIfNoBracketsElseIfExpr, parseIfExpr) {
                                         new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements[0]->token.type, TokenType::If);
@@ -274,7 +274,7 @@ TEST(shouldGetIfElseIfNoBracketsExpr, parseIfExpr) {
                                         new Token("h", TokenType::Var),
                                         new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -320,7 +320,7 @@ TEST(shouldGetMultiIfElseIfExpr, parseIfExpr) {
                                         new Token("++", TokenType::Inc), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -339,7 +339,7 @@ TEST(shouldGetVarDec, parseDeclare) {
                                         new Token("=", TokenType::Assign), new Token("1", TokenType::Num),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -356,7 +356,7 @@ TEST(shouldGetWhileExpr, parseWhileExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -376,7 +376,7 @@ TEST(shouldGetWhileNoBrackets, parseWhileExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -399,7 +399,7 @@ TEST(shouldGetForExpr, parseForExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -423,7 +423,7 @@ TEST(shouldGetExpr, parseExpr) {
 //                                        new Token("j", TokenType::Var), new Token("=", TokenType::Assign),
 //                                        new Token("5", TokenType::Num), new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -437,7 +437,7 @@ TEST(shouldGetMultiExpr, parseExpr) {
                                         new Token("j", TokenType::Var), new Token("=", TokenType::Assign),
                                         new Token("5", TokenType::Num), new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -462,7 +462,7 @@ TEST(shouldGetMultiExprComplex, parse) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 3);
@@ -497,7 +497,7 @@ TEST(shouldGetForIfExprComplex, parse) {
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -525,7 +525,7 @@ TEST(shouldGetForWhileExprComplex, parse) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -557,7 +557,7 @@ TEST(shouldGetIfForExprComplex, parse) {
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
 
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -587,7 +587,7 @@ TEST(shouldGetIfWhileExprComplex, parse) {
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
 
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -614,7 +614,7 @@ TEST(shouldGetWhileInsideIf, parseIfExpr) {
                                         new Token("}", TokenType::R_BR),
 
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -642,7 +642,7 @@ TEST(shouldGetWhileNoBracketsInsideIf, parseIfExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -668,7 +668,7 @@ TEST(shouldGetWhileInsideIfNoneBrackets, parseIfExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -697,7 +697,7 @@ TEST(shouldGetWhileInsideIfElse, parseIfExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -729,7 +729,7 @@ TEST(shouldGetWhileInsideIfElseNoBrackets, parseIfExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -758,7 +758,7 @@ TEST(shouldGetWhileInsideIfElseNoneBrackets, parseIfExpr) {
                                         new Token("a", TokenType::Var),
                                         new Token("--", TokenType::Dec), new Token(";", TokenType::S_Colon),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -790,7 +790,7 @@ TEST(shouldGetForInsideIf, parseIfExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -822,7 +822,7 @@ TEST(shouldGetForNoBracketsInsideIf, parseIfExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -852,7 +852,7 @@ TEST(shouldGetForInsideIfNoneBrackets, parseIfExpr) {
                                         new Token("a", TokenType::Var, 3), new Token("++", TokenType::Inc, 3),
                                         new Token(";", TokenType::S_Colon, 3),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -886,7 +886,7 @@ TEST(shouldGetForInsideIfElse, parseIfExpr) {
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -918,7 +918,7 @@ TEST(shouldGetForNoBracketsInsideIfElse, parseIfExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -938,7 +938,7 @@ TEST(shouldGetDoWhileExpr, parseDowhileExpr) {
                                         new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -960,7 +960,7 @@ TEST(shouldGetDoWhileNoBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num, 3), new Token(")", TokenType::R_PH, 3),
                                         new Token(";", TokenType::S_Colon, 3)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements[0]->children[0]->token.type, TokenType::S_Colon);
@@ -986,7 +986,7 @@ TEST(shouldGetForInDoWhileNoBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num, 5), new Token(")", TokenType::R_PH, 5),
                                         new Token(";", TokenType::S_Colon, 5)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1009,7 +1009,7 @@ TEST(shouldGetIfInDoWhileNoBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num, 5), new Token(")", TokenType::R_PH, 5),
                                         new Token(";", TokenType::S_Colon, 5)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1030,7 +1030,7 @@ TEST(shouldGetIfNoBracketsInDoWhileNoBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num, 4), new Token(")", TokenType::R_PH, 4),
                                         new Token(";", TokenType::S_Colon, 4)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1055,7 +1055,7 @@ TEST(shouldGetForNoBracketsInDowhileNoBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num, 4), new Token(")", TokenType::R_PH, 4),
                                         new Token(";", TokenType::S_Colon, 4)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1103,7 +1103,7 @@ TEST(shouldGetComplexExpr1, parse) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 
@@ -1152,7 +1152,7 @@ TEST(shouldGetComplexExpr2, parse) {
                                         new Token("}", TokenType::R_BR),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 
@@ -1188,7 +1188,7 @@ TEST(shouldGetComplexExprNoneBrackets, parse) {
                                         new Token("=", TokenType::Assign, 6), new Token("10", TokenType::Num, 6),
                                         new Token(";", TokenType::S_Colon, 6)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1204,7 +1204,7 @@ TEST(shouldGetMultiSCoonIfExpr, parse) {
                                         new Token(";", TokenType::S_Colon, 2),
                                         new Token("}", TokenType::R_BR, 3),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -1234,7 +1234,7 @@ TEST(shouldGetDoubleIf, parseIfExpr) {
                                         new Token("}", TokenType::R_BR),
                                     });
 
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -1263,7 +1263,7 @@ TEST(shouldGetDoubleFor, parseForExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -1284,7 +1284,7 @@ TEST(shouldGetDoubleWhile, parseWhileExpr) {
                                         new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
                                         new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -1309,7 +1309,7 @@ TEST(shouldGetUltraIf, parseIfExpr) {
                                         new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 3);
@@ -1338,7 +1338,7 @@ TEST(shouldGetIfInsideFor, parseForExpr) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children[1]->token.type, TokenType::L_BR);
@@ -1367,7 +1367,7 @@ TEST(shouldGetWhileInsideFor, parseForExpr) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements[0]->children[3]->children[0]->children.size(), 1);
@@ -1390,7 +1390,7 @@ TEST(shouldGetDowhileInsideIf, parseDowhileExpr) {
                                         new Token(";", TokenType::S_Colon),
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1416,7 +1416,7 @@ TEST(shouldGetDowhileInsideFor, parseForExpr) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1439,7 +1439,7 @@ TEST(shouldGetDowhileInsideWhile, parseWhileExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -1462,7 +1462,7 @@ TEST(shouldGetDoubleDowhile, parseDowhileExpr) {
                                         new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 2);
@@ -1506,7 +1506,7 @@ TEST(shouldGetForInsideFor, parseForExpr) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1524,7 +1524,7 @@ TEST(shouldGetForNobrackets, parseForExpr) {
                                         new Token("a", TokenType::Var, 2), new Token("++", TokenType::Inc, 2),
                                         new Token(";", TokenType::S_Colon, 2),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -1560,7 +1560,7 @@ TEST(shouldGetForInsideNonebracketsFor, parseForExpr) {
                                         new Token("++", TokenType::Inc),
                                         new Token(")", TokenType::R_PH),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1588,7 +1588,7 @@ TEST(shouldGetWhileInsideWhile, parseWhileExpr) {
 
                                         new Token("}", TokenType::R_BR)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
 }
@@ -1614,7 +1614,7 @@ TEST(shouldGetDowhileInsideDowhile, parseDowhileExpr) {
                                         new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -1639,7 +1639,7 @@ TEST(shouldGetDowhileInsideDowhileNoneBrackets, parseDowhileExpr) {
                                         new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
                                         new Token(";", TokenType::S_Colon)
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);
@@ -1673,7 +1673,7 @@ TEST(shouldGetIfInsideIf, parseIfExpr) {
 
                                         new Token("}", TokenType::R_BR),
                                     });
-  Expr expr(*tokens);
+  AheadWatcher expr(*tokens);
   bool rst = expr.parse();
   EXPECT_EQ(true, rst);
   EXPECT_EQ(expr.statements.size(), 1);

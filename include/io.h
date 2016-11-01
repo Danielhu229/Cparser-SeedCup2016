@@ -34,7 +34,7 @@ inline void write(const string &relativePath, const string &content) {
   }
   return;
 }
-}
-};
+} // namespace cParser::io
+}; // namespace cParser::io
 
 #endif // C_PARSER_IO_H

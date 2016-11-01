@@ -4,7 +4,7 @@
 
 #include "Interpreter.h"
 #include "ASTType.h"
-#include "Expr.h"
+#include "AheadWatcher.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Utility.h"
@@ -94,19 +94,20 @@ ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
   ValueType result(0);
   if (statement->token.type == TokenType::Inc) {
     result = interpreter->curContext()->get<ValueType>(
-        statement->children[0]->token.str) +
-        1;
+                 statement->children[0]->token.str) +
+             1;
   } else if (statement->token.type == TokenType::Dec) {
     result = interpreter->curContext()->get<ValueType>(
-        statement->children[0]->token.str) -
-        1;
+                 statement->children[0]->token.str) -
+             1;
   }
   interpreter->curContext()->set<ValueType>(statement->children[0]->token.str,
                                             result);
   return result;
 }
 
-void realRSelfCalculator(Interpreter* interpreter, string name, TokenType type) {
+void realRSelfCalculator(Interpreter *interpreter, string name,
+                         TokenType type) {
   int val = interpreter->curContext()->get<int>(name);
   if (type == TokenType::Inc) {
     interpreter->curContext()->set<int>(name, val + 1);
@@ -143,26 +144,25 @@ void forExecutor(Interpreter *interpreter, Statement *ast) {
   // initialize operation first
   interpreter->execute(ast->children[0]);
   // transform the calculation of condition
-  while (interpreter->calculate<int>(ast->children[1]->children[0])) {
-    bool breakFlag(false);
+  while (ast->children[1]->children.empty() ||
+         interpreter->calculate<int>(ast->children[1]->children[0])) {
     // should enter a new context
+    interpreter->record(ast->token.lineNum);
     interpreter->pushContext();
-
+    bool insideBreakFlag;
     // execute body
     for (auto child : ast->children[3]->children) {
-      // handle
-      if (child->type == ASTType::ChildStatement &&
-          child->children[0]->token.type == TokenType::Break) {
-        breakFlag = true;
+      interpreter->execute(child);
+      if (interpreter->breakFlag) {
+        interpreter->breakFlag = false;
+            insideBreakFlag = true;
         break;
       }
-
-      interpreter->execute(child);
     }
 
     // should leave the context , all variables are freed
     interpreter->popContext();
-    if (breakFlag) {
+    if (insideBreakFlag) {
       break;
     }
     // execute the third statement of for()
@@ -177,21 +177,20 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
   while (condition->type == ASTType::ChildStatement) {
     condition = condition->children[0];
   }
-
   while (interpreter->calculate<int>(condition)) {
-    bool breakFlag(false);
+    interpreter->record(condition->token.lineNum);
+    bool insideBreakFlag(false);
     // execute body
     for (auto child : ast->children[1]->children) {
       // break handle
-      if (child->type == ASTType::ChildStatement &&
-          child->children[0]->token.type == TokenType::Break) {
-        interpreter->record(child->token.lineNum);
-        breakFlag = true;
+      interpreter->execute(child);
+      if (interpreter->breakFlag) {
+        interpreter->breakFlag = false;
+        insideBreakFlag = true;
         break;
       }
-      interpreter->execute(child);
     }
-    if (breakFlag) {
+    if (insideBreakFlag) {
       break;
     }
   }
@@ -298,7 +297,11 @@ void Interpreter::record(int line) {
   }
 }
 
-Interpreter* Interpreter::execute(Statement *ast) {
+Interpreter *Interpreter::execute(Statement *ast) {
+  if (ast->token.type == TokenType::Break) {
+    this->breakFlag = true;
+    record(ast->token.lineNum);
+  }
   switch (ast->type) {
   case ASTType::Comma:
     calculate<int>(ast);
@@ -402,7 +405,7 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     } else if (ast->token.type == TokenType::S_Colon) {
       return T(0);
     }
-      return T(0);
+    return T(0);
   default:
     cerr << "calculate error" << endl;
     return T(0);
@@ -412,17 +415,17 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
 void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
 }
-Interpreter* Interpreter::run() {
+Interpreter *Interpreter::run() {
   while (currentStatement < static_cast<int>(statements.size())) {
     step();
   }
   return this;
 }
 
-Interpreter* Interpreter::build(string source) {
+Interpreter *Interpreter::build(string source) {
   Lexer lexer(source);
   lexer.lexan();
-  Expr expr(lexer.tokens);
+  AheadWatcher expr(lexer.tokens);
   expr.parse();
   this->statements = expr.statements;
   return this;

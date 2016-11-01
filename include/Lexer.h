@@ -4,13 +4,13 @@
 
 #ifndef SEEDCUP_PHASER_H
 #define SEEDCUP_PHASER_H
-#include <iostream>
-#include <functional>
+#include "Token.h"
 #include <fstream>
-#include <string>
+#include <functional>
+#include <iostream>
 #include <map>
 #include <set>
-#include "Token.h"
+#include <string>
 #include <vector>
 using namespace std;
 
@@ -18,7 +18,7 @@ namespace cParser {
 
 class Lexer {
 
- private:
+private:
   const string &code;
   const string old_code;
   int pos;
@@ -31,7 +31,7 @@ class Lexer {
   void push(Token *token);
   map<int, std::function<void()>> functions;
 
- public:
+public:
   map<string, Token> identifiers;
   int line;
   vector<Token *> tokens;
@@ -40,8 +40,8 @@ class Lexer {
    * begin Lexcial analysis;
    */
   void lexan();
-  Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE, ENUM, RETURN, SIZEOF, WHILE, FOR, VOID,
-      MAIN, ASSIGN, EQ;
+  Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE,
+      ENUM, RETURN, SIZEOF, WHILE, FOR, VOID, MAIN, ASSIGN, EQ;
   Token INC, DEC;
   Token ADD, SUB, DIV, MUL;
   Token LE, LT, GE, GT, NE, COND;
@@ -55,9 +55,7 @@ class Lexer {
   Token S_COLON, COLON, COMMA;
   Token DO;
   Token PRINTF;
-
 };
+} // namespace cParser
 
-}
-
-#endif //SEEDCUP_PHASER_H
+#endif // SEEDCUP_PHASER_H

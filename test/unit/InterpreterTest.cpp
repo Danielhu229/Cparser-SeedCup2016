@@ -82,7 +82,7 @@ TEST(calculateSigned2, Statement) {
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
-  // EXPECT_EQ(interpreter->curContext()->get<int>("i"), 8);
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 8);
 }
 
 
@@ -453,6 +453,27 @@ TEST(MultiIf, runControl) {
   interpreter->build(a);
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
+}
+
+TEST(forEmpty, runControl) {
+  std::string a("int a;\n"
+                    "int b = 3;\n"
+                    "a = 2;\n"
+                    "for (;;) {\n"
+                    "\tfor (;;) {\n"
+                    "\t\ta--;\n"
+                    "\t\tif (a <= 0)\n"
+                    "\t\t\tbreak;\n"
+                    "\t}\n"
+                    "\tb--;\n"
+                    "\tif (b <= 0)\n"
+                    "\t\tbreak;\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "2 3 4 5 6 7 5 6 7 8 10 11 4 5 6 7 8 10 11 4 5 6 7 8 10 11 12");
 }
 
 /*

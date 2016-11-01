@@ -14,13 +14,18 @@
 using namespace std;
 
 namespace cParser {
-
+/**
+ * the abstract syntax tree class
+ */
 struct Statement {
   ASTType type;
   Token token;
-  vector<Statement*> children;
-  Statement(ASTType type, Token token) : type(type), token(token), children({}) {}
-  virtual ~Statement() {}
+  /**
+   * childrens of this AST node
+   */
+  vector<Statement *> children;
+  Statement(ASTType type, Token token)
+      : type(type), token(token), children({}) {}
 };
 }
 

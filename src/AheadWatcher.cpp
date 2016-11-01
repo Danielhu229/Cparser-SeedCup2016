@@ -2,7 +2,7 @@
 // Created by aLIEzTed on 10/29/16.
 //
 
-#include "Expr.h"
+#include "AheadWatcher.h"
 #include <vector>
 #include <Parser.h>
 #include <iostream>
@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cParser;
 
-bool Expr::parse() {
+bool AheadWatcher::parse() {
   cParser::Statement *newStat = nullptr;
   while (pos < static_cast<int>(mTokens.size())) {
     getNextToken();
@@ -22,29 +22,29 @@ bool Expr::parse() {
   return true;
 }
 
-cParser::Statement *Expr::parseStatement() {
+cParser::Statement *AheadWatcher::parseStatement() {
   switch (curToken->type) {
     case TokenType::Int:return this->parseDeclare();
     case TokenType::If:return this->parseIfExpr();
     case TokenType::While:return this->parseWhileExpr();
     case TokenType::For:return this->parseForExpr();
     case TokenType::Switch:return this->parseSwitchExpr();
-    case TokenType::DO:return this->parseDowhileExpr();
-    default:return this->parseExpr();
+    case TokenType::DO:return this->watchDowhileExpr();
+    default:return this->watchExpr();
   }
 }
 
-cParser::Statement *Expr::parseDeclare() {
+cParser::Statement *AheadWatcher::parseDeclare() {
   TokenType aheadToken = lookAheadToken(2)->type;
   // func declaration
   if (aheadToken == TokenType::L_PH) {
-    return this->parseFuncDeclaration();
+    return this->watchFuncDeclaration();
   } else {
-    return this->parseVarDeclaration();
+    return this->watchVarDeclaration();
   }
 }
 
-cParser::Statement *Expr::parseVarDeclaration() {
+cParser::Statement *AheadWatcher::watchVarDeclaration() {
   int begin = pos - 1;
   int sColonPos = pos;
   int end;
@@ -56,7 +56,7 @@ cParser::Statement *Expr::parseVarDeclaration() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-cParser::Statement *Expr::parseDowhileExpr() {
+cParser::Statement *AheadWatcher::watchDowhileExpr() {
   int begin = pos - 1;
   // simple way to find end, firstly we find the while pos
   int whilePos = pos - 1;
@@ -90,7 +90,7 @@ cParser::Statement *Expr::parseDowhileExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-cParser::Statement *Expr::parseIfExpr() {
+cParser::Statement *AheadWatcher::parseIfExpr() {
   int begin = pos - 1;
   int end = pos;
   end = Utility::findLastElse(mTokens, pos, (int) mTokens.size());
@@ -99,7 +99,7 @@ cParser::Statement *Expr::parseIfExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-cParser::Statement *Expr::parseExpr() {
+cParser::Statement *AheadWatcher::watchExpr() {
   int begin = pos - 1;
   int sColonPos = pos;
   int end;
@@ -112,16 +112,16 @@ cParser::Statement *Expr::parseExpr() {
 }
 
 //TODO: implement this one
-cParser::Statement *Expr::parseFuncDeclaration() {
+cParser::Statement *AheadWatcher::watchFuncDeclaration() {
   return nullptr;
 }
 
 // TODO: implement this one
-cParser::Statement *Expr::parseSwitchExpr() {
+cParser::Statement *AheadWatcher::parseSwitchExpr() {
   return nullptr;
 }
 
-cParser::Statement *Expr::parseForExpr() {
+cParser::Statement *AheadWatcher::parseForExpr() {
   // in for loop if we should look for the last occurrence of ';'
   int begin = pos - 1;
   int end;
@@ -166,7 +166,7 @@ cParser::Statement *Expr::parseForExpr() {
   return cParser::Parser::parseTokens(mTokens, begin, end);
 }
 
-cParser::Statement *Expr::parseWhileExpr() {
+cParser::Statement *AheadWatcher::parseWhileExpr() {
   // much like what we do in if expression.
   int begin = pos - 1;
   int doPos = pos - 1;

@@ -25,5 +25,5 @@ enum class ASTType {
   Block,
   Printf
 };
-}
+} // namespace cParser
 #endif // C_PARSER_ASTTYPE_H

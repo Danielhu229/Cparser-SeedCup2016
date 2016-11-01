@@ -84,6 +84,8 @@ class Interpreter {
   void step();
 
 public:
+  bool breakFlag;
+
   vector<int> runLines;
 
   vector<Statement *> statements;
@@ -122,7 +124,7 @@ public:
 
   template <typename T> T calculate(Statement *ast);
 
-  Interpreter() : currentStatement(0) { contexts.push(new Context()); }
+  Interpreter() : currentStatement(0), breakFlag(false) { contexts.push(new Context()); }
 };
 } // namespace cParser
 
