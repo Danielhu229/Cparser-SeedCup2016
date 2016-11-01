@@ -27,7 +27,7 @@ TEST(calculateOct, Statement) {
   EXPECT_EQ(result, -5);
 }
 
-/*
+
 TEST(calculateFibonacci, Statement) {
   std::string a("int n = 6;printf(\"%d \", __LINE__);\n"
                     "    int result;  printf(\"%d \", __LINE__);\n"
@@ -48,7 +48,7 @@ TEST(calculateFibonacci, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("result"), 8);
 }
-*/
+
 
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
@@ -455,6 +455,7 @@ TEST(MultiIf, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
 }
 
+//fixme: parsing now is right but the loop is running forever...
 /*
 TEST(LoopComplex, runControl) {
   std::string a("int i = 0, j, k = 0; printf(\"%d \", __LINE__);\n"
@@ -484,5 +485,5 @@ TEST(LoopComplex, runControl) {
   interpreter->build(a);
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
-}
-*/
+}*/
+
