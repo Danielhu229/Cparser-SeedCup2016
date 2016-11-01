@@ -108,17 +108,17 @@ public:
    */
   void rSelfOperation();
 
-  void execute(Statement *ast);
+  Interpreter* execute(Statement *ast);
 
   /**
    * start interpret
    */
-  void run();
+  Interpreter* run();
 
   /**
    * build the abstract syntax trees
    */
-  void build(string source);
+  Interpreter* build(string source);
 
   template <typename T> T calculate(Statement *ast);
 

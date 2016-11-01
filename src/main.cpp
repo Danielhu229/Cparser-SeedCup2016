@@ -13,8 +13,7 @@ using namespace cParser;
 
 int main(int argc, char const *argv[]) {
   Interpreter interpreter;
-  interpreter.build(io::read("input.txt"));
-  interpreter.run();
+  interpreter.build(io::read("input.txt"))->run();
   io::write("output.txt" , Utility::intsToString(interpreter.runLines));
   return 0;
 }

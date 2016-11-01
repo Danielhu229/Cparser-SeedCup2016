@@ -256,7 +256,6 @@ TEST(For, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "1 2 3 2 3 2 3 2 3 2 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
 TEST(ForWithBreak, runControl) {
@@ -277,7 +276,6 @@ TEST(ForMoreTimes, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "1 2 3 2 3 2 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
 TEST(ForWithComma, runControl) {
@@ -299,7 +297,6 @@ TEST(ForWithOutBracket, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "1 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
-  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
 TEST(MultiFor, runControl) {
@@ -457,3 +454,35 @@ TEST(MultiIf, runControl) {
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
 }
+
+/*
+TEST(LoopComplex, runControl) {
+  std::string a("int i = 0, j, k = 0; printf(\"%d \", __LINE__);\n"
+                    "\n"
+                    "for (int x = 0, y = 0; i < 5; i++) { printf(\"%d \", __LINE__);\n"
+                    "  {\n"
+                    "    while (1) { printf(\"%d \", __LINE__);\n"
+                    "      y = 1 + y; printf(\"%d \", __LINE__);\n"
+                    "      printf(\"%d \", __LINE__); if (y < 3) {\n"
+                    "        while (1) { printf(\"%d \", __LINE__);\n"
+                    "          j = k++; printf(\"%d \", __LINE__);\n"
+                    "          {\n"
+                    "            printf(\"%d \", __LINE__); break;\n"
+                    "          }\n"
+                    "        }\n"
+                    "      }\n"
+                    "      else {\n"
+                    "        printf(\"%d \", __LINE__); break;\n"
+                    "      }\n"
+                    "    }\n"
+                    "    printf(\"%d \", __LINE__); if (i == 4) {\n"
+                    "      printf(\"%d \", __LINE__);break;\n"
+                    "    }\n"
+                    "  }\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+}
+*/

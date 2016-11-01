@@ -390,7 +390,6 @@ ParserFun callParser = [](vector<Token *> &tokens, int begin, int end,
 ParserFun printfParser = [](vector<Token *> &tokens, int begin, int end,
                             int position) -> Statement * {
   auto ast = (new Statement(ASTType::Printf, *tokens[position]));
-  int cur_token = begin;
   // skip (, )
   begin += 2;
   end--;

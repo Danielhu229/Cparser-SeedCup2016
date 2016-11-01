@@ -91,7 +91,7 @@ ValueType commaCalculator(Interpreter *interpreter, Statement *statement) {
 
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
-  ValueType result;
+  ValueType result(0);
   if (statement->token.type == TokenType::Inc) {
     result = interpreter->curContext()->get<ValueType>(
         statement->children[0]->token.str) +
@@ -298,7 +298,7 @@ void Interpreter::record(int line) {
   }
 }
 
-void Interpreter::execute(Statement *ast) {
+Interpreter* Interpreter::execute(Statement *ast) {
   switch (ast->type) {
   case ASTType::Comma:
     calculate<int>(ast);
@@ -370,6 +370,7 @@ void Interpreter::execute(Statement *ast) {
   default:
     break;
   }
+  return this;
 }
 
 template <typename T> T Interpreter::calculate(Statement *ast) {
@@ -411,18 +412,20 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
 void Interpreter::markRSelf(string varname, TokenType selfOp) {
   marks[varname] = selfOp;
 }
-void Interpreter::run() {
+Interpreter* Interpreter::run() {
   while (currentStatement < static_cast<int>(statements.size())) {
     step();
   }
+  return this;
 }
 
-void Interpreter::build(string source) {
+Interpreter* Interpreter::build(string source) {
   Lexer lexer(source);
   lexer.lexan();
   Expr expr(lexer.tokens);
   expr.parse();
   this->statements = expr.statements;
+  return this;
 }
 
 } // namespace cParser
