@@ -22,7 +22,7 @@ class Lexer {
   const string &code;
   const string old_code;
   int pos;
-
+  bool negative;
   map<string, Token> keywords;
   Token curr_token;
   void init();

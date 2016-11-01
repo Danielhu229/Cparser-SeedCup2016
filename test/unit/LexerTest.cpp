@@ -7,6 +7,177 @@
 
 using namespace cParser;
 
+TEST(shouldFindPositiveNumber, findNum) {
+  std::string a("+1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+}
+
+TEST(shouldFindNegitiveNumber, findNum) {
+  std::string a("-1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 1);
+}
+
+TEST(shouldFindPositiveNumberAdding, findnum) {
+  std::string a("+1+1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Add);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "1");
+}
+
+TEST(shouldFindNegativeNumberSubbing, findNum) {
+  std::string a("-1-1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "-1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Sub);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "1");
+}
+
+TEST(shouldFindPositiveNumberAdded, findNum) {
+  std::string a("1+ +1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Add);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "1");
+}
+
+TEST(shouldFindNegativeNumberSubbed, findNum) {
+  std::string a("1- -1");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Sub);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "-1");
+}
+
+TEST(shouldFindPositiveNumberAddEachOther, findNum) {
+  std::string a("+1+ +10");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Add);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "10");
+}
+
+TEST(shouldFindNegativeNumberSubEachOther, findNum) {
+
+  std::string a("-1- -10");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[0]->str, "-1");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Sub);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "-10");
+}
+
+TEST(shouldFindPositiveNumberAssign, findNum) {
+  std::string a("a=+10");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[0]->str, "a");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Assign);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "10");
+}
+
+TEST(shouldFindNegativeNumberAssign, findNum) {
+  std::string a("a=-10");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[0]->str, "a");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Assign);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Num);
+  EXPECT_EQ(lexer.tokens[2]->str, "-10");
+}
+
+TEST(shouldFindMultiAdd, findNum) {
+  std::string a("x+++y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 4);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[0]->str, "x");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Inc);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Add);
+}
+
+TEST(shouldFindMultiDec, findNum) {
+  std::string a("x---y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 4);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Var);
+  EXPECT_EQ(lexer.tokens[0]->str, "x");
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Dec);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Sub);
+}
+
+TEST(shouldFindIncAtStart, findInc) {
+  std::string a("++y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 2);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Inc);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Var);
+}
+
+TEST(shouldFindDecAtStart, findDec) {
+  std::string a("--y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 2);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::Dec);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Var);
+}
+
+TEST(shouldFindIncWithSColon, findInc) {
+  std::string a(";++y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::S_Colon);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Inc);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Var);
+}
+
+TEST(shouldFindDecWithSColon, findInc) {
+  std::string a(";--y");
+  Lexer lexer(a);
+  lexer.lexan();
+  EXPECT_EQ(lexer.tokens.size(), 3);
+  EXPECT_EQ(lexer.tokens[0]->type, TokenType::S_Colon);
+  EXPECT_EQ(lexer.tokens[1]->type, TokenType::Dec);
+  EXPECT_EQ(lexer.tokens[2]->type, TokenType::Var);
+}
 
 TEST(shouldFindParentheses, findParenttheses) {
   std::string a("()");
@@ -258,6 +429,7 @@ TEST(shouldFindDec, findDec) {
   EXPECT_EQ(lexer.tokens.size(), 4);
   EXPECT_EQ(lexer.tokens[2]->type, TokenType::Dec);
 }
+
 
 TEST(shouldFindWhile, findWhile) {
   std::string a("while (a < 3) { a++; }");
