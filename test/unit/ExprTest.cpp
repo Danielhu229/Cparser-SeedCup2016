@@ -1374,6 +1374,27 @@ TEST(shouldGetWhileInsideFor, parseForExpr) {
   EXPECT_EQ(expr.statements[0]->children[3]->children[1]->children.size(), 2);
 }
 
+TEST(shouldGetDowhileInsideIf, parseDowhileExpr) {
+  auto tokens = new vector<Token *>({
+                                        new Token("if", TokenType::If), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token(">", TokenType::Gt),
+                                        new Token("0", TokenType::Num),
+                                        new Token(")", TokenType::R_PH),
+                                        new Token("{", TokenType::L_BR),
+                                        new Token("do", TokenType::DO), new Token("{", TokenType::L_BR),
+                                        new Token("a", TokenType::Var), new Token("++", TokenType::Inc),
+                                        new Token(";", TokenType::S_Colon), new Token("}", TokenType::R_BR),
+                                        new Token("while", TokenType::While), new Token("(", TokenType::L_PH),
+                                        new Token("a", TokenType::Var), new Token("!=", TokenType::Ne),
+                                        new Token("10", TokenType::Num), new Token(")", TokenType::R_PH),
+                                        new Token(";", TokenType::S_Colon),
+                                        new Token("}", TokenType::R_BR),
+                                    });
+  Expr expr(*tokens);
+  bool rst = expr.parse();
+  EXPECT_EQ(true, rst);
+}
+
 TEST(shouldGetDowhileInsideFor, parseForExpr) {
   auto tokens = new vector<Token *>({
                                         new Token("for", TokenType::For), new Token("(", TokenType::L_PH),

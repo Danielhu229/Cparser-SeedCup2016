@@ -28,18 +28,18 @@ class Lexer {
   void init();
   void initFunctions();
   void next();
+  void push(Token *token);
   map<int, std::function<void()>> functions;
- public:
 
+ public:
   map<string, Token> identifiers;
   int line;
   vector<Token *> tokens;
   Lexer(const string &code);
-  /*
-   * Lexical analysis
+  /*!
+   * begin Lexcial analysis;
    */
   void lexan();
-  void push(Token *token);
   Token INT, DOUBLE, FLOAT, CHAR, LONG, UNSIGNED, BREAK, SWITCH, CASE, IF, ELSE, ENUM, RETURN, SIZEOF, WHILE, FOR, VOID,
       MAIN, ASSIGN, EQ;
   Token INC, DEC;
