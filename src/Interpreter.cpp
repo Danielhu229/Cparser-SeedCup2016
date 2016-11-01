@@ -1,14 +1,15 @@
 //
-// Created by 胡一鸣 on 16/10/27.
+// Created by Danielhu <yimingdz@gmail.com> on 16/10/27.
 //
 
 #include "Interpreter.h"
 #include "ASTType.h"
+#include "Expr.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Utility.h"
-#include <Expr.h>
 #include <functional>
+#include <map>
 
 using namespace std;
 
@@ -80,25 +81,43 @@ ValueType binaryCalculator(Interpreter *interpreter,
 template <typename ValueType>
 ValueType commaCalculator(Interpreter *interpreter, Statement *statement) {
   ValueType result;
-  for (auto child: statement->children) {
+  for (auto child : statement->children) {
     result = interpreter->calculate<ValueType>(child);
   }
+
+  // comma expression return the last child expression
   return result;
 }
 
-
 template <typename ValueType>
 ValueType lSelfCalculator(Interpreter *interpreter, Statement *statement) {
-  ValueType result = interpreter->curContext()->get<ValueType>(
-                         statement->children[0]->token.str) +
-                     1;
+  ValueType result;
+  if (statement->token.type == TokenType::Inc) {
+    result = interpreter->curContext()->get<ValueType>(
+        statement->children[0]->token.str) +
+        1;
+  } else if (statement->token.type == TokenType::Dec) {
+    result = interpreter->curContext()->get<ValueType>(
+        statement->children[0]->token.str) -
+        1;
+  }
   interpreter->curContext()->set<ValueType>(statement->children[0]->token.str,
                                             result);
   return result;
 }
 
+void realRSelfCalculator(Interpreter* interpreter, string name, TokenType type) {
+  int val = interpreter->curContext()->get<int>(name);
+  if (type == TokenType::Inc) {
+    interpreter->curContext()->set<int>(name, val + 1);
+  } else if (type == TokenType::Dec) {
+    interpreter->curContext()->set<int>(name, val - 1);
+  }
+}
+
 template <typename ValueType>
 ValueType rSelfCalculator(Interpreter *interpreter, Statement *statement) {
+  // mark first, will be performed later
   interpreter->markRSelf(statement->children[0]->token.str,
                          statement->token.type);
   return static_cast<ValueType>(
@@ -121,37 +140,52 @@ ValueType declareVar(Interpreter *interpreter, Statement *statement) {
 }
 
 void forExecutor(Interpreter *interpreter, Statement *ast) {
+  // initialize operation first
   interpreter->execute(ast->children[0]);
+  // transform the calculation of condition
   while (interpreter->calculate<int>(ast->children[1]->children[0])) {
     bool breakFlag(false);
+    // should enter a new context
     interpreter->pushContext();
+
+    // execute body
     for (auto child : ast->children[3]->children) {
+      // handle
       if (child->type == ASTType::ChildStatement &&
           child->children[0]->token.type == TokenType::Break) {
         breakFlag = true;
         break;
       }
+
       interpreter->execute(child);
     }
+
+    // should leave the context , all variables are freed
     interpreter->popContext();
     if (breakFlag) {
       break;
     }
+    // execute the third statement of for()
     interpreter->execute(ast->children[2]);
   }
 }
 
 void whileExecutor(Interpreter *interpreter, Statement *ast) {
+
+  // find the condition
   Statement *condition = ast->children[0];
   while (condition->type == ASTType::ChildStatement) {
     condition = condition->children[0];
   }
+
   while (interpreter->calculate<int>(condition)) {
     bool breakFlag(false);
+    // execute body
     for (auto child : ast->children[1]->children) {
+      // break handle
       if (child->type == ASTType::ChildStatement &&
           child->children[0]->token.type == TokenType::Break) {
-        interpreter->recode(child->token.lineNum);
+        interpreter->record(child->token.lineNum);
         breakFlag = true;
         break;
       }
@@ -163,12 +197,15 @@ void whileExecutor(Interpreter *interpreter, Statement *ast) {
   }
 }
 
+// template specific
 template <> map<string, int> &Context::getVars<int>() { return this->ints; }
 
+// template specific
 template <> map<string, float> &Context::getVars<float>() {
   return this->floats;
 }
 
+// template specific
 template <> map<string, double> &Context::getVars<double>() {
   return this->doubles;
 }
@@ -179,6 +216,7 @@ template <class T> void Context::declare(string name, int value) {
 
 template <class T> void Context::set(string name, T value) {
   auto current = this;
+  // search towards root
   while (current != nullptr) {
     if (current->getVars<T>().find(name) != current->getVars<T>().end()) {
       current->getVars<T>()[name] = value;
@@ -190,6 +228,7 @@ template <class T> void Context::set(string name, T value) {
 
 template <class T> T Context::get(string name) {
   auto current = this;
+  // search towards root
   while (current != nullptr) {
     auto value = current->getVars<T>().find(name);
     if (value != current->getVars<T>().end()) {
@@ -229,16 +268,13 @@ void Interpreter::popContext() { this->contexts.pop(); }
 void Interpreter::rSelfOperation() {
   for (auto mark : this->marks) {
     if (this->curContext()->has<int>(mark.first)) {
-      int val = this->curContext()->get<int>(mark.first);
-      this->curContext()->set<int>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     } else if (this->curContext()->has<float>(mark.first)) {
-      float val = this->curContext()->get<float>(mark.first);
-      this->curContext()->set<float>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     } else if (this->curContext()->has<double>(mark.first)) {
-      double val = this->curContext()->get<double>(mark.first);
-      this->curContext()->set<double>(mark.first, val + 1);
+      realRSelfCalculator(this, mark.first, mark.second);
       marks.erase(mark.first);
     }
   }
@@ -249,7 +285,7 @@ void Interpreter::step() {
   currentStatement++;
 }
 
-void Interpreter::recode(int line) {
+void Interpreter::record(int line) {
   if (line == 0) {
     getchar();
   }
@@ -264,10 +300,10 @@ void Interpreter::recode(int line) {
 
 void Interpreter::execute(Statement *ast) {
   switch (ast->type) {
-    case ASTType::Comma:
-      calculate<int>(ast);
-      break;
-    case ASTType::Binary:
+  case ASTType::Comma:
+    calculate<int>(ast);
+    break;
+  case ASTType::Binary:
     calculate<int>(ast);
     rSelfOperation();
     break;
@@ -285,7 +321,7 @@ void Interpreter::execute(Statement *ast) {
     break;
   case ASTType::Printf:
     execute(ast->children[0]);
-      rSelfOperation();
+    rSelfOperation();
     break;
   case ASTType::Block:
     for (auto child : ast->children) {
@@ -341,31 +377,31 @@ template <typename T> T Interpreter::calculate(Statement *ast) {
     return T(0);
   }
   switch (ast->type) {
-    case ASTType::Comma:
-      return commaCalculator<T>(this, ast);
-      break;
+  case ASTType::Comma:
+    return commaCalculator<T>(this, ast);
   case ASTType::Binary:
-    recode(ast->token.lineNum);
+    record(ast->token.lineNum);
     return binaryCalculator<T>(this, ast);
   case ASTType::LSelf:
-    recode(ast->token.lineNum);
+    record(ast->token.lineNum);
     return lSelfCalculator<T>(this, ast);
   case ASTType::RSelf:
-    recode(ast->token.lineNum);
+    record(ast->token.lineNum);
     return rSelfCalculator<T>(this, ast);
   case ASTType::Final:
     if (ast->token.type == TokenType::Num) {
-      recode(ast->token.lineNum);
+      record(ast->token.lineNum);
       auto s = ast->token.str;
       return static_cast<T>(atof(s.c_str()));
     } else if (ast->token.type == TokenType::Var) {
       return curContext()->get<T>(ast->token.str);
     } else if (ast->token.type == TokenType::Str) {
-      recode(ast->token.lineNum);
+      record(ast->token.lineNum);
       return T(0);
     } else if (ast->token.type == TokenType::S_Colon) {
       return T(0);
     }
+      return T(0);
   default:
     cerr << "calculate error" << endl;
     return T(0);
@@ -388,4 +424,5 @@ void Interpreter::build(string source) {
   expr.parse();
   this->statements = expr.statements;
 }
-}
+
+} // namespace cParser

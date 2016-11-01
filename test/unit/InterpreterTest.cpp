@@ -1,5 +1,5 @@
 //
-// Created by 胡一鸣 on 16/10/28.
+// Created by Danielhu <yimingdz@gmail.com> on 16/10/28.
 //
 
 #include "Interpreter.h"
@@ -32,15 +32,15 @@ TEST(calculateFibonacci, Statement) {
   std::string a("int n = 6;printf(\"%d \", __LINE__);\n"
                     "    int result;  printf(\"%d \", __LINE__);\n"
                     "        int previous_result;  printf(\"%d \", __LINE__);\n"
-                    "\t    int previous_pre_result;  printf(\"%d \", __LINE__);\n"
+                    "\t    int previous_pre_result;  printf(\"%d \",__LINE__);\n"
                     "\t        result=1;  printf(\"%d \", __LINE__);\n"
                     "\t\t    previous_result=1;  printf(\"%d \", __LINE__);\n"
                     "\t\t        while(printf(\"%d \", __LINE__), n>2)  \n"
                     "\t    {  \n"
                     "\t\t            n--;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t            previous_pre_result=previous_result;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t\t            previous_result=result;  printf(\"%d \", __LINE__);\n"
-                    "\t\t\t\t\t            result=previous_result+previous_pre_result; printf(\"%d \", __LINE__); \n"
+                    "\t\t\t            previous_pre_result=previous_result;printf(\"%d \", __LINE__);\n"
+                    "\t\t\t\t            previous_result=result;  printf(\"%d\", __LINE__);\n"
+                    "\t\t\t\t\tresult=previous_result+previous_pre_result; printf(\"%d \", __LINE__); \n"
                     "\t\t\t\t\t\t        }  \n"
                     "    printf(\"\", result);  printf(\"%d \", __LINE__);");
   auto interpreter = new Interpreter();
@@ -48,7 +48,7 @@ TEST(calculateFibonacci, Statement) {
   interpreter->run();
   EXPECT_EQ(interpreter->curContext()->get<int>("result"), 8);
 }
- */
+*/
 
 TEST(declaration, Statement) {
   std::string a("int i = 24;");
@@ -68,7 +68,6 @@ TEST(declarationWithCommnt, Statement) {
   EXPECT_EQ(test, "2");
 }
 
-
 TEST(calculateSigned, Statement) {
   std::string a("int i = -(3+5);");
   auto interpreter = new Interpreter();
@@ -77,24 +76,34 @@ TEST(calculateSigned, Statement) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), -8);
 }
 
-// parsing seems correct but the result goes wrong.
-//TEST(calculateComplex, Statement) {
-//  std::string a("int a = +2;\n"
-//                    "int b = a- -1;\n"
-//                    "\n"
-//                    "if (a>0)\n"
-//                    "  for(;a>0;a--)\n"
-//                    "    b++;\n"
-//                    "\n"
-//                    "if(b>0)\n"
-//                    "  while(b>0)b--;");
-//  auto interpreter = new Interpreter();
-//  interpreter->build(a);
-//  interpreter->run();
-//  auto test = Utility::intsToString(interpreter->runLines);
-//  EXPECT_EQ(test, "1 2 4 5 6 5 6 5 8 9");
-//  EXPECT_EQ(interpreter->curContext()->get<int>("a"), 0);
-//}
+// FIXME: signed num;
+TEST(calculateSigned2, Statement) {
+  std::string a("int i = 3- -5;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  // EXPECT_EQ(interpreter->curContext()->get<int>("i"), 8);
+}
+
+
+TEST(calculateComplex, Statement) {
+  std::string a("int a = +2;\n"
+                    "int b = a- -1;\n"
+                    "\n"
+                    "if (a>0)\n"
+                    "  for(;a>0;a--)\n"
+                    "    b++;\n"
+                    "\n"
+                    "if(b>0)\n"
+                    "  while(b>0)b--;");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 4 5 6 5 6 5 8 9");
+  EXPECT_EQ(interpreter->curContext()->get<int>("a"), 0);
+}
+
 
 TEST(declarationAndCalculate, Statement) {
   std::string a("int i = (4 + 3) * 6 - 10 + 11;");
@@ -149,20 +158,20 @@ TEST(printf, runControl) {
 
 TEST(printfMulti, runControl) {
   std::string a("int pen;\n"
-                    "int apple;\n"
-                    "int apple_pen;\n"
-                    "\n"
-                    "pen = 1;\n"
-                    "apple = 2;\n"
-                    "apple_pen = apple + pen;\n"
-                    "\n"
-                    "int pineapple = 4;\n"
-                    "int pineapple_pen = pineapple + pen;\n"
-                    "\n"
-                    "printf(\"I have a pen. %d\\n\", pen);\n"
-                    "printf(\"I have an apple. %d\\n\", apple);\n"
-                    "/* PPAP */\n"
-                    "printf(\"Pen-pineapple-apple pen.\\n\");");
+                "int apple;\n"
+                "int apple_pen;\n"
+                "\n"
+                "pen = 1;\n"
+                "apple = 2;\n"
+                "apple_pen = apple + pen;\n"
+                "\n"
+                "int pineapple = 4;\n"
+                "int pineapple_pen = pineapple + pen;\n"
+                "\n"
+                "printf(\"I have a pen. %d\\n\", pen);\n"
+                "printf(\"I have an apple. %d\\n\", apple);\n"
+                "/* PPAP */\n"
+                "printf(\"Pen-pineapple-apple pen.\\n\");");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -209,8 +218,9 @@ TEST(IfWithElseIf, runControl) {
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "2 4 5");
-//  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
+  EXPECT_EQ(interpreter->curContext()->get<int>("i"), 1);
 }
+
 
 TEST(IfWithElseIfWithElse, runControl) {
   std::string a("int apple;\n"
@@ -270,7 +280,6 @@ TEST(ForMoreTimes, runControl) {
   EXPECT_EQ(interpreter->curContext()->get<int>("i"), 0);
 }
 
-// fixme: failed to get the correct result of i, but line number passed
 TEST(ForWithComma, runControl) {
   std::string a("int j = 0;\n for(int a = 4, b = 3, c = 5, d = 2; a + b*2 < c + d;"
                     "a = a - b, b++, c--) {\n j = 2; \n}");
@@ -279,7 +288,7 @@ TEST(ForWithComma, runControl) {
   interpreter->run();
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "1 2");
-//  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+EXPECT_EQ(interpreter->curContext()->get<int>("j"), 0);
 }
 
 TEST(ForWithOutBracket, runControl) {
@@ -302,6 +311,38 @@ TEST(MultiFor, runControl) {
   auto test = Utility::intsToString(interpreter->runLines);
   EXPECT_EQ(test, "1 2 3 4 3 4 3 4 3 2 3 4 3 4 3 4 3 2");
   EXPECT_EQ(interpreter->curContext()->get<int>("k"), 2);
+}
+
+TEST(MultiFor2, runControl) {
+  std::string a("int i, j;\n"
+                "\n"
+                "for (i = 0; i < 2; i++) {\n"
+                "  int i = 2;\n"
+                "  for (; i <= 2;) {\n"
+                "    i++;j++;\n"
+                "  }\n"
+                "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "3 4 5 6 5 3 4 5 6 5 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("j"), 2);
+}
+
+TEST(ForIf, runControl) {
+  std::string a("int a = 0, b = 0;\n"
+                "if (a <= 0) {\n"
+                "    for (int i = 0; i != 5; i++) {\n"
+                "        b = i;\n"
+                "    }\n"
+                "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+  EXPECT_EQ(test, "1 2 3 4 3 4 3 4 3 4 3 4 3");
+  EXPECT_EQ(interpreter->curContext()->get<int>("b"), 4);
 }
 
 TEST(ForWhile, runControl) {
@@ -356,7 +397,8 @@ TEST(DoWhile, runControl) {
 }
 
 TEST(IfInsideFor, runControl) {
-  std::string a("int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
+  std::string a(
+      "int a = 1;\n for (a = 0; a < 3; a++) {\n if (a == 1) {\na = 4;\n}\n}");
   auto interpreter = new Interpreter();
   interpreter->build(a);
   interpreter->run();
@@ -400,18 +442,18 @@ TEST(MultiIf, runControl) {
   EXPECT_EQ(test, "1 2 3 4 5 13 14 23 26 27");
 }
 
-//TEST(WhileInsideForComplex, runControl) {
-//  std::string a("int i = 2;\n"
-//                    "int j = 0;\n"
-//                    "for ( ; i > 0; i--){\n"
-//                    "\tprintf(\"hello world!\");\n"
-//                    "\twhile (j <= 2){\n"
-//                    "\t\tprintf(\"hello world!\");\n"
-//                    "\t\tj++;\n"
-//                    "\t}\n"
-//                    "}");
-//  auto interpreter = new Interpreter();
-//  interpreter->build(a);
-//  interpreter->run();
-//  auto test = Utility::intsToString(interpreter->runLines);
-//}
+ TEST(WhileInsideForComplex, runControl) {
+  std::string a("int i = 2;\n"
+                    "int j = 0;\n"
+                    "for (; i > 0; i--){\n"
+                    "\tprintf(\"hello world!\");\n"
+                    "\twhile (j <= 2){\n"
+                    "\t\tprintf(\"hello world!\");\n"
+                    "\t\tj++;\n"
+                    "\t}\n"
+                    "}");
+  auto interpreter = new Interpreter();
+  interpreter->build(a);
+  interpreter->run();
+  auto test = Utility::intsToString(interpreter->runLines);
+}

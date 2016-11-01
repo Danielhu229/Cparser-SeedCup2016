@@ -1,5 +1,5 @@
 //
-// Created by 胡一鸣 on 16/10/27.
+// Created by Danielhu <yimingdz@gmail.com> on 16/10/27.
 //
 
 #ifndef C_PARSER_UTILITY_H
